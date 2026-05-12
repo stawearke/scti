@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCTI Admin — Content Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --red:#C41E3A;--red-dk:#9e1830;--red-lt:#fff0f2;
+  --gold:#D4AF37;--gold-lt:rgba(212,175,55,.13);
+  --navy:#0a2540;--navy2:#0d3b5e;--navy-lt:#122d4a;
+  --gray:#5a6680;--gray-lt:#f4f7fb;--border:#e2e8f0;
+  --white:#fff;--r:12px;--rlg:18px;
+  --sidebar:260px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:#eef1f6;color:#1a1a2e;line-height:1.5;overflow-x:hidden}
+h1,h2,h3,h4,.syne{font-family:'Syne',sans-serif}
+a{text-decoration:none}
+
+/* ── LOGIN ── */
+#loginScreen{position:fixed;inset:0;background:var(--navy);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:white;border-radius:24px;padding:48px 40px;width:100%;max-width:400px;box-shadow:0 32px 80px rgba(0,0,0,.35)}
+.login-logo{display:flex;align-items:center;gap:14px;margin-bottom:32px}
+.login-logo .lm{background:var(--red);width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:white;line-height:1.1;text-align:center}
+.login-logo h1{font-size:1.1rem;font-weight:700;color:var(--navy)}
+.login-logo p{font-size:.6rem;letter-spacing:2px;color:var(--gold);font-weight:700}
+.lf-group{margin-bottom:18px}
+.lf-group label{font-weight:600;font-size:.8rem;color:var(--gray);display:block;margin-bottom:6px}
+.lf-group input{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'Outfit',sans-serif;font-size:.88rem;transition:.2s}
+.lf-group input:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(196,30,58,.1)}
+.login-btn{width:100%;background:var(--red);color:white;border:none;padding:13px;border-radius:50px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:'Outfit',sans-serif;transition:.2s}
+.login-btn:hover{background:var(--red-dk)}
+.login-err{background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:8px;font-size:.8rem;margin-bottom:16px;display:none}
+
+/* ── LAYOUT ── */
+#appShell{display:none}
+.admin-header{background:var(--navy);height:62px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;position:fixed;top:0;left:0;right:0;z-index:500;box-shadow:0 2px 16px rgba(0,0,0,.2)}
+.admin-header .brand{display:flex;align-items:center;gap:12px}
+.admin-header .brand .lm{background:var(--red);width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:11px;color:white;line-height:1.1;text-align:center;flex-shrink:0}
+.admin-header .brand span{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:white}
+.admin-header .brand small{font-size:.58rem;color:var(--gold);letter-spacing:2px;display:block;font-weight:700}
+.hdr-right{display:flex;align-items:center;gap:12px}
+.hdr-badge{background:rgba(255,255,255,.1);border-radius:50px;padding:5px 14px;font-size:.75rem;color:rgba(255,255,255,.8)}
+.hdr-badge.live-on{background:var(--red);color:white;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+.logout-btn{background:rgba(255,255,255,.12);border:none;color:white;padding:7px 16px;border-radius:50px;cursor:pointer;font-size:.78rem;font-family:'Outfit',sans-serif;display:flex;align-items:center;gap:7px;transition:.2s}
+.logout-btn:hover{background:rgba(255,255,255,.2)}
+
+/* ── SIDEBAR ── */
+.sidebar{position:fixed;top:62px;left:0;bottom:0;width:var(--sidebar);background:white;border-right:1px solid var(--border);overflow-y:auto;z-index:400;padding:16px 0}
+.sidebar-section{font-size:.62rem;font-weight:700;letter-spacing:2px;color:var(--gray);padding:14px 20px 6px;opacity:.6}
+.sb-item{display:flex;align-items:center;gap:11px;padding:11px 20px;cursor:pointer;transition:all .18s;border-left:3px solid transparent;color:var(--gray);font-size:.85rem;font-weight:500}
+.sb-item:hover{background:var(--gray-lt);color:var(--navy)}
+.sb-item.on{background:var(--red-lt);border-left-color:var(--red);color:var(--red);font-weight:700}
+.sb-item i{width:20px;text-align:center;font-size:.85rem}
+.sb-item .sb-count{margin-left:auto;background:var(--red);color:white;border-radius:50px;font-size:.6rem;padding:2px 7px;font-weight:700}
+.sb-item.on .sb-count{background:var(--navy)}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sidebar);margin-top:62px;padding:28px;min-height:calc(100vh - 62px)}
+
+/* ── TOASTS ── */
+#toast{position:fixed;bottom:28px;right:28px;z-index:9000;display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--navy);color:white;padding:12px 18px;border-radius:12px;font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.2);animation:slideUp .3s ease;max-width:320px}
+.toast.success{background:#065f46;border-left:4px solid #10b981}
+.toast.error{background:#991b1b;border-left:4px solid var(--red)}
+.toast.info{background:var(--navy);border-left:4px solid var(--gold)}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ── CARDS ── */
+.card{background:white;border-radius:var(--rlg);padding:24px;border:1px solid var(--border);margin-bottom:24px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.card-header h2{font-size:1.1rem;font-weight:700;color:var(--navy)}
+.card-header .ch-left{display:flex;align-items:center;gap:10px}
+.card-header .ch-icon{width:34px;height:34px;background:var(--red-lt);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--red);font-size:.9rem}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px;margin-bottom:24px}
+.stat-card{background:white;border-radius:var(--rlg);padding:20px;border:1px solid var(--border);position:relative;overflow:hidden;cursor:pointer;transition:all .2s}
+.stat-card:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.09);border-color:var(--red)}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--red)}
+.stat-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--navy);line-height:1}
+.stat-lbl{font-size:.75rem;color:var(--gray);margin-top:4px;font-weight:500}
+.stat-icon{position:absolute;top:16px;right:16px;font-size:1.5rem;opacity:.08;color:var(--navy)}
+
+/* ── FORMS ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-grid.cols3{grid-template-columns:repeat(3,1fr)}
+.fg{margin-bottom:0}
+.fg.s2{grid-column:span 2}
+.fg.s3{grid-column:span 3}
+label{font-weight:600;display:block;margin-bottom:5px;color:var(--navy);font-size:.78rem}
+label .r{color:var(--red)}
+input,select,textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:9px;font-family:'Outfit',sans-serif;font-size:.85rem;color:#1a1a2e;transition:.2s;background:white}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(196,30,58,.08)}
+input[type="checkbox"]{width:auto;accent-color:var(--red)}
+.form-sep{grid-column:1/-1;border:none;border-top:1px solid var(--border);margin:6px 0}
+.form-sep-label{grid-column:1/-1;font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;color:var(--red);padding-top:4px;display:flex;align-items:center;gap:8px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:50px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'Outfit',sans-serif;font-size:.82rem;padding:9px 18px}
+.btn-red{background:var(--red);color:white}
+.btn-red:hover{background:var(--red-dk);transform:translateY(-1px)}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-gold:hover{background:#b8942a}
+.btn-navy{background:var(--navy);color:white}
+.btn-navy:hover{background:var(--navy2)}
+.btn-outline{background:transparent;border:1.5px solid var(--red);color:var(--red)}
+.btn-outline:hover{background:var(--red);color:white}
+.btn-ghost{background:var(--gray-lt);color:var(--gray);border:1.5px solid var(--border)}
+.btn-ghost:hover{background:var(--border)}
+.btn-danger{background:#dc2626;color:white}
+.btn-danger:hover{background:#b91c1c}
+.btn-sm{padding:6px 12px;font-size:.74rem}
+.btn-lg{padding:12px 26px;font-size:.9rem}
+
+/* ── TABLES ── */
+.table-wrap{overflow-x:auto;border-radius:var(--r);border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:.82rem}
+th{background:var(--gray-lt);font-weight:700;padding:11px 14px;text-align:left;color:var(--navy);white-space:nowrap}
+td{padding:10px 14px;border-top:1px solid var(--border);color:var(--gray);vertical-align:middle}
+tr:hover td{background:#fafbfc}
+.td-thumb{width:52px;height:40px;border-radius:7px;object-fit:cover}
+.td-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:50px;font-size:.65rem;font-weight:700}
+.badge-red{background:var(--red-lt);color:var(--red)}
+.badge-gold{background:var(--gold-lt);color:#8a6a00}
+.badge-green{background:#d1fae5;color:#065f46}
+.badge-live{background:var(--red);color:white;animation:pulse 2s infinite}
+.badge-navy{background:rgba(10,37,64,.08);color:var(--navy)}
+
+/* ── GALLERY GRID ── */
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:16px}
+.gi{position:relative;border-radius:var(--r);overflow:hidden;aspect-ratio:4/3;background:#eee;border:1px solid var(--border)}
+.gi img{width:100%;height:100%;object-fit:cover;display:block;transition:.2s}
+.gi:hover img{transform:scale(1.04)}
+.gi-del{position:absolute;top:6px;right:6px;background:rgba(220,38,38,.9);color:white;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;font-size:.7rem;display:flex;align-items:center;justify-content:center;opacity:0;transition:.2s}
+.gi:hover .gi-del{opacity:1}
+.gi-order{position:absolute;bottom:6px;left:6px;background:rgba(0,0,0,.6);color:white;font-size:.62rem;padding:2px 7px;border-radius:50px}
+
+/* ── SLIDES ── */
+.slide-row{background:var(--gray-lt);border-radius:var(--r);padding:16px;margin-bottom:14px;border:1px solid var(--border);display:grid;grid-template-columns:90px 1fr auto;gap:16px;align-items:start}
+.slide-preview{width:90px;height:60px;border-radius:8px;object-fit:cover;border:2px solid var(--border)}
+.slide-handle{cursor:grab;color:var(--gray);padding:4px}
+
+/* ── SETTINGS GRID ── */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+
+/* ── APP MODAL ── */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:1000;align-items:center;justify-content:center;padding:20px}
+.modal-bg.on{display:flex}
+.modal-box{background:white;border-radius:var(--rlg);width:100%;max-width:680px;max-height:90vh;overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,.25)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--border);position:sticky;top:0;background:white;z-index:10}
+.modal-head h3{font-size:1rem;color:var(--navy)}
+.modal-close{background:none;border:none;color:var(--gray);cursor:pointer;font-size:1.2rem;line-height:1}
+.modal-body{padding:24px}
+.modal-foot{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:var(--gray-lt);border-radius:0 0 var(--rlg) var(--rlg)}
+
+/* ── APPLICATIONS TABLE ── */
+.app-status{display:inline-flex;align-items:center;gap:5px}
+.status-dot{width:7px;height:7px;border-radius:50%}
+.status-pending .status-dot{background:#f59e0b}
+.status-approved .status-dot{background:#10b981}
+.status-rejected .status-dot{background:var(--red)}
+.status-contacted .status-dot{background:#6366f1}
+
+/* ── LOADING ── */
+.loading-row td{text-align:center;padding:40px;color:var(--gray);font-size:.85rem}
+.spinner{width:24px;height:24px;border:2px solid var(--red-lt);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:52px 24px;color:var(--gray)}
+.empty-state i{font-size:3rem;opacity:.18;margin-bottom:14px;color:var(--navy)}
+.empty-state p{font-size:.88rem}
+
+/* ── CONTACT ENQUIRIES ── */
+.enquiry-row{background:var(--gray-lt);border-radius:var(--r);padding:14px 18px;margin-bottom:10px;border:1px solid var(--border)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  :root{--sidebar:0px}
+  .sidebar{transform:translateX(-260px);transition:.3s;width:260px}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .form-grid,.settings-grid{grid-template-columns:1fr}
+  .fg.s2,.fg.s3{grid-column:span 1}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="lm">SC<br>TI</div>
+      <div>
+        <h1>SCTI Admin</h1>
+        <p>CONTENT MANAGEMENT SYSTEM</p>
+      </div>
+    </div>
+    <div id="loginErr" class="login-err"></div>
+    <div class="lf-group"><label>Admin Username</label><input type="text" id="loginUser" placeholder="admin" autocomplete="username"></div>
+    <div class="lf-group"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" onkeypress="if(event.key==='Enter')doLogin()"></div>
+    <button class="login-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Sign In</button>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="appShell">
+  <!-- Header -->
+  <header class="admin-header">
+    <div class="brand">
+      <div class="lm">SC<br>TI</div>
+      <div><span>SCTI Admin</span><small>CONTENT MANAGEMENT</small></div>
+    </div>
+    <div class="hdr-right">
+      <span class="hdr-badge" id="liveStatusBadge"><i class="fas fa-circle" style="font-size:.5rem"></i> No Live Stream</span>
+      <span class="hdr-badge" id="syncBadge" style="cursor:pointer" onclick="syncIndicator()"><i class="fas fa-database"></i> <span id="syncLabel">Synced</span></span>
+      <button class="logout-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-section">OVERVIEW</div>
+    <div class="sb-item on" data-page="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</div>
+    <div class="sb-item" data-page="applications"><i class="fas fa-file-alt"></i> Applications <span class="sb-count" id="appCount">0</span></div>
+    <div class="sb-item" data-page="enquiries"><i class="fas fa-envelope"></i> Enquiries <span class="sb-count" id="enqCount">0</span></div>
+    <div class="sidebar-section">WEBSITE CONTENT</div>
+    <div class="sb-item" data-page="hero"><i class="fas fa-image"></i> Hero Slides <span class="sb-count" id="heroCount">0</span></div>
+    <div class="sb-item" data-page="courses"><i class="fas fa-book-open"></i> Courses <span class="sb-count" id="courseCount">0</span></div>
+    <div class="sb-item" data-page="events"><i class="fas fa-calendar-alt"></i> Events <span class="sb-count" id="eventCount">0</span></div>
+    <div class="sb-item" data-page="gallery"><i class="fas fa-images"></i> Gallery <span class="sb-count" id="galCount">0</span></div>
+    <div class="sidebar-section">SETTINGS</div>
+    <div class="sb-item" data-page="settings"><i class="fas fa-cog"></i> Site Settings</div>
+    <div class="sb-item" data-page="live"><i class="fas fa-video"></i> Live Stream</div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main" id="mainContent">
+    <div style="text-align:center;padding:80px 0">
+      <div class="spinner"></div>
+      <p style="margin-top:12px;color:var(--gray)">Loading…</p>
+    </div>
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="globalModal">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="modalTitle">Edit</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+/* ════════════════════════════════
+   SUPABASE
+════════════════════════════════ */
+const SB_URL  = 'https://iuskmfphmraighipmsmh.supabase.co';
+const SB_ANON = 'sb_publishable_473bcG4eRXPZfqKHR7T47A_qpYNQQWQ';
+const sb = supabase.createClient(SB_URL, SB_ANON);
+
+/* ════════════════════════════════
+   AUTH
+════════════════════════════════ */
+const ADMIN_CREDS = { user: 'admin', pass: 'scti@2025' };
+let isLoggedIn = sessionStorage.getItem('scti_admin_auth') === '1';
+
+function doLogin(){
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  if(u === ADMIN_CREDS.user && p === ADMIN_CREDS.pass){
+    sessionStorage.setItem('scti_admin_auth','1');
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('appShell').style.display='block';
+    initApp();
+  } else {
+    const e = document.getElementById('loginErr');
+    e.textContent='Invalid username or password.';
+    e.style.display='block';
+    setTimeout(()=>e.style.display='none',3000);
+  }
+}
+function doLogout(){
+  sessionStorage.removeItem('scti_admin_auth');
+  location.reload();
+}
+
+if(isLoggedIn){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appShell').style.display='block';
+}
+
+/* ════════════════════════════════
+   APP INIT
+════════════════════════════════ */
+let DB = { events:[], courses:[], gallery:[], hero_slides:[], settings:{}, applications:[], enquiries:[] };
+let currentPage = 'dashboard';
+
+async function initApp(){
+  await loadAllData();
+  setupNav();
+  goPage('dashboard');
+}
+
+async function loadAllData(){
+  try{
+    const [evR,coR,galR,heroR,setR,appR,enqR] = await Promise.all([
+      sb.from('events').select('*').order('date',{ascending:true}),
+      sb.from('courses').select('*').order('sort_order',{ascending:true}),
+      sb.from('gallery').select('*').order('sort_order',{ascending:true}),
+      sb.from('hero_slides').select('*').order('sort_order',{ascending:true}),
+      sb.from('settings').select('*'),
+      sb.from('applications').select('*').order('created_at',{ascending:false}),
+      sb.from('contact_enquiries').select('*').order('created_at',{ascending:false})
+    ]);
+    if(evR.data)  DB.events       = evR.data;
+    if(coR.data)  DB.courses      = coR.data;
+    if(galR.data) DB.gallery      = galR.data;
+    if(heroR.data)DB.hero_slides  = heroR.data;
+    if(setR.data){DB.settings={}; setR.data.forEach(s=>DB.settings[s.key]=s.value);}
+    if(appR.data) DB.applications = appR.data;
+    if(enqR.data) DB.enquiries    = enqR.data;
+  }catch(e){ toast('Failed to load some data: '+e.message,'error'); }
+  updateCounts();
+  updateLiveBadge();
+}
+
+function S(k){ return DB.settings[k]||''; }
+
+function updateCounts(){
+  qs('#appCount').textContent   = DB.applications.length;
+  qs('#enqCount').textContent   = DB.enquiries.length;
+  qs('#heroCount').textContent  = DB.hero_slides.length;
+  qs('#courseCount').textContent= DB.courses.length;
+  qs('#eventCount').textContent = DB.events.length;
+  qs('#galCount').textContent   = DB.gallery.length;
+}
+function updateLiveBadge(){
+  const live = DB.events.find(e=>e.is_live);
+  const badge = qs('#liveStatusBadge');
+  if(live){
+    badge.innerHTML=`<i class="fas fa-circle" style="color:#f87171;font-size:.5rem"></i> LIVE: ${live.title.substring(0,22)}…`;
+    badge.classList.add('live-on');
+  } else {
+    badge.innerHTML=`<i class="fas fa-circle" style="font-size:.5rem"></i> No Live Stream`;
+    badge.classList.remove('live-on');
+  }
+}
+
+function qs(s,ctx=document){return ctx.querySelector(s);}
+function qsa(s,ctx=document){return ctx.querySelectorAll(s);}
+
+/* ════════════════════════════════
+   NAV
+════════════════════════════════ */
+function setupNav(){
+  qsa('.sb-item').forEach(el=>{
+    el.addEventListener('click',()=>{ goPage(el.dataset.page); });
+  });
+}
+function goPage(page){
+  currentPage = page;
+  qsa('.sb-item').forEach(el=>el.classList.toggle('on', el.dataset.page===page));
+  const pages = {
+    dashboard, applications, enquiries, hero, courses, events, gallery, settings, live
+  };
+  const fn = pages[page];
+  if(fn) qs('#mainContent').innerHTML = fn();
+  else qs('#mainContent').innerHTML = `<p>Page not found</p>`;
+  // post-render
+  if(page==='gallery') initGalleryDrop();
+}
+
+/* ════════════════════════════════
+   TOAST
+════════════════════════════════ */
+function toast(msg, type='success'){
+  const icon = type==='success'?'fa-check-circle':type==='error'?'fa-exclamation-circle':'fa-info-circle';
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas ${icon}"></i> ${msg}`;
+  qs('#toast').appendChild(t);
+  setTimeout(()=>t.remove(),3500);
+}
+
+/* ════════════════════════════════
+   MODAL
+════════════════════════════════ */
+function openModal(title, body, foot){
+  qs('#modalTitle').textContent = title;
+  qs('#modalBody').innerHTML = body;
+  qs('#modalFoot').innerHTML = foot||`<button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
+  qs('#globalModal').classList.add('on');
+}
+function closeModal(){ qs('#globalModal').classList.remove('on'); }
+
+/* ════════════════════════════════
+   fmtDate
+════════════════════════════════ */
+function fmtDate(d){ if(!d) return ''; return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+function fmtTs(d){ if(!d) return ''; return new Date(d).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
+function esc(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ════════════════════════════════
+   SYNC INDICATOR
+════════════════════════════════ */
+function syncIndicator(){
+  qs('#syncLabel').textContent='Checking…';
+  setTimeout(()=>{qs('#syncLabel').textContent='Synced';},1200);
+}
+
+/* ════════════════════════════════
+   DASHBOARD
+════════════════════════════════ */
+function dashboard(){
+  const pendingApps = DB.applications.filter(a=>a.status==='pending').length;
+  const liveEvent   = DB.events.find(e=>e.is_live);
+  const upcoming    = DB.events.filter(e=>new Date(e.date)>=new Date()).slice(0,3);
+
+  return `
+  <div style="margin-bottom:24px">
+    <h1 style="font-size:1.4rem;font-family:'Syne',sans-serif;color:var(--navy)">Welcome back 👋</h1>
+    <p style="color:var(--gray);font-size:.85rem">Skymo Creative Training Institute — Admin CMS</p>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card" onclick="goPage('applications')">
+      <i class="fas fa-file-alt stat-icon"></i>
+      <div class="stat-num">${DB.applications.length}</div>
+      <div class="stat-lbl">Total Applications</div>
+      ${pendingApps ? `<div style="margin-top:8px"><span class="badge badge-gold"><i class="fas fa-clock"></i> ${pendingApps} pending</span></div>`:''}
+    </div>
+    <div class="stat-card" onclick="goPage('courses')">
+      <i class="fas fa-book-open stat-icon"></i>
+      <div class="stat-num">${DB.courses.length}</div>
+      <div class="stat-lbl">Courses</div>
+    </div>
+    <div class="stat-card" onclick="goPage('events')">
+      <i class="fas fa-calendar stat-icon"></i>
+      <div class="stat-num">${DB.events.length}</div>
+      <div class="stat-lbl">Events</div>
+    </div>
+    <div class="stat-card" onclick="goPage('gallery')">
+      <i class="fas fa-images stat-icon"></i>
+      <div class="stat-num">${DB.gallery.length}</div>
+      <div class="stat-lbl">Gallery Images</div>
+    </div>
+    <div class="stat-card" onclick="goPage('enquiries')">
+      <i class="fas fa-envelope stat-icon"></i>
+      <div class="stat-num">${DB.enquiries.length}</div>
+      <div class="stat-lbl">Enquiries</div>
+    </div>
+  </div>
+
+  ${liveEvent ? `<div class="card" style="border-left:4px solid var(--red)">
+    <div class="card-header"><div class="ch-left"><div class="ch-icon"><i class="fas fa-video"></i></div><h2>🔴 Live Event Active</h2></div>
+    <button class="btn btn-sm btn-danger" onclick="toggleLiveEvent(${liveEvent.id}, false)"><i class="fas fa-stop-circle"></i> Stop Live</button></div>
+    <p style="font-size:.88rem;color:var(--navy)"><strong>${esc(liveEvent.title)}</strong></p>
+    <p style="font-size:.8rem;color:var(--gray);margin-top:4px">${esc(liveEvent.location)} · ${esc(liveEvent.time)}</p>
+  </div>`:''}
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="card">
+      <div class="card-header"><div class="ch-left"><div class="ch-icon"><i class="fas fa-clock"></i></div><h2>Upcoming Events</h2></div>
+      <button class="btn btn-sm btn-outline" onclick="goPage('events')">View All</button></div>
+      ${upcoming.length ? upcoming.map(e=>`
+        <div style="display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);align-items:center">
+          <div style="background:var(--navy);color:white;border-radius:8px;padding:5px 10px;text-align:center;min-width:42px;flex-shrink:0">
+            <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;line-height:1">${new Date(e.date).getDate()}</div>
+            <div style="font-size:.55rem;opacity:.7;font-weight:700">${new Date(e.date).toLocaleString('en',{month:'short'}).toUpperCase()}</div>
+          </div>
+          <div><p style="font-size:.83rem;font-weight:600;color:var(--navy)">${esc(e.title)}</p>
+          <p style="font-size:.74rem;color:var(--gray)">${esc(e.time)} · ${esc(e.location)}</p></div>
+        </div>`).join('')
+        : '<p style="font-size:.85rem;color:var(--gray);text-align:center;padding:20px">No upcoming events</p>'}
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="ch-left"><div class="ch-icon"><i class="fas fa-file-alt"></i></div><h2>Recent Applications</h2></div>
+      <button class="btn btn-sm btn-outline" onclick="goPage('applications')">View All</button></div>
+      ${DB.applications.slice(0,5).map(a=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <p style="font-size:.82rem;font-weight:600;color:var(--navy)">${esc(a.full_name)}</p>
+            <p style="font-size:.73rem;color:var(--gray)">${esc(a.course_name)}</p>
+          </div>
+          <span class="badge ${a.status==='approved'?'badge-green':a.status==='rejected'?'badge-red':'badge-gold'}">${a.status||'pending'}</span>
+        </div>`).join('') || '<p style="font-size:.85rem;color:var(--gray);text-align:center;padding:20px">No applications yet</p>'}
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════════
+   APPLICATIONS
+════════════════════════════════ */
+function applications(){
+  const filter = `<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
+    <button class="btn btn-sm btn-navy" onclick="filterApps('all',this)">All (${DB.applications.length})</button>
+    <button class="btn btn-sm btn-ghost" onclick="filterApps('pending',this)">Pending</button>
+    <button class="btn btn-sm btn-ghost" onclick="filterApps('approved',this)">Approved</button>
+    <button class="btn btn-sm btn-ghost" onclick="filterApps('contacted',this)">Contacted</button>
+    <button class="btn btn-sm btn-ghost" onclick="filterApps('rejected',this)">Rejected</button>
+  </div>`;
+
+  const rows = DB.applications.map(a=>`
+    <tr>
+      <td><strong>${esc(a.full_name)}</strong><br><span style="font-size:.72rem;color:var(--gray)">${esc(a.email)}</span></td>
+      <td>${esc(a.phone)}</td>
+      <td>${esc(a.course_name)}</td>
+      <td>${esc(a.county||'')} ${esc(a.town||'')}</td>
+      <td>${fmtDate(a.created_at)}</td>
+      <td>
+        <select class="app-status-sel" style="width:120px;font-size:.74rem;padding:5px 8px" onchange="updateAppStatus(${a.id},this.value)">
+          <option value="pending" ${a.status==='pending'?'selected':''}>Pending</option>
+          <option value="contacted" ${a.status==='contacted'?'selected':''}>Contacted</option>
+          <option value="approved" ${a.status==='approved'?'selected':''}>Approved</option>
+          <option value="rejected" ${a.status==='rejected'?'selected':''}>Rejected</option>
+        </select>
+      </td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-sm btn-navy" onclick="viewApplication(${a.id})"><i class="fas fa-eye"></i></button>
+          <a class="btn btn-sm btn-gold" href="https://wa.me/${(a.phone||'').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i></a>
+          <a class="btn btn-sm btn-outline" href="mailto:${a.email}"><i class="fas fa-envelope"></i></a>
+          <button class="btn btn-sm btn-danger" onclick="deleteApp(${a.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`).join('');
+
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-file-alt" style="color:var(--red);margin-right:8px"></i>Applications</h1>
+    <button class="btn btn-outline" onclick="exportApplications()"><i class="fas fa-download"></i> Export CSV</button>
+  </div>
+  ${filter}
+  <div class="card" style="padding:0">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Applicant</th><th>Phone</th><th>Course</th><th>Location</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="appTable">${rows||`<tr class="loading-row"><td colspan="7" style="text-align:center;padding:40px;color:var(--gray)">No applications yet</td></tr>`}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+window.filterApps = function(status, btn){
+  qsa('.btn-navy,.btn-ghost').forEach(b=>{if(b.onclick||b.getAttribute('onclick')?.includes('filterApps')){b.classList.remove('btn-navy');b.classList.add('btn-ghost');}});
+  btn.classList.remove('btn-ghost'); btn.classList.add('btn-navy');
+  const rows = DB.applications.filter(a=>status==='all'||a.status===status);
+  qs('#appTable').innerHTML = rows.map(a=>`
+    <tr>
+      <td><strong>${esc(a.full_name)}</strong><br><span style="font-size:.72rem;color:var(--gray)">${esc(a.email)}</span></td>
+      <td>${esc(a.phone)}</td>
+      <td>${esc(a.course_name)}</td>
+      <td>${esc(a.county||'')} ${esc(a.town||'')}</td>
+      <td>${fmtDate(a.created_at)}</td>
+      <td><select class="app-status-sel" style="width:120px;font-size:.74px;padding:5px 8px" onchange="updateAppStatus(${a.id},this.value)">
+        <option value="pending" ${a.status==='pending'?'selected':''}>Pending</option>
+        <option value="contacted" ${a.status==='contacted'?'selected':''}>Contacted</option>
+        <option value="approved" ${a.status==='approved'?'selected':''}>Approved</option>
+        <option value="rejected" ${a.status==='rejected'?'selected':''}>Rejected</option>
+      </select></td>
+      <td><div class="td-actions">
+        <button class="btn btn-sm btn-navy" onclick="viewApplication(${a.id})"><i class="fas fa-eye"></i></button>
+        <a class="btn btn-sm btn-gold" href="https://wa.me/${(a.phone||'').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        <a class="btn btn-sm btn-outline" href="mailto:${a.email}"><i class="fas fa-envelope"></i></a>
+        <button class="btn btn-sm btn-danger" onclick="deleteApp(${a.id})"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('') || `<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray)">No ${status} applications</td></tr>`;
+};
+
+window.viewApplication = function(id){
+  const a = DB.applications.find(x=>x.id===id); if(!a) return;
+  openModal(`Application — ${a.full_name}`, `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      ${[['Full Name',a.full_name],['Email',a.email],['Phone',a.phone],['Date of Birth',fmtDate(a.date_of_birth)],['Gender',a.gender],['National ID',a.national_id],['County',a.county],['Town',a.town],['Guardian',a.guardian_name],['Guardian Phone',a.guardian_phone],['Relation',a.guardian_relationship],['Education',a.highest_education],['School',a.school_name],['Grad Year',a.graduation_year],['Course',a.course_name],['Level',a.study_level],['Mode',a.study_mode],['Intake',a.intake_month],['How Heard',a.how_heard],['Applied',fmtTs(a.created_at)]].map(([k,v])=>`
+        <div style="padding:10px 12px;background:var(--gray-lt);border-radius:8px">
+          <div style="font-size:.68rem;font-weight:700;color:var(--gray);margin-bottom:3px">${k}</div>
+          <div style="font-size:.83rem;color:var(--navy);font-weight:600">${esc(v)||'—'}</div>
+        </div>`).join('')}
+    </div>
+    ${a.personal_statement?`<div style="margin-top:14px;padding:14px;background:var(--navy);color:rgba(255,255,255,.82);border-radius:10px;font-size:.83rem"><strong style="color:var(--gold)">Personal Statement:</strong><br>${esc(a.personal_statement)}</div>`:''}
+    <div style="margin-top:14px">
+      <h4 style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:10px">Documents</h4>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${a.passport_photo_url ? `<a href="${a.passport_photo_url}" target="_blank"><img src="${a.passport_photo_url}" style="width:90px;height:70px;object-fit:cover;border-radius:8px;border:2px solid var(--border)"></a>`:'' }
+        ${a.national_id_front_url ? `<a href="${a.national_id_front_url}" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-id-card"></i> ID Front</a>`:'' }
+        ${a.national_id_back_url  ? `<a href="${a.national_id_back_url}"  target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-id-card"></i> ID Back</a>`:'' }
+        ${a.certificate_url       ? `<a href="${a.certificate_url}"        target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-file"></i> Certificate</a>`:'' }
+      </div>
+    </div>`,
+  `<select id="modalStatus" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:'Outfit',sans-serif;font-size:.83rem">
+      <option value="pending" ${a.status==='pending'?'selected':''}>Pending</option>
+      <option value="contacted" ${a.status==='contacted'?'selected':''}>Contacted</option>
+      <option value="approved" ${a.status==='approved'?'selected':''}>Approved</option>
+      <option value="rejected" ${a.status==='rejected'?'selected':''}>Rejected</option>
+    </select>
+    <button class="btn btn-red" onclick="updateAppStatus(${a.id},qs('#modalStatus').value);closeModal()"><i class="fas fa-save"></i> Update Status</button>
+    <a class="btn btn-gold" href="https://wa.me/${(a.phone||'').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    <button class="btn btn-ghost" onclick="closeModal()">Close</button>`);
+};
+
+window.updateAppStatus = async function(id, status){
+  const {error} = await sb.from('applications').update({status}).eq('id',id);
+  if(error){ toast('Failed to update: '+error.message,'error'); return; }
+  const a = DB.applications.find(x=>x.id===id); if(a) a.status=status;
+  toast('Status updated to: '+status);
+};
+
+window.deleteApp = async function(id){
+  if(!confirm('Delete this application? This cannot be undone.')) return;
+  const {error} = await sb.from('applications').delete().eq('id',id);
+  if(error){ toast('Delete failed','error'); return; }
+  DB.applications = DB.applications.filter(x=>x.id!==id);
+  updateCounts(); goPage('applications');
+  toast('Application deleted');
+};
+
+window.exportApplications = function(){
+  const headers = ['full_name','email','phone','course_name','study_level','study_mode','intake_month','county','town','highest_education','how_heard','status','created_at'];
+  const csv = [headers.join(','), ...DB.applications.map(a=>headers.map(h=>`"${(a[h]||'').toString().replace(/"/g,'""')}"`).join(','))].join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `scti_applications_${new Date().toISOString().slice(0,10)}.csv`;
+  link.click();
+  toast('Applications exported as CSV');
+};
+
+/* ════════════════════════════════
+   ENQUIRIES
+════════════════════════════════ */
+function enquiries(){
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-envelope" style="color:var(--red);margin-right:8px"></i>Contact Enquiries</h1>
+  </div>
+  <div class="card" style="padding:0">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Subject</th><th>Date</th><th>Actions</th></tr></thead>
+        <tbody>${DB.enquiries.map(e=>`
+          <tr>
+            <td><strong>${esc(e.name)}</strong></td>
+            <td>${esc(e.email)}</td>
+            <td>${esc(e.phone||'—')}</td>
+            <td>${esc(e.subject||'—')}</td>
+            <td>${fmtDate(e.created_at)}</td>
+            <td><div class="td-actions">
+              <button class="btn btn-sm btn-navy" onclick="viewEnquiry(${e.id})"><i class="fas fa-eye"></i> View</button>
+              <a class="btn btn-sm btn-outline" href="mailto:${e.email}"><i class="fas fa-envelope"></i></a>
+              <button class="btn btn-sm btn-danger" onclick="deleteEnquiry(${e.id})"><i class="fas fa-trash"></i></button>
+            </div></td>
+          </tr>`).join('') || `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray)">No enquiries yet</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+window.viewEnquiry = function(id){
+  const e = DB.enquiries.find(x=>x.id===id); if(!e) return;
+  openModal(`Enquiry from ${e.name}`,`
+    <div style="display:grid;gap:10px">
+      ${[['Name',e.name],['Email',e.email],['Phone',e.phone||'—'],['Subject',e.subject||'—'],['Date',fmtTs(e.created_at)]].map(([k,v])=>`
+        <div style="padding:10px;background:var(--gray-lt);border-radius:8px"><span style="font-size:.7rem;color:var(--gray);font-weight:700">${k}</span><div style="font-size:.85rem;font-weight:600;color:var(--navy);margin-top:2px">${esc(v)}</div></div>`).join('')}
+      <div style="padding:14px;background:var(--navy);color:rgba(255,255,255,.82);border-radius:10px;font-size:.84rem;line-height:1.6">
+        <span style="color:var(--gold);font-weight:700;font-size:.75rem">MESSAGE</span><br>${esc(e.message)}
+      </div>
+    </div>`,
+  `<a class="btn btn-red" href="mailto:${e.email}"><i class="fas fa-reply"></i> Reply by Email</a><button class="btn btn-ghost" onclick="closeModal()">Close</button>`);
+};
+
+window.deleteEnquiry = async function(id){
+  if(!confirm('Delete this enquiry?')) return;
+  const {error} = await sb.from('contact_enquiries').delete().eq('id',id);
+  if(error){ toast('Delete failed','error'); return; }
+  DB.enquiries = DB.enquiries.filter(x=>x.id!==id);
+  updateCounts(); goPage('enquiries');
+  toast('Enquiry deleted');
+};
+
+/* ════════════════════════════════
+   HERO SLIDES
+════════════════════════════════ */
+function hero(){
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-image" style="color:var(--red);margin-right:8px"></i>Hero Slides</h1>
+    <button class="btn btn-red" onclick="openAddHeroModal()"><i class="fas fa-plus"></i> Add Slide</button>
+  </div>
+  <div class="card">
+    ${DB.hero_slides.length ? DB.hero_slides.map(s=>`
+      <div class="slide-row">
+        <img src="${esc(s.background_url)}" class="slide-preview" alt="Slide" onerror="this.src='https://via.placeholder.com/90x60?text=IMG'">
+        <div>
+          <div style="font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--gold)">${esc(s.badge)}</div>
+          <div style="font-size:.9rem;font-weight:700;color:var(--navy);margin:3px 0">${s.title?s.title.replace(/<[^>]+>/g,''):'—'}</div>
+          <div style="font-size:.78rem;color:var(--gray)">${esc(s.subtitle||'')}</div>
+          <div style="margin-top:6px;font-size:.7rem;color:var(--gray)">Order: ${s.sort_order}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+          <button class="btn btn-sm btn-navy" onclick="editHeroSlide(${s.id})"><i class="fas fa-pen"></i> Edit</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteHeroSlide(${s.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`).join('')
+    : '<div class="empty-state"><i class="fas fa-image"></i><p>No hero slides found</p></div>'}
+  </div>`;
+}
+
+window.openAddHeroModal = function(){
+  openModal('Add Hero Slide', heroForm(),
+  `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+   <button class="btn btn-red" onclick="saveHeroSlide()"><i class="fas fa-save"></i> Add Slide</button>`);
+};
+
+window.editHeroSlide = function(id){
+  const s = DB.hero_slides.find(x=>x.id===id); if(!s) return;
+  openModal('Edit Hero Slide', heroForm(s),
+  `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+   <button class="btn btn-red" onclick="saveHeroSlide(${id})"><i class="fas fa-save"></i> Save Changes</button>`);
+};
+
+function heroForm(s={}){
+  return `<div class="form-grid" style="grid-template-columns:1fr">
+    <div class="fg"><label>Background Image URL <span class="r">*</span></label><input id="h_bg" value="${esc(s.background_url||'')}"></div>
+    <div class="fg"><label>Badge Text</label><input id="h_badge" value="${esc(s.badge||'')}" placeholder="SKILLS THAT PAY"></div>
+    <div class="fg"><label>Title (use &lt;span class='g'&gt; for gold highlight&lt;/span&gt;)</label><input id="h_title" value="${esc(s.title||'')}"></div>
+    <div class="fg"><label>Subtitle</label><textarea id="h_sub" rows="2">${esc(s.subtitle||'')}</textarea></div>
+    <div class="fg"><label>Sort Order</label><input id="h_order" type="number" value="${s.sort_order||1}"></div>
+  </div>`;
+}
+
+window.saveHeroSlide = async function(id){
+  const payload = {
+    background_url: qs('#h_bg').value.trim(),
+    badge:          qs('#h_badge').value.trim(),
+    title:          qs('#h_title').value.trim(),
+    subtitle:       qs('#h_sub').value.trim(),
+    sort_order:     parseInt(qs('#h_order').value)||1
+  };
+  if(!payload.background_url){ toast('Image URL is required','error'); return; }
+  let error;
+  if(id){
+    ({error} = await sb.from('hero_slides').update(payload).eq('id',id));
+    if(!error){ const s=DB.hero_slides.find(x=>x.id===id); if(s) Object.assign(s,payload); }
+  } else {
+    const {data,error:e} = await sb.from('hero_slides').insert([payload]).select();
+    error=e; if(!error && data) DB.hero_slides.push(data[0]);
+  }
+  if(error){ toast('Save failed: '+error.message,'error'); return; }
+  updateCounts(); closeModal(); goPage('hero'); toast('Hero slide saved!');
+};
+
+window.deleteHeroSlide = async function(id){
+  if(!confirm('Delete this slide?')) return;
+  const {error} = await sb.from('hero_slides').delete().eq('id',id);
+  if(error){ toast('Delete failed','error'); return; }
+  DB.hero_slides = DB.hero_slides.filter(x=>x.id!==id);
+  updateCounts(); goPage('hero'); toast('Slide deleted');
+};
+
+/* ════════════════════════════════
+   COURSES
+════════════════════════════════ */
+function courses(){
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-book-open" style="color:var(--red);margin-right:8px"></i>Courses</h1>
+    <button class="btn btn-red" onclick="openAddCourseModal()"><i class="fas fa-plus"></i> Add Course</button>
+  </div>
+  <div class="card" style="padding:0">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Image</th><th>Course Name</th><th>Category</th><th>Duration</th><th>Fee</th><th>Mode</th><th>Order</th><th>Actions</th></tr></thead>
+        <tbody>${DB.courses.map(c=>`
+          <tr>
+            <td><img src="${esc(c.image_url)}" class="td-thumb" onerror="this.src='https://via.placeholder.com/52x40?text=IMG'"></td>
+            <td><strong>${esc(c.name)}</strong></td>
+            <td><span class="badge badge-navy">${esc(c.category)}</span></td>
+            <td>${esc(c.duration)}</td>
+            <td>${esc(c.fee)}</td>
+            <td>${esc(c.mode)}</td>
+            <td>${c.sort_order||0}</td>
+            <td><div class="td-actions">
+              <button class="btn btn-sm btn-navy" onclick="editCourse(${c.id})"><i class="fas fa-pen"></i></button>
+              <button class="btn btn-sm btn-danger" onclick="deleteCourse(${c.id})"><i class="fas fa-trash"></i></button>
+            </div></td>
+          </tr>`).join('') || `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray)">No courses found</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+window.openAddCourseModal = function(){
+  openModal('Add New Course', courseForm(),
+  `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+   <button class="btn btn-red" onclick="saveCourse()"><i class="fas fa-save"></i> Add Course</button>`);
+};
+
+window.editCourse = function(id){
+  const c = DB.courses.find(x=>x.id===id); if(!c) return;
+  openModal('Edit Course', courseForm(c),
+  `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+   <button class="btn btn-red" onclick="saveCourse(${id})"><i class="fas fa-save"></i> Save Changes</button>`);
+};
+
+function courseForm(c={}){
+  const cats = ['ICT & Technology','Creative Media','Business'];
+  return `<div class="form-grid">
+    <div class="fg s2"><label>Course Name <span class="r">*</span></label><input id="c_name" value="${esc(c.name||'')}"></div>
+    <div class="fg"><label>Category</label><select id="c_cat">${cats.map(cat=>`<option ${c.category===cat?'selected':''}>${cat}</option>`).join('')}</select></div>
+    <div class="fg"><label>Duration</label><input id="c_dur" value="${esc(c.duration||'')}" placeholder="6 Months"></div>
+    <div class="fg"><label>Fee</label><input id="c_fee" value="${esc(c.fee||'')}" placeholder="Ksh 25,000"></div>
+    <div class="fg"><label>Levels (comma-separated)</label><input id="c_levels" value="${esc(c.levels||'')}" placeholder="Certificate,Diploma"></div>
+    <div class="fg"><label>Study Mode</label><input id="c_mode" value="${esc(c.mode||'')}" placeholder="Full-time / Online"></div>
+    <div class="fg s2"><label>Description</label><textarea id="c_desc" rows="2">${esc(c.description||'')}</textarea></div>
+    <div class="fg s2"><label>Requirements (comma-separated)</label><textarea id="c_req" rows="2">${esc(c.requirements||'')}</textarea></div>
+    <div class="fg s2"><label>Career Outcomes (comma-separated)</label><textarea id="c_careers" rows="2">${esc(c.careers||'')}</textarea></div>
+    <div class="fg s2"><label>Main Image URL <span class="r">*</span></label><input id="c_img" value="${esc(c.image_url||'')}" placeholder="https://…"></div>
+    <div class="fg s2"><label>Gallery Image URLs (JSON array)</label><input id="c_gal" value="${esc(c.gallery_urls||'[]')}" placeholder='["https://…","https://…"]'></div>
+    <div class="fg"><label>Sort Order</label><input id="c_order" type="number" value="${c.sort_order||99}"></div>
+  </div>`;
+}
+
+window.saveCourse = async function(id){
+  const payload = {
+    name:        qs('#c_name').value.trim(),
+    category:    qs('#c_cat').value,
+    duration:    qs('#c_dur').value.trim(),
+    fee:         qs('#c_fee').value.trim(),
+    levels:      qs('#c_levels').value.trim(),
+    mode:        qs('#c_mode').value.trim(),
+    description: qs('#c_desc').value.trim(),
+    requirements:qs('#c_req').value.trim(),
+    careers:     qs('#c_careers').value.trim(),
+    image_url:   qs('#c_img').value.trim(),
+    gallery_urls:qs('#c_gal').value.trim(),
+    sort_order:  parseInt(qs('#c_order').value)||99
+  };
+  if(!payload.name){ toast('Course name required','error'); return; }
+  let error;
+  if(id){
+    ({error} = await sb.from('courses').update(payload).eq('id',id));
+    if(!error){ const c=DB.courses.find(x=>x.id===id); if(c) Object.assign(c,payload); }
+  } else {
+    const {data,error:e} = await sb.from('courses').insert([payload]).select();
+    error=e; if(!error && data) DB.courses.push(data[0]);
+  }
+  if(error){ toast('Save failed: '+error.message,'error'); return; }
+  updateCounts(); closeModal(); goPage('courses'); toast('Course saved!');
+};
+
+window.deleteCourse = async function(id){
+  if(!confirm('Delete this course? Applications referencing it are not deleted.')) return;
+  const {error} = await sb.from('courses').delete().eq('id',id);
+  if(error){ toast('Delete failed','error'); return; }
+  DB.courses = DB.courses.filter(x=>x.id!==id);
+  updateCounts(); goPage('courses'); toast('Course deleted');
+};
+
+/* ════════════════════════════════
+   EVENTS
+════════════════════════════════ */
+function events(){
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-calendar-alt" style="color:var(--red);margin-right:8px"></i>Events</h1>
+    <button class="btn btn-red" onclick="openAddEventModal()"><i class="fas fa-plus"></i> Add Event</button>
+  </div>
+  <div class="card" style="padding:0">
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Thumb</th><th>Title</th><th>Date</th><th>Time</th><th>Location</th><th>Tag</th><th>Live</th><th>Actions</th></tr></thead>
+        <tbody>${DB.events.map(e=>`
+          <tr>
+            <td><img src="${esc(e.thumbnail)}" class="td-thumb" onerror="this.src='https://via.placeholder.com/52x40?text=IMG'"></td>
+            <td><strong>${esc(e.title)}</strong></td>
+            <td>${fmtDate(e.date)}</td>
+            <td>${esc(e.time)}</td>
+            <td>${esc(e.location)}</td>
+            <td><span class="badge badge-navy">${esc(e.tag||'')}</span></td>
+            <td>
+              <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+                <input type="checkbox" ${e.is_live?'checked':''} onchange="toggleLiveEvent(${e.id},this.checked)">
+                ${e.is_live?'<span class="badge badge-live"><i class="fas fa-circle" style="font-size:.5rem"></i> LIVE</span>':''}
+              </label>
+            </td>
+            <td><div class="td-actions">
+              <button class="btn btn-sm btn-navy" onclick="editEvent(${e.id})"><i class="fas fa-pen"></i></button>
+              <button class="btn btn-sm btn-danger" onclick="deleteEvent(${e.id})"><i class="fas fa-trash"></i></button>
+            </div></td>
+          </tr>`).join('') || `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray)">No events found</td></tr>`}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+window.openAddEventModal = function(){
+  openModal('Add New Event', eventForm(),
+  `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+   <button class="btn btn-red" onclick="saveEvent()"><i class="fas fa-save"></i> Add Event</button>`);
+};
+
+window.editEvent = function(id){
+  const e = DB.events.find(x=>x.id===id); if(!e) return;
+  openModal('Edit Event', eventForm(e),
+  `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+   <button class="btn btn-red" onclick="saveEvent(${id})"><i class="fas fa-save"></i> Save Changes</button>`);
+};
+
+function eventForm(e={}){
+  return `<div class="form-grid">
+    <div class="fg s2"><label>Event Title <span class="r">*</span></label><input id="e_title" value="${esc(e.title||'')}"></div>
+    <div class="fg"><label>Date <span class="r">*</span></label><input id="e_date" type="date" value="${e.date||''}"></div>
+    <div class="fg"><label>Date Label (display)</label><input id="e_datelabel" value="${esc(e.date_label||'')}" placeholder="e.g. 24 May 2026"></div>
+    <div class="fg"><label>Time</label><input id="e_time" value="${esc(e.time||'')}" placeholder="10:00 AM – 2:00 PM"></div>
+    <div class="fg"><label>Location</label><input id="e_location" value="${esc(e.location||'')}" placeholder="SCTI Campus, Ruiru"></div>
+    <div class="fg"><label>Tag</label><input id="e_tag" value="${esc(e.tag||'')}" placeholder="Workshop / Open Day"></div>
+    <div class="fg s2"><label>Description</label><textarea id="e_desc" rows="2">${esc(e.description||'')}</textarea></div>
+    <div class="fg s2"><label>Thumbnail URL</label><input id="e_thumb" value="${esc(e.thumbnail||'')}" placeholder="https://…"></div>
+    <div class="fg s2"><label>YouTube / Stream Embed URL</label><input id="e_video" value="${esc(e.video_url||'')}" placeholder="https://www.youtube.com/embed/VIDEO_ID"></div>
+    <div class="fg" style="display:flex;align-items:center;gap:10px;padding-top:24px">
+      <input type="checkbox" id="e_live" ${e.is_live?'checked':''} style="width:18px;height:18px">
+      <label for="e_live" style="margin:0;font-size:.85rem">Mark as LIVE (shows live badge on site)</label>
+    </div>
+  </div>`;
+}
+
+window.saveEvent = async function(id){
+  const payload = {
+    title:      qs('#e_title').value.trim(),
+    date:       qs('#e_date').value,
+    date_label: qs('#e_datelabel').value.trim() || fmtDate(qs('#e_date').value),
+    time:       qs('#e_time').value.trim(),
+    location:   qs('#e_location').value.trim(),
+    tag:        qs('#e_tag').value.trim(),
+    description:qs('#e_desc').value.trim(),
+    thumbnail:  qs('#e_thumb').value.trim(),
+    video_url:  qs('#e_video').value.trim(),
+    is_live:    qs('#e_live').checked
+  };
+  if(!payload.title){ toast('Title is required','error'); return; }
+  let error;
+  if(id){
+    ({error} = await sb.from('events').update(payload).eq('id',id));
+    if(!error){ const ev=DB.events.find(x=>x.id===id); if(ev) Object.assign(ev,payload); }
+  } else {
+    const {data,error:e} = await sb.from('events').insert([payload]).select();
+    error=e; if(!error && data) DB.events.push(data[0]);
+  }
+  if(error){ toast('Save failed: '+error.message,'error'); return; }
+  updateCounts(); updateLiveBadge(); closeModal(); goPage('events'); toast('Event saved!');
+};
+
+window.toggleLiveEvent = async function(id, isLive){
+  const {error} = await sb.from('events').update({is_live:isLive}).eq('id',id);
+  if(error){ toast('Update failed','error'); return; }
+  const ev = DB.events.find(x=>x.id===id); if(ev) ev.is_live=isLive;
+  updateLiveBadge(); goPage('events');
+  toast(isLive ? '🔴 Event is now LIVE!' : 'Live stream stopped','info');
+};
+
+window.deleteEvent = async function(id){
+  if(!confirm('Delete this event?')) return;
+  const {error} = await sb.from('events').delete().eq('id',id);
+  if(error){ toast('Delete failed','error'); return; }
+  DB.events = DB.events.filter(x=>x.id!==id);
+  updateCounts(); updateLiveBadge(); goPage('events'); toast('Event deleted');
+};
+
+/* ════════════════════════════════
+   GALLERY
+════════════════════════════════ */
+function gallery(){
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-images" style="color:var(--red);margin-right:8px"></i>Gallery</h1>
+    <button class="btn btn-red" onclick="openAddGalleryModal()"><i class="fas fa-plus"></i> Add Images</button>
+  </div>
+  <div class="card">
+    <p style="font-size:.82rem;color:var(--gray);margin-bottom:14px">Click ✕ on an image to delete it. ${DB.gallery.length} images total.</p>
+    <div class="gal-grid" id="galGrid">
+      ${DB.gallery.map(g=>`
+        <div class="gi">
+          <img src="${esc(g.url||g)}" alt="${esc(g.caption||'Gallery')}" onerror="this.src='https://via.placeholder.com/150?text=IMG'">
+          <button class="gi-del" onclick="deleteGalleryItem(${g.id||0},'${esc(g.url||g)}')">×</button>
+          <span class="gi-order">${g.sort_order!==undefined?g.sort_order:''}</span>
+        </div>`).join('')}
+    </div>
+    ${!DB.gallery.length?'<div class="empty-state"><i class="fas fa-images"></i><p>No gallery images yet</p></div>':''}
+  </div>`;
+}
+
+window.openAddGalleryModal = function(){
+  openModal('Add Gallery Images',`
+    <div style="margin-bottom:16px">
+      <label>Image URLs (one per line or comma-separated)</label>
+      <textarea id="g_urls" rows="5" placeholder="https://images.pexels.com/…&#10;https://…"></textarea>
+    </div>
+    <div class="form-grid">
+      <div class="fg"><label>Caption</label><input id="g_caption" placeholder="SCTI Campus"></div>
+      <div class="fg"><label>Sort Order</label><input id="g_order" type="number" value="${DB.gallery.length+1}"></div>
+    </div>`,
+  `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+   <button class="btn btn-red" onclick="saveGalleryImages()"><i class="fas fa-save"></i> Add Images</button>`);
+};
+
+window.saveGalleryImages = async function(){
+  const raw = qs('#g_urls').value;
+  const urls = raw.split(/[\n,]+/).map(u=>u.trim()).filter(Boolean);
+  if(!urls.length){ toast('Enter at least one URL','error'); return; }
+  const caption = qs('#g_caption').value.trim()||'SCTI Campus';
+  let baseOrder = parseInt(qs('#g_order').value)||DB.gallery.length+1;
+  const rows = urls.map((url,i)=>({url, caption, sort_order: baseOrder+i}));
+  const {data,error} = await sb.from('gallery').insert(rows).select();
+  if(error){ toast('Save failed: '+error.message,'error'); return; }
+  if(data) DB.gallery.push(...data);
+  updateCounts(); closeModal(); goPage('gallery'); toast(`${urls.length} image(s) added!`);
+};
+
+window.deleteGalleryItem = async function(id, url){
+  if(!confirm('Delete this image?')) return;
+  if(id && id!==0){
+    const {error} = await sb.from('gallery').delete().eq('id',id);
+    if(error){ toast('Delete failed','error'); return; }
+    DB.gallery = DB.gallery.filter(x=>x.id!==id);
+  } else {
+    DB.gallery = DB.gallery.filter(x=>(x.url||x)!==url);
+  }
+  updateCounts(); goPage('gallery'); toast('Image deleted');
+};
+
+function initGalleryDrop(){ /* drag-and-drop reorder placeholder */ }
+
+/* ════════════════════════════════
+   SETTINGS
+════════════════════════════════ */
+function settings(){
+  const fields = [
+    ['site_name','Site Name','text'],['phone1','Primary Phone','text'],
+    ['phone2','Secondary Phone','text'],['whatsapp','WhatsApp Number (intl)','text'],
+    ['email','Email Address','email'],['address','Physical Address','text'],
+    ['working_hours','Working Hours','text'],['students_count','Students Count (stat)','text'],
+    ['courses_count','Courses Count (stat)','text'],['years_count','Years (stat)','text'],
+    ['placement_rate','Placement Rate (stat)','text'],['about_text','About Text','textarea'],
+    ['footer_text','Footer Tagline','text'],['cta_title','CTA Title','text'],
+    ['cta_subtitle','CTA Subtitle','text'],['facebook','Facebook URL','url'],
+    ['instagram','Instagram URL','url'],['tiktok','TikTok URL','url'],
+    ['youtube','YouTube URL','url'],['twitter','X/Twitter URL','url'],
+  ];
+
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-cog" style="color:var(--red);margin-right:8px"></i>Site Settings</h1>
+    <button class="btn btn-red" onclick="saveSettings()"><i class="fas fa-save"></i> Save All Settings</button>
+  </div>
+  <div class="card">
+    <div class="settings-grid">
+      ${fields.map(([k,lbl,type])=>type==='textarea'
+        ?`<div class="fg" style="grid-column:span 2"><label>${lbl}</label><textarea id="st_${k}" rows="3">${esc(S(k))}</textarea></div>`
+        :`<div class="fg"><label>${lbl}</label><input id="st_${k}" type="${type}" value="${esc(S(k))}"></div>`
+      ).join('')}
+    </div>
+    <div style="margin-top:20px;text-align:right">
+      <button class="btn btn-red btn-lg" onclick="saveSettings()"><i class="fas fa-save"></i> Save All Settings</button>
+    </div>
+  </div>`;
+}
+
+window.saveSettings = async function(){
+  const keys = ['site_name','phone1','phone2','whatsapp','email','address','working_hours','students_count','courses_count','years_count','placement_rate','about_text','footer_text','cta_title','cta_subtitle','facebook','instagram','tiktok','youtube','twitter'];
+  const btn = document.querySelector('.btn-red.btn-lg');
+  if(btn){ btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Saving…'; }
+  const upserts = keys.map(k=>({ key:k, value: (qs(`#st_${k}`)?.value||'').trim() }));
+  const {error} = await sb.from('settings').upsert(upserts, {onConflict:'key'});
+  if(btn){ btn.disabled=false; btn.innerHTML='<i class="fas fa-save"></i> Save All Settings'; }
+  if(error){ toast('Save failed: '+error.message,'error'); return; }
+  keys.forEach(k=>{ DB.settings[k]=(qs(`#st_${k}`)?.value||'').trim(); });
+  toast('All settings saved!');
+};
+
+/* ════════════════════════════════
+   LIVE STREAM
+════════════════════════════════ */
+function live(){
+  const liveEvent = DB.events.find(e=>e.is_live);
+  return `
+  <div style="margin-bottom:20px">
+    <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-video" style="color:var(--red);margin-right:8px"></i>Live Stream Control</h1>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div class="card">
+      <div class="card-header"><div class="ch-left"><div class="ch-icon"><i class="fas fa-circle"></i></div><h2>Current Status</h2></div></div>
+      ${liveEvent ? `
+        <div style="background:var(--red-lt);border:1px solid rgba(196,30,58,.25);border-radius:12px;padding:16px;margin-bottom:16px">
+          <span class="badge badge-live" style="margin-bottom:8px"><i class="fas fa-circle"></i> LIVE</span>
+          <p style="font-size:.9rem;font-weight:700;color:var(--navy)">${esc(liveEvent.title)}</p>
+          <p style="font-size:.8rem;color:var(--gray)">${esc(liveEvent.location)} · ${esc(liveEvent.time)}</p>
+          ${liveEvent.video_url?`<p style="font-size:.75rem;color:var(--gray);margin-top:6px;word-break:break-all">${esc(liveEvent.video_url)}</p>`:''}
+        </div>
+        <button class="btn btn-danger btn-lg" style="width:100%;justify-content:center" onclick="toggleLiveEvent(${liveEvent.id},false)"><i class="fas fa-stop-circle"></i> Stop Live Stream</button>
+      ` : `
+        <div style="text-align:center;padding:32px 20px;background:var(--gray-lt);border-radius:12px;margin-bottom:16px">
+          <i class="fas fa-video" style="font-size:2.5rem;opacity:.2;color:var(--navy)"></i>
+          <p style="color:var(--gray);font-size:.85rem;margin-top:10px">No event is currently live</p>
+        </div>
+        <p style="font-size:.8rem;color:var(--gray)">To go live, go to <strong>Events</strong> and check the "Is Live" toggle on the event you want to stream.</p>
+      `}
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="ch-left"><div class="ch-icon"><i class="fas fa-list"></i></div><h2>Set Any Event Live</h2></div></div>
+      ${DB.events.map(e=>`
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+          <div>
+            <p style="font-size:.83rem;font-weight:600;color:var(--navy)">${esc(e.title)}</p>
+            <p style="font-size:.74rem;color:var(--gray)">${fmtDate(e.date)}</p>
+          </div>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0">
+            <input type="checkbox" ${e.is_live?'checked':''} onchange="toggleLiveEvent(${e.id},this.checked)">
+            ${e.is_live?'<span class="badge badge-live" style="font-size:.6rem">LIVE</span>':''}
+          </label>
+        </div>`).join('') || '<p style="text-align:center;padding:20px;color:var(--gray)">No events yet. Add events first.</p>'}
+    </div>
+  </div>`;
+}
+
+/* ════════════════════════════════
+   BOOTSTRAP
+════════════════════════════════ */
+if(isLoggedIn) initApp();
+window.goPage = goPage;
+</script>
+</body>
+</html>
