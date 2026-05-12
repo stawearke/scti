@@ -193,22 +193,89 @@ header{background:var(--navy);position:sticky;top:0;z-index:1000;box-shadow:0 2p
 .val-card p{color:var(--gray);font-size:.8rem;line-height:1.55}
 
 /* ── COURSE DETAIL ── */
-.detail-hero{background:var(--navy);color:white;padding:52px 0}
+.detail-hero{background:linear-gradient(135deg,var(--navy) 0%,#0d3b5e 100%);color:white;padding:0;position:relative;overflow:hidden}
+.detail-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.18;filter:blur(2px)}
+.detail-hero-inner{position:relative;z-index:2;padding:52px 0 40px}
 .back-btn{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.65);font-size:.83rem;cursor:pointer;background:none;border:none;font-family:'Outfit',sans-serif;padding:0;margin-bottom:18px;transition:.2s;}
 .back-btn:hover{color:white}
-.detail-hero h1{font-size:clamp(1.5rem,3vw,2.1rem);margin-bottom:8px}
-.detail-meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px}
-.detail-meta span{display:flex;align-items:center;gap:7px;font-size:.83rem;opacity:.82}
-.detail-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;padding:52px 0}
+.detail-hero h1{font-size:clamp(1.5rem,3vw,2.2rem);margin-bottom:8px;font-weight:800}
+.detail-meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+.detail-meta span{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;background:rgba(255,255,255,.12);padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,.15)}
+.detail-meta i{color:var(--gold)}
+.detail-layout{display:grid;grid-template-columns:1fr 340px;gap:40px;padding:48px 0 60px;align-items:start}
+/* Tabs */
+.cd-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:28px}
+.cd-tab{padding:12px 20px;font-weight:600;font-size:.87rem;cursor:pointer;border:none;background:none;color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Outfit',sans-serif;transition:.2s}
+.cd-tab.on{color:var(--red);border-bottom-color:var(--red)}
+.cd-tab:hover{color:var(--navy)}
+.cd-panel{display:none}
+.cd-panel.on{display:block}
+/* Info blocks */
 .info-block{background:var(--gray-lt);border-radius:var(--r);padding:26px;margin-bottom:22px;border:1px solid var(--border)}
-.info-block h3{font-size:1rem;color:var(--red);margin-bottom:16px}
+.info-block h3{font-size:1rem;color:var(--red);margin-bottom:16px;font-family:'Syne',sans-serif;font-weight:700}
 .info-list{list-style:none}
-.info-list li{display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-bottom:1px solid var(--border);font-size:.85rem;color:var(--navy)}
+.info-list li{display:flex;align-items:flex-start;gap:11px;padding:10px 0;border-bottom:1px solid var(--border);font-size:.86rem;color:var(--navy);line-height:1.5}
 .info-list li:last-child{border-bottom:none}
 .info-list i{color:var(--red);width:17px;flex-shrink:0;margin-top:2px}
-.mini-gal{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}
-.mini-gal img{width:100%;height:125px;object-fit:cover;border-radius:10px;cursor:pointer;transition:.3s}
-.mini-gal img:hover{transform:scale(1.04)}
+.mini-gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:8px}
+.mini-gal img{width:100%;height:100px;object-fit:cover;border-radius:10px;cursor:pointer;transition:.3s}
+.mini-gal img:hover{transform:scale(1.04);box-shadow:0 8px 20px rgba(0,0,0,.15)}
+/* What you'll learn grid */
+.learn-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.learn-item{display:flex;align-items:flex-start;gap:10px;background:white;border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:.84rem;color:var(--navy);line-height:1.4}
+.learn-item i{color:var(--gold);width:16px;flex-shrink:0;margin-top:2px}
+/* Curriculum */
+.curr-module{border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.curr-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:white;cursor:pointer;font-weight:700;font-size:.9rem;color:var(--navy);transition:.2s}
+.curr-head:hover{background:var(--red-lt);color:var(--red)}
+.curr-head .mod-num{background:var(--red);color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;flex-shrink:0}
+.curr-head .mod-title{flex:1;margin:0 12px}
+.curr-body{display:none;padding:0 18px 14px;background:var(--gray-lt)}
+.curr-body ul{list-style:none;padding-top:10px}
+.curr-body li{font-size:.83rem;color:var(--gray);padding:6px 0;border-bottom:1px dashed var(--border);display:flex;align-items:center;gap:8px}
+.curr-body li:last-child{border:none}
+.curr-body i{color:var(--red);font-size:.7rem}
+.curr-module.open .curr-body{display:block}
+.curr-module.open .curr-head{background:var(--red-lt);color:var(--red)}
+.curr-module.open .curr-chevron{transform:rotate(180deg)}
+.curr-chevron{transition:transform .25s}
+/* FAQ */
+.faq-item{border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;font-weight:600;font-size:.88rem;color:var(--navy);background:white;transition:.2s}
+.faq-q:hover{background:var(--red-lt);color:var(--red)}
+.faq-a{display:none;padding:14px 18px;background:var(--gray-lt);font-size:.85rem;color:var(--gray);line-height:1.65;border-top:1px solid var(--border)}
+.faq-item.open .faq-a{display:block}
+.faq-item.open .faq-q{background:var(--red-lt);color:var(--red)}
+.faq-chevron{transition:transform .25s}
+.faq-item.open .faq-chevron{transform:rotate(180deg)}
+/* Sidebar sticky card */
+.detail-sidebar{}
+.enroll-card{background:white;border:2px solid var(--border);border-radius:var(--rlg);padding:28px;box-shadow:0 12px 36px rgba(0,0,0,.1);position:sticky;top:90px;margin-bottom:20px}
+.enroll-card .ec-price{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;color:var(--navy);margin-bottom:4px}
+.enroll-card .ec-price span{font-size:1rem;color:var(--gray);font-weight:400;font-family:'Outfit',sans-serif}
+.enroll-divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+.ec-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;font-size:.83rem;border-bottom:1px solid var(--border)}
+.ec-row:last-of-type{border:none}
+.ec-row .label{color:var(--gray);display:flex;align-items:center;gap:7px}
+.ec-row .val{font-weight:700;color:var(--navy)}
+.ec-row i{color:var(--red);width:14px}
+.detail-contact-box{background:var(--navy);border-radius:var(--r);padding:20px;color:white;margin-top:16px}
+.detail-contact-box h4{color:var(--gold);font-size:.88rem;margin-bottom:12px}
+.detail-contact-box p{font-size:.8rem;opacity:.75;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.detail-contact-box i{color:var(--gold);width:14px}
+/* Related courses */
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;margin-top:8px}
+/* Career tags */
+.career-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.career-tag{background:white;border:1.5px solid var(--border);color:var(--navy);padding:6px 14px;border-radius:50px;font-size:.78rem;font-weight:600;transition:.2s}
+.career-tag:hover{background:var(--red);border-color:var(--red);color:white;cursor:default}
+/* Intake badges */
+.intake-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.intake-badge{background:var(--gold-lt);color:#7a5800;border:1px solid rgba(212,175,55,.3);padding:5px 13px;border-radius:50px;font-size:.76rem;font-weight:700}
+/* Rating bar */
+.rating-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.stars{color:var(--gold);font-size:1rem;letter-spacing:2px}
+.rating-count{font-size:.78rem;color:var(--gray)}
 
 /* ── GALLERY PAGE ── */
 .gal-masonry{columns:3;column-gap:18px;margin-top:36px}
@@ -320,18 +387,22 @@ footer{background:var(--navy);color:#8fa3b5;padding:52px 0 24px;margin-top:60px}
 .breadcrumb span{color:var(--gold)}
 
 /* ── RESPONSIVE ── */
-@media(max-width:1024px){.ft-grid{grid-template-columns:1fr 1fr}.apply-wrap{grid-template-columns:1fr}}
+@media(max-width:1024px){.ft-grid{grid-template-columns:1fr 1fr}.apply-wrap{grid-template-columns:1fr}.detail-layout{grid-template-columns:1fr}}
 @media(max-width:768px){
   .hamburger{display:flex}
   .nav-list{display:none;position:absolute;top:100%;left:0;right:0;background:var(--navy);flex-direction:column;padding:12px;border-top:1px solid rgba(255,255,255,.1);gap:2px}
   .nav-list.on{display:flex}
   .events-dropdown{left:0;transform:none;width:calc(100vw - 48px)}
-  .why-grid,.about-grid,.contact-grid,.detail-grid,.fgrid{grid-template-columns:1fr}
+  .why-grid,.about-grid,.contact-grid,.detail-grid,.fgrid,.learn-grid{grid-template-columns:1fr}
   .gal-masonry{columns:2}
   .hero{height:70vh}
   .slide-ov h2{font-size:1.7rem}
   .ft-grid{grid-template-columns:1fr 1fr}
   .chat-win{width:calc(100vw - 30px);right:15px}
+  .detail-layout{grid-template-columns:1fr}
+  .enroll-card{position:static}
+  .cd-tabs{overflow-x:auto}
+  .cd-tab{white-space:nowrap;font-size:.8rem;padding:10px 14px}
 }
 @media(max-width:480px){
   .gal-masonry{columns:1}
@@ -719,65 +790,278 @@ function renderDetail(){
   const c=SEL_COURSE;
   if(!c)return renderCourses();
   const gal=getGalleryUrls(c);
+
+  // Parse extra fields (graceful fallback)
+  let whatLearn=[],curriculum=[],faqs=[],intakes=[];
+  try{ whatLearn=JSON.parse(c.what_you_learn||'[]'); }catch(e){ if(c.what_you_learn) whatLearn=c.what_you_learn.split('|').map(s=>s.trim()).filter(Boolean); }
+  try{ curriculum=JSON.parse(c.curriculum||'[]'); }catch(e){}
+  try{ faqs=JSON.parse(c.faqs||'[]'); }catch(e){}
+  try{ intakes=JSON.parse(c.intake_dates||'[]'); }catch(e){ if(c.intake_dates) intakes=c.intake_dates.split(',').map(s=>s.trim()).filter(Boolean); }
+  if(!intakes.length) intakes=['January','March','May','July','September','November'];
+
+  // Default what-you-learn from description if none
+  if(!whatLearn.length && c.description){
+    whatLearn=[c.description];
+  }
+
+  // Default curriculum modules from careers/requirements
+  const hasCurriculum=curriculum.length>0;
+  const defCurriculum=[
+    {title:'Introduction & Foundations',topics:['Course overview & objectives','Tools and equipment orientation','Industry landscape overview']},
+    {title:'Core Skills Development',topics:['Practical exercises and projects','Hands-on lab sessions','Skill assessments']},
+    {title:'Advanced Techniques',topics:['Professional workflows','Real-world case studies','Portfolio development']},
+    {title:'Industry Readiness',topics:['Job preparation','CV and portfolio workshop','Graduation project']}
+  ];
+  const modules=hasCurriculum?curriculum:defCurriculum;
+
+  // Default FAQs
+  const defFaqs=[
+    {q:'What is the intake schedule?',a:'We have rolling intakes throughout the year. You can start in any of our scheduled months — contact us to confirm the next available date.'},
+    {q:'What documents do I need to apply?',a:'You will need a passport photo, National ID (front and back), and your academic certificate (KCSE or equivalent). All can be uploaded online.'},
+    {q:'Can I study online or part-time?',a:`Yes! This course is available in ${c.mode} mode. Contact us to discuss the schedule that works best for you.`},
+    {q:'Is there a payment plan?',a:'Yes, SCTI offers flexible payment plans. You can pay in instalments. Speak to our admissions team for details.'},
+    {q:'Will I get a certificate?',a:`Yes. Upon successful completion you receive a recognised ${(c.levels||'Certificate').split(',')[0].trim()} from Skymo Creative Training Institute.`}
+  ];
+  const faqList=faqs.length?faqs:defFaqs;
+
+  const related=DB.courses.filter(x=>x.id!==c.id&&x.category===c.category).slice(0,3);
+  const careers=(c.careers||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const requirements=(c.requirements||'').split(',').map(s=>s.trim()).filter(Boolean);
+
   return`
+  <!-- DETAIL HERO -->
   <div class="detail-hero">
-    <div class="container">
-      <button class="back-btn" onclick="go('courses')"><i class="fas fa-arrow-left"></i> Back to Courses</button>
-      <span style="background:var(--gold);color:var(--navy);padding:3px 12px;border-radius:50px;font-size:.7rem;font-weight:700">${c.category}</span>
-      <h1 style="margin-top:10px">${c.name}</h1>
-      <p style="opacity:.82;max-width:560px;margin-top:8px">${c.description||''}</p>
-      <div class="detail-meta">
-        <span><i class="fas fa-clock"></i> ${c.duration}</span>
-        <span><i class="fas fa-tag"></i> ${c.fee}</span>
-        <span><i class="fas fa-graduation-cap"></i> ${(c.levels||'').split(',').join(' / ')}</span>
-        <span><i class="fas fa-laptop"></i> ${c.mode}</span>
+    <div class="detail-hero-bg" style="background-image:url('${c.image_url}')"></div>
+    <div class="detail-hero-inner">
+      <div class="container">
+        <button class="back-btn" onclick="go('courses')"><i class="fas fa-arrow-left"></i> All Courses</button>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+          <span style="background:var(--gold);color:var(--navy);padding:3px 13px;border-radius:50px;font-size:.68rem;font-weight:800;letter-spacing:.5px">${c.category}</span>
+          ${c.featured?'<span style="background:var(--red);color:white;padding:3px 13px;border-radius:50px;font-size:.68rem;font-weight:800">⭐ FEATURED</span>':''}
+        </div>
+        <h1>${c.name}</h1>
+        <p style="opacity:.82;max-width:600px;margin-top:8px;font-size:.95rem;line-height:1.65">${c.description||''}</p>
+        <div class="detail-meta" style="margin-top:18px">
+          <span><i class="fas fa-clock"></i> ${c.duration}</span>
+          <span><i class="fas fa-tag"></i> ${c.fee}</span>
+          <span><i class="fas fa-graduation-cap"></i> ${(c.levels||'').split(',').join(' / ')}</span>
+          <span><i class="fas fa-laptop"></i> ${c.mode}</span>
+          <span><i class="fas fa-calendar-check"></i> Rolling Intake</span>
+        </div>
+        <div style="margin-top:22px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-red" onclick="go('apply',${JSON.stringify(c).replace(/'/g,"&#39;")})"><i class="fas fa-pen"></i> Apply Now</button>
+          <a class="btn btn-gold" href="https://wa.me/${(S('whatsapp')||'254113504043').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Enquiry</a>
+        </div>
       </div>
     </div>
   </div>
+
+  <!-- MAIN CONTENT -->
   <div class="container">
-    <div class="detail-grid">
+    <div class="detail-layout">
+
+      <!-- LEFT COLUMN -->
       <div>
-        <div class="info-block">
-          <h3><i class="fas fa-list-check"></i> Requirements</h3>
-          <ul class="info-list">
-            ${(c.requirements||'').split(',').map(r=>`<li><i class="fas fa-check"></i>${r.trim()}</li>`).join('')}
-          </ul>
+        <!-- TABS -->
+        <div class="cd-tabs" style="margin-top:36px">
+          <button class="cd-tab on" onclick="cdTab(this,'tab-overview')"><i class="fas fa-info-circle"></i> Overview</button>
+          <button class="cd-tab" onclick="cdTab(this,'tab-curriculum')"><i class="fas fa-list-ul"></i> Curriculum</button>
+          <button class="cd-tab" onclick="cdTab(this,'tab-requirements')"><i class="fas fa-check-square"></i> Requirements</button>
+          <button class="cd-tab" onclick="cdTab(this,'tab-careers')"><i class="fas fa-briefcase"></i> Careers</button>
+          <button class="cd-tab" onclick="cdTab(this,'tab-faq')"><i class="fas fa-question-circle"></i> FAQ</button>
+          ${gal.length?`<button class="cd-tab" onclick="cdTab(this,'tab-gallery')"><i class="fas fa-images"></i> Gallery</button>`:''}
         </div>
-        <div class="info-block">
-          <h3><i class="fas fa-briefcase"></i> Career Opportunities</h3>
-          <ul class="info-list">
-            ${(c.careers||'').split(',').map(j=>`<li><i class="fas fa-arrow-right"></i>${j.trim()}</li>`).join('')}
-          </ul>
+
+        <!-- OVERVIEW TAB -->
+        <div id="tab-overview" class="cd-panel on">
+          <div class="info-block">
+            <div class="rating-row">
+              <span class="stars">★★★★★</span>
+              <span style="font-size:.85rem;font-weight:700;color:var(--navy)">4.8</span>
+              <span class="rating-count">· Rated by graduates</span>
+            </div>
+            <h3><i class="fas fa-star"></i> What You'll Learn</h3>
+            <div class="learn-grid">
+              ${whatLearn.map(w=>`<div class="learn-item"><i class="fas fa-check-circle"></i><span>${w}</span></div>`).join('')}
+              ${!whatLearn.length||whatLearn.length<2?[
+                'Practical hands-on skills from day one',
+                'Industry-standard tools and workflows',
+                'Real-world project experience',
+                'Portfolio-building guidance',
+                'Job preparation and career support',
+                'Certificate upon completion'
+              ].map(w=>`<div class="learn-item"><i class="fas fa-check-circle"></i><span>${w}</span></div>`).join(''):''}
+            </div>
+          </div>
+          <div class="info-block">
+            <h3><i class="fas fa-calendar-alt"></i> Available Intake Months</h3>
+            <p style="font-size:.84rem;color:var(--gray);margin-bottom:12px">SCTI runs rolling intakes. Choose a month that suits your schedule:</p>
+            <div class="intake-badges">
+              ${intakes.map(m=>`<span class="intake-badge"><i class="fas fa-calendar" style="margin-right:5px"></i>${m}</span>`).join('')}
+            </div>
+            <div style="margin-top:16px;padding:14px;background:white;border-radius:10px;border:1px solid var(--border);font-size:.84rem;color:var(--gray)">
+              <i class="fas fa-info-circle" style="color:var(--red);margin-right:8px"></i>
+              Can't find a date that works? Call us — we'll work something out. <strong style="color:var(--navy)">${S('phone1')}</strong>
+            </div>
+          </div>
         </div>
-        ${gal.length?`<div class="info-block"><h3><i class="fas fa-images"></i> Gallery</h3><div class="mini-gal">${gal.map(img=>`<img src="${img}" onclick="openImgModal('${img}')" alt="Course image">`).join('')}</div></div>`:''}
+
+        <!-- CURRICULUM TAB -->
+        <div id="tab-curriculum" class="cd-panel">
+          <div class="info-block" style="background:white">
+            <h3><i class="fas fa-book-open"></i> Course Curriculum</h3>
+            <p style="font-size:.84rem;color:var(--gray);margin-bottom:18px">${modules.length} modules · ${c.duration} · Practical-focused</p>
+            <div id="curriculumList">
+              ${modules.map((m,i)=>`
+              <div class="curr-module${i===0?' open':''}">
+                <div class="curr-head" onclick="toggleModule(this.parentElement)">
+                  <div class="mod-num">${i+1}</div>
+                  <span class="mod-title">${m.title||m.name||'Module '+(i+1)}</span>
+                  <i class="fas fa-chevron-down curr-chevron" style="${i===0?'transform:rotate(180deg)':''}"></i>
+                </div>
+                <div class="curr-body">
+                  <ul>
+                    ${(m.topics||m.items||[]).map(t=>`<li><i class="fas fa-dot-circle"></i>${t}</li>`).join('')}
+                  </ul>
+                </div>
+              </div>`).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- REQUIREMENTS TAB -->
+        <div id="tab-requirements" class="cd-panel">
+          <div class="info-block">
+            <h3><i class="fas fa-clipboard-list"></i> Entry Requirements</h3>
+            <ul class="info-list">
+              ${requirements.map(r=>`<li><i class="fas fa-check-circle"></i>${r}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="info-block">
+            <h3><i class="fas fa-file-alt"></i> Documents Required to Apply</h3>
+            <ul class="info-list">
+              <li><i class="fas fa-camera"></i> Passport-size photo (JPG/PNG)</li>
+              <li><i class="fas fa-id-card"></i> National ID – Front and Back</li>
+              <li><i class="fas fa-file-certificate"></i> Academic certificate (KCSE or equivalent)</li>
+            </ul>
+            <div style="margin-top:16px">
+              <button class="btn btn-red" onclick="go('apply',${JSON.stringify(c).replace(/'/g,"&#39;")})"><i class="fas fa-pen"></i> Apply Now</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CAREERS TAB -->
+        <div id="tab-careers" class="cd-panel">
+          <div class="info-block">
+            <h3><i class="fas fa-briefcase"></i> Career Opportunities</h3>
+            <p style="font-size:.84rem;color:var(--gray);margin-bottom:16px">Graduates from this course go on to work in roles such as:</p>
+            <div class="career-tags">
+              ${careers.map(j=>`<span class="career-tag"><i class="fas fa-arrow-right" style="color:var(--red);margin-right:6px;font-size:.65rem"></i>${j}</span>`).join('')}
+            </div>
+          </div>
+          <div class="info-block" style="background:var(--navy);border-color:var(--navy)">
+            <h3 style="color:var(--gold)"><i class="fas fa-chart-line"></i> Employment Rate</h3>
+            <div style="display:flex;gap:32px;flex-wrap:wrap">
+              <div style="text-align:center">
+                <div style="font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;color:var(--gold)">${S('placement_rate')||'92%'}</div>
+                <div style="font-size:.76rem;color:rgba(255,255,255,.6);margin-top:4px">Graduate Placement</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:800;color:white">${S('students_count')||'2,000+'}</div>
+                <div style="font-size:.76rem;color:rgba(255,255,255,.6);margin-top:4px">Students Trained</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ TAB -->
+        <div id="tab-faq" class="cd-panel">
+          <div class="info-block" style="background:white">
+            <h3><i class="fas fa-question-circle"></i> Frequently Asked Questions</h3>
+            <div id="faqList">
+              ${faqList.map((f,i)=>`
+              <div class="faq-item${i===0?' open':''}">
+                <div class="faq-q" onclick="toggleFaq(this.parentElement)">
+                  <span>${f.q||f.question||''}</span>
+                  <i class="fas fa-chevron-down faq-chevron" style="${i===0?'transform:rotate(180deg)':''}"></i>
+                </div>
+                <div class="faq-a">${f.a||f.answer||''}</div>
+              </div>`).join('')}
+            </div>
+          </div>
+          <div style="text-align:center;padding:20px;background:var(--gray-lt);border-radius:var(--r);border:1px solid var(--border)">
+            <p style="font-size:.87rem;color:var(--gray);margin-bottom:12px">Still have a question?</p>
+            <a class="btn btn-gold" href="https://wa.me/${(S('whatsapp')||'254113504043').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> Ask on WhatsApp</a>
+          </div>
+        </div>
+
+        <!-- GALLERY TAB -->
+        ${gal.length?`
+        <div id="tab-gallery" class="cd-panel">
+          <div class="info-block" style="background:white">
+            <h3><i class="fas fa-images"></i> Course Gallery</h3>
+            <div class="mini-gal">
+              ${gal.map(img=>`<img src="${img}" onclick="openImgModal('${img}')" alt="${c.name}">`).join('')}
+            </div>
+          </div>
+        </div>`:''}
+
+        <!-- RELATED COURSES -->
+        ${related.length?`
+        <div style="margin-top:40px;margin-bottom:40px">
+          <h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;color:var(--navy);margin-bottom:20px"><i class="fas fa-layer-group" style="color:var(--red);margin-right:10px"></i>Related Courses</h2>
+          <div class="related-grid">
+            ${related.map(r=>courseCard(r)).join('')}
+          </div>
+        </div>`:''}
       </div>
-      <div>
-        <div class="info-block" style="background:var(--navy);border-color:var(--navy)">
-          <h3 style="color:var(--gold)"><i class="fas fa-info-circle"></i> Course Details</h3>
-          <ul class="info-list">
-            <li style="border-color:rgba(255,255,255,.1);color:white"><i class="fas fa-calendar"></i> Duration: ${c.duration}</li>
-            <li style="border-color:rgba(255,255,255,.1);color:white"><i class="fas fa-tag"></i> Fee: ${c.fee}</li>
-            <li style="border-color:rgba(255,255,255,.1);color:white"><i class="fas fa-certificate"></i> Levels: ${(c.levels||'').split(',').join(', ')}</li>
-            <li style="border-color:rgba(255,255,255,.1);color:white"><i class="fas fa-laptop"></i> Mode: ${c.mode}</li>
-            <li style="border-color:rgba(255,255,255,.1);color:white"><i class="fas fa-calendar-check"></i> Intake: Rolling / Ongoing</li>
-          </ul>
-          <button class="btn btn-red" style="width:100%;justify-content:center;margin-top:20px" onclick="go('apply',${JSON.stringify(c)})"><i class="fas fa-pen"></i> Apply for This Course</button>
-          <a class="btn btn-gold" style="width:100%;justify-content:center;margin-top:10px" href="https://wa.me/${(S('whatsapp')||'').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Enquiry</a>
+
+      <!-- SIDEBAR -->
+      <div class="detail-sidebar">
+        <div class="enroll-card">
+          <div class="ec-price">${c.fee} <span>/ full course</span></div>
+          <div style="font-size:.78rem;color:var(--gray);margin-bottom:14px">Payment plans available</div>
+          <button class="btn btn-red" style="width:100%;justify-content:center;margin-bottom:10px;padding:14px" onclick="go('apply',${JSON.stringify(c).replace(/'/g,"&#39;")})">
+            <i class="fas fa-pen"></i> Apply for This Course
+          </button>
+          <a class="btn btn-gold" style="width:100%;justify-content:center;margin-bottom:10px;padding:12px" href="https://wa.me/${(S('whatsapp')||'254113504043').replace(/\D/g,'')}" target="_blank">
+            <i class="fab fa-whatsapp"></i> WhatsApp Enquiry
+          </a>
+          <a class="btn btn-or" style="width:100%;justify-content:center;padding:11px" href="tel:${S('phone1')}">
+            <i class="fas fa-phone"></i> Call ${S('phone1')}
+          </a>
+          <hr class="enroll-divider">
+          <div class="ec-row"><span class="label"><i class="fas fa-clock"></i> Duration</span><span class="val">${c.duration}</span></div>
+          <div class="ec-row"><span class="label"><i class="fas fa-graduation-cap"></i> Level</span><span class="val">${(c.levels||'Certificate').split(',')[0].trim()}</span></div>
+          <div class="ec-row"><span class="label"><i class="fas fa-laptop"></i> Mode</span><span class="val">${c.mode}</span></div>
+          <div class="ec-row"><span class="label"><i class="fas fa-calendar-check"></i> Intake</span><span class="val">Rolling</span></div>
+          <div class="ec-row"><span class="label"><i class="fas fa-language"></i> Language</span><span class="val">English / Swahili</span></div>
+          <div class="ec-row"><span class="label"><i class="fas fa-certificate"></i> Certificate</span><span class="val">Yes</span></div>
         </div>
-        <div class="info-block">
-          <h3><i class="fas fa-phone"></i> Contact Us</h3>
-          <ul class="info-list">
-            <li><i class="fas fa-phone"></i> ${S('phone1')}</li>
-            <li><i class="fas fa-phone"></i> ${S('phone2')}</li>
-            <li><i class="fas fa-envelope"></i> ${S('email')}</li>
-            <li><i class="fas fa-map-marker-alt"></i> ${S('address')}</li>
-          </ul>
+        <div class="detail-contact-box">
+          <h4><i class="fas fa-headset"></i> Need Help? Talk to Us</h4>
+          <p><i class="fas fa-phone"></i> ${S('phone1')}</p>
+          <p><i class="fas fa-phone"></i> ${S('phone2')}</p>
+          <p><i class="fas fa-envelope"></i> ${S('email')}</p>
+          <p><i class="fas fa-map-marker-alt"></i> ${S('address')}</p>
+          <p style="margin-top:10px;font-size:.76rem;opacity:.6"><i class="fas fa-clock"></i> ${S('working_hours')||'Mon–Fri 8am–5pm'}</p>
         </div>
       </div>
+
     </div>
   </div>
   ${renderFooter()}`;
 }
+
+function cdTab(btn, panelId){
+  document.querySelectorAll('.cd-tab').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('.cd-panel').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  const panel=document.getElementById(panelId);
+  if(panel) panel.classList.add('on');
+}
+function toggleModule(el){ el.classList.toggle('open'); }
+function toggleFaq(el){ el.classList.toggle('open'); }
 
 /* ═══════════════════════════════════════════
    EVENTS PAGE
@@ -1412,7 +1696,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeVidBtn();closeImgModal();}
 });
 
-Object.assign(window,{go,filterCat,goSlide,openVid,closeVid,closeVidBtn,openImgModal,closeImgModal,toggleChat,sendMsg,toggleNav,submitApplication,sendContactMsg,previewFile});
+Object.assign(window,{go,filterCat,goSlide,openVid,closeVid,closeVidBtn,openImgModal,closeImgModal,toggleChat,sendMsg,toggleNav,submitApplication,sendContactMsg,previewFile,cdTab,toggleModule,toggleFaq});
 
 loadAllData();
 </script>
