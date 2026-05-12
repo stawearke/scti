@@ -757,7 +757,7 @@ function renderCourses(){
 }
 
 function courseCard(c){
-  return`<div class="course-card" onclick="go('detail',${JSON.stringify(c)})">
+  return`<div class="course-card" onclick="goDetail(${c.id})">
     <div class="cc-thumb" style="background-image:url('${c.image_url}')">
       <span class="cc-cat">${c.category}</span>
     </div>
@@ -772,6 +772,8 @@ function courseCard(c){
     </div>
   </div>`;
 }
+function goDetail(id){ go('detail', DB.courses.find(c=>c.id==id)||null); }
+function goApply(id){ SEL_COURSE=DB.courses.find(c=>c.id==id)||null; go('apply'); }
 
 function filterCat(cat,btn){
   ACT_CAT=cat;
@@ -849,7 +851,7 @@ function renderDetail(){
           <span><i class="fas fa-calendar-check"></i> Rolling Intake</span>
         </div>
         <div style="margin-top:22px;display:flex;gap:10px;flex-wrap:wrap">
-          <button class="btn btn-red" onclick="go('apply',${JSON.stringify(c).replace(/'/g,"&#39;")})"><i class="fas fa-pen"></i> Apply Now</button>
+          <button class="btn btn-red" onclick="goApply(${c.id})"><i class="fas fa-pen"></i> Apply Now</button>
           <a class="btn btn-gold" href="https://wa.me/${(S('whatsapp')||'254113504043').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Enquiry</a>
         </div>
       </div>
@@ -945,7 +947,7 @@ function renderDetail(){
               <li><i class="fas fa-file-certificate"></i> Academic certificate (KCSE or equivalent)</li>
             </ul>
             <div style="margin-top:16px">
-              <button class="btn btn-red" onclick="go('apply',${JSON.stringify(c).replace(/'/g,"&#39;")})"><i class="fas fa-pen"></i> Apply Now</button>
+              <button class="btn btn-red" onclick="goApply(${c.id})"><i class="fas fa-pen"></i> Apply Now</button>
             </div>
           </div>
         </div>
@@ -1021,7 +1023,7 @@ function renderDetail(){
         <div class="enroll-card">
           <div class="ec-price">${c.fee} <span>/ full course</span></div>
           <div style="font-size:.78rem;color:var(--gray);margin-bottom:14px">Payment plans available</div>
-          <button class="btn btn-red" style="width:100%;justify-content:center;margin-bottom:10px;padding:14px" onclick="go('apply',${JSON.stringify(c).replace(/'/g,"&#39;")})">
+          <button class="btn btn-red" style="width:100%;justify-content:center;margin-bottom:10px;padding:14px" onclick="goApply(${c.id})">
             <i class="fas fa-pen"></i> Apply for This Course
           </button>
           <a class="btn btn-gold" style="width:100%;justify-content:center;margin-bottom:10px;padding:12px" href="https://wa.me/${(S('whatsapp')||'254113504043').replace(/\D/g,'')}" target="_blank">
@@ -1587,7 +1589,7 @@ function renderFooter(){
         </div>
         <div class="ft-col">
           <h4>OUR COURSES</h4>
-          ${DB.courses.slice(0,6).map(c=>`<div onclick="go('detail',${JSON.stringify(c)})">${c.name}</div>`).join('')}
+          ${DB.courses.slice(0,6).map(c=>`<div onclick="goDetail(${c.id})">${c.name}</div>`).join('')}
         </div>
         <div class="ft-col">
           <h4>CONTACT US</h4>
@@ -1696,7 +1698,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){closeVidBtn();closeImgModal();}
 });
 
-Object.assign(window,{go,filterCat,goSlide,openVid,closeVid,closeVidBtn,openImgModal,closeImgModal,toggleChat,sendMsg,toggleNav,submitApplication,sendContactMsg,previewFile,cdTab,toggleModule,toggleFaq});
+Object.assign(window,{go,goDetail,goApply,filterCat,goSlide,openVid,closeVid,closeVidBtn,openImgModal,closeImgModal,toggleChat,sendMsg,toggleNav,submitApplication,sendContactMsg,previewFile,cdTab,toggleModule,toggleFaq});
 
 loadAllData();
 </script>
