@@ -404,10 +404,12 @@ function toast(msg, type='success'){
 /* ════════════════════════════════
    MODAL
 ════════════════════════════════ */
-function openModal(title, body, foot){
+function openModal(title, body, foot, width){
   qs('#modalTitle').textContent = title;
   qs('#modalBody').innerHTML = body;
   qs('#modalFoot').innerHTML = foot||`<button class="btn btn-ghost" onclick="closeModal()">Close</button>`;
+  const box = qs('.modal-box');
+  if(box) box.style.maxWidth = width||'680px';
   qs('#globalModal').classList.add('on');
 }
 function closeModal(){ qs('#globalModal').classList.remove('on'); }
@@ -789,21 +791,22 @@ function courses(){
   <div class="card" style="padding:0">
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Image</th><th>Course Name</th><th>Category</th><th>Duration</th><th>Fee</th><th>Mode</th><th>Order</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Image</th><th>Course Name</th><th>Category</th><th>Duration</th><th>Fee</th><th>Mode</th><th>Featured</th><th>Order</th><th>Actions</th></tr></thead>
         <tbody>${DB.courses.map(c=>`
           <tr>
             <td><img src="${esc(c.image_url)}" class="td-thumb" onerror="this.src='https://via.placeholder.com/52x40?text=IMG'"></td>
-            <td><strong>${esc(c.name)}</strong></td>
+            <td><strong>${esc(c.name)}</strong>${c.what_you_learn?'<br><small style="color:var(--gray);font-size:.7rem">✓ Rich content</small>':''}</td>
             <td><span class="badge badge-navy">${esc(c.category)}</span></td>
             <td>${esc(c.duration)}</td>
             <td>${esc(c.fee)}</td>
             <td>${esc(c.mode)}</td>
+            <td>${c.featured?'<span class="badge badge-gold">⭐ Yes</span>':'<span style="color:var(--gray);font-size:.75rem">—</span>'}</td>
             <td>${c.sort_order||0}</td>
             <td><div class="td-actions">
               <button class="btn btn-sm btn-navy" onclick="editCourse(${c.id})"><i class="fas fa-pen"></i></button>
               <button class="btn btn-sm btn-danger" onclick="deleteCourse(${c.id})"><i class="fas fa-trash"></i></button>
             </div></td>
-          </tr>`).join('') || `<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray)">No courses found</td></tr>`}
+          </tr>`).join('') || `<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--gray)">No courses found</td></tr>`}
         </tbody>
       </table>
     </div>
@@ -813,14 +816,14 @@ function courses(){
 window.openAddCourseModal = function(){
   openModal('Add New Course', courseForm(),
   `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-   <button class="btn btn-red" onclick="saveCourse()"><i class="fas fa-save"></i> Add Course</button>`);
+   <button class="btn btn-red" onclick="saveCourse()"><i class="fas fa-save"></i> Add Course</button>`,'900px');
 };
 
 window.editCourse = function(id){
   const c = DB.courses.find(x=>x.id===id); if(!c) return;
-  openModal('Edit Course', courseForm(c),
+  openModal('Edit Course: '+c.name, courseForm(c),
   `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
-   <button class="btn btn-red" onclick="saveCourse(${id})"><i class="fas fa-save"></i> Save Changes</button>`);
+   <button class="btn btn-red" onclick="saveCourse(${id})"><i class="fas fa-save"></i> Save Changes</button>`,'900px');
 };
 
 function courseForm(c={}){
@@ -832,29 +835,63 @@ function courseForm(c={}){
     <div class="fg"><label>Fee</label><input id="c_fee" value="${esc(c.fee||'')}" placeholder="Ksh 25,000"></div>
     <div class="fg"><label>Levels (comma-separated)</label><input id="c_levels" value="${esc(c.levels||'')}" placeholder="Certificate,Diploma"></div>
     <div class="fg"><label>Study Mode</label><input id="c_mode" value="${esc(c.mode||'')}" placeholder="Full-time / Online"></div>
-    <div class="fg s2"><label>Description</label><textarea id="c_desc" rows="2">${esc(c.description||'')}</textarea></div>
-    <div class="fg s2"><label>Requirements (comma-separated)</label><textarea id="c_req" rows="2">${esc(c.requirements||'')}</textarea></div>
-    <div class="fg s2"><label>Career Outcomes (comma-separated)</label><textarea id="c_careers" rows="2">${esc(c.careers||'')}</textarea></div>
-    <div class="fg s2"><label>Main Image URL <span class="r">*</span></label><input id="c_img" value="${esc(c.image_url||'')}" placeholder="https://…"></div>
+    <div class="fg s2"><label>Short Description <span class="r">*</span></label><textarea id="c_desc" rows="2">${esc(c.description||'')}</textarea></div>
+    <div class="fg s2"><label>Entry Requirements (comma-separated)</label><textarea id="c_req" rows="2" placeholder="KCSE certificate, Basic computer knowledge">${esc(c.requirements||'')}</textarea></div>
+    <div class="fg s2"><label>Career Outcomes (comma-separated)</label><textarea id="c_careers" rows="2" placeholder="IT Support, Data Analyst, Web Developer">${esc(c.careers||'')}</textarea></div>
+    <hr class="form-sep">
+    <div class="form-sep-label s2"><i class="fas fa-star"></i> What You'll Learn (pipe-separated | or JSON array)</div>
+    <div class="fg s2"><label>What You'll Learn <small style="font-weight:400;color:var(--gray)">(separate with | or use JSON array)</small></label>
+      <textarea id="c_learn" rows="3" placeholder="Practical computer skills|Microsoft Office suite|Internet & email|Digital literacy">${esc(c.what_you_learn||'')}</textarea></div>
+    <hr class="form-sep">
+    <div class="form-sep-label s2"><i class="fas fa-book-open"></i> Curriculum Modules (JSON)</div>
+    <div class="fg s2"><label>Curriculum <small style="font-weight:400;color:var(--gray)">[{"title":"Module 1","topics":["Topic A","Topic B"]},…]</small></label>
+      <textarea id="c_curr" rows="5" placeholder='[{"title":"Introduction","topics":["Overview","Tools setup"]},{"title":"Core Skills","topics":["Hands-on practice","Assessment"]}]'>${esc(c.curriculum||'')}</textarea></div>
+    <hr class="form-sep">
+    <div class="form-sep-label s2"><i class="fas fa-question-circle"></i> FAQs (JSON)</div>
+    <div class="fg s2"><label>FAQs <small style="font-weight:400;color:var(--gray)">[{"q":"Question?","a":"Answer."},…]</small></label>
+      <textarea id="c_faqs" rows="4" placeholder='[{"q":"What are the entry requirements?","a":"KCSE or equivalent."}]'>${esc(c.faqs||'')}</textarea></div>
+    <hr class="form-sep">
+    <div class="form-sep-label s2"><i class="fas fa-calendar"></i> Intake Dates & Media</div>
+    <div class="fg s2"><label>Intake Months <small style="font-weight:400;color:var(--gray)">(comma-separated, or JSON array)</small></label>
+      <input id="c_intakes" value="${esc(c.intake_dates||'')}" placeholder="January,March,May,July,September,November"></div>
+    <div class="fg s2"><label>Main Image URL <span class="r">*</span></label><input id="c_img" value="${esc(c.image_url||'')}" placeholder="https://…" oninput="previewCourseImg(this.value)"></div>
+    <div class="fg s2" id="c_img_prev_wrap" style="${c.image_url?'':'display:none'}">
+      <img id="c_img_prev" src="${esc(c.image_url||'')}" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;border:1px solid var(--border)" onerror="this.style.display='none'">
+    </div>
     <div class="fg s2"><label>Gallery Image URLs (JSON array)</label><input id="c_gal" value="${esc(c.gallery_urls||'[]')}" placeholder='["https://…","https://…"]'></div>
     <div class="fg"><label>Sort Order</label><input id="c_order" type="number" value="${c.sort_order||99}"></div>
+    <div class="fg" style="display:flex;align-items:center;gap:10px;padding-top:22px">
+      <input type="checkbox" id="c_featured" ${c.featured?'checked':''} style="width:18px;height:18px;accent-color:var(--gold)">
+      <label for="c_featured" style="margin-bottom:0;font-size:.88rem;color:var(--navy)">⭐ Featured Course (shown with badge)</label>
+    </div>
   </div>`;
 }
 
 window.saveCourse = async function(id){
+  const rawLearn = qs('#c_learn').value.trim();
+  const rawCurr  = qs('#c_curr').value.trim();
+  const rawFaqs  = qs('#c_faqs').value.trim();
+  // Validate JSON fields if non-empty
+  if(rawCurr){ try{ JSON.parse(rawCurr); }catch(e){ toast('Curriculum JSON is invalid. Check format.','error'); return; } }
+  if(rawFaqs){ try{ JSON.parse(rawFaqs); }catch(e){ toast('FAQs JSON is invalid. Check format.','error'); return; } }
   const payload = {
-    name:        qs('#c_name').value.trim(),
-    category:    qs('#c_cat').value,
-    duration:    qs('#c_dur').value.trim(),
-    fee:         qs('#c_fee').value.trim(),
-    levels:      qs('#c_levels').value.trim(),
-    mode:        qs('#c_mode').value.trim(),
-    description: qs('#c_desc').value.trim(),
-    requirements:qs('#c_req').value.trim(),
-    careers:     qs('#c_careers').value.trim(),
-    image_url:   qs('#c_img').value.trim(),
-    gallery_urls:qs('#c_gal').value.trim(),
-    sort_order:  parseInt(qs('#c_order').value)||99
+    name:          qs('#c_name').value.trim(),
+    category:      qs('#c_cat').value,
+    duration:      qs('#c_dur').value.trim(),
+    fee:           qs('#c_fee').value.trim(),
+    levels:        qs('#c_levels').value.trim(),
+    mode:          qs('#c_mode').value.trim(),
+    description:   qs('#c_desc').value.trim(),
+    requirements:  qs('#c_req').value.trim(),
+    careers:       qs('#c_careers').value.trim(),
+    what_you_learn:rawLearn,
+    curriculum:    rawCurr,
+    faqs:          rawFaqs,
+    intake_dates:  qs('#c_intakes').value.trim(),
+    image_url:     qs('#c_img').value.trim(),
+    gallery_urls:  qs('#c_gal').value.trim(),
+    sort_order:    parseInt(qs('#c_order').value)||99,
+    featured:      qs('#c_featured')?.checked||false
   };
   if(!payload.name){ toast('Course name required','error'); return; }
   let error;
@@ -867,6 +904,12 @@ window.saveCourse = async function(id){
   }
   if(error){ toast('Save failed: '+error.message,'error'); return; }
   updateCounts(); closeModal(); goPage('courses'); toast('Course saved!');
+};
+
+window.previewCourseImg = function(url){
+  const wrap=qs('#c_img_prev_wrap'); const img=qs('#c_img_prev');
+  if(url&&wrap&&img){wrap.style.display='';img.src=url;}
+  else if(wrap) wrap.style.display='none';
 };
 
 window.deleteCourse = async function(id){
