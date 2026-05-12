@@ -711,7 +711,7 @@ function hero(){
   <div class="card">
     ${DB.hero_slides.length ? DB.hero_slides.map(s=>`
       <div class="slide-row">
-        <img src="${esc(s.background_url)}" class="slide-preview" alt="Slide" onerror="this.src='https://via.placeholder.com/90x60?text=IMG'">
+        <img src="${esc(s.background_url)}" class="slide-preview" alt="Slide" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='60'%3E%3Crect width='90' height='60' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='9' fill='%23aaa' font-family='sans-serif'%3EIMG%3C/text%3E%3C/svg%3E'">
         <div>
           <div style="font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--gold)">${esc(s.badge)}</div>
           <div style="font-size:.9rem;font-weight:700;color:var(--navy);margin:3px 0">${s.title?s.title.replace(/<[^>]+>/g,''):'—'}</div>
@@ -794,7 +794,7 @@ function courses(){
         <thead><tr><th>Image</th><th>Course Name</th><th>Category</th><th>Duration</th><th>Fee</th><th>Mode</th><th>Featured</th><th>Order</th><th>Actions</th></tr></thead>
         <tbody>${DB.courses.map(c=>`
           <tr>
-            <td><img src="${esc(c.image_url)}" class="td-thumb" onerror="this.src='https://via.placeholder.com/52x40?text=IMG'"></td>
+            <td><img src="${esc(c.image_url)}" class="td-thumb" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='40'%3E%3Crect width='52' height='40' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='8' fill='%23aaa' font-family='sans-serif'%3EIMG%3C/text%3E%3C/svg%3E'"></td>
             <td><strong>${esc(c.name)}</strong>${c.what_you_learn?'<br><small style="color:var(--gray);font-size:.7rem">✓ Rich content</small>':''}</td>
             <td><span class="badge badge-navy">${esc(c.category)}</span></td>
             <td>${esc(c.duration)}</td>
@@ -935,7 +935,7 @@ function events(){
         <thead><tr><th>Thumb</th><th>Title</th><th>Date</th><th>Time</th><th>Location</th><th>Tag</th><th>Live</th><th>Actions</th></tr></thead>
         <tbody>${DB.events.map(e=>`
           <tr>
-            <td><img src="${esc(e.thumbnail)}" class="td-thumb" onerror="this.src='https://via.placeholder.com/52x40?text=IMG'"></td>
+            <td><img src="${esc(e.thumbnail)}" class="td-thumb" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='40'%3E%3Crect width='52' height='40' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='8' fill='%23aaa' font-family='sans-serif'%3EIMG%3C/text%3E%3C/svg%3E'"></td>
             <td><strong>${esc(e.title)}</strong></td>
             <td>${fmtDate(e.date)}</td>
             <td>${esc(e.time)}</td>
@@ -1045,7 +1045,7 @@ function gallery(){
     <div class="gal-grid" id="galGrid">
       ${DB.gallery.map(g=>`
         <div class="gi">
-          <img src="${esc(g.url||g)}" alt="${esc(g.caption||'Gallery')}" onerror="this.src='https://via.placeholder.com/150?text=IMG'">
+          <img src="${esc(g.url||g)}" alt="${esc(g.caption||'Gallery')}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='12' fill='%23aaa' font-family='sans-serif'%3EIMG%3C/text%3E%3C/svg%3E'">
           <button class="gi-del" onclick="deleteGalleryItem(${g.id||0},'${esc(g.url||g)}')">×</button>
           <span class="gi-order">${g.sort_order!==undefined?g.sort_order:''}</span>
         </div>`).join('')}
