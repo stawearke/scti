@@ -125,7 +125,8 @@ table{width:100%;border-collapse:collapse;font-size:.82rem}
 th{background:var(--gray-lt);font-weight:700;padding:11px 14px;text-align:left;color:var(--navy);white-space:nowrap}
 td{padding:10px 14px;border-top:1px solid var(--border);color:var(--gray);vertical-align:middle}
 tr:hover td{background:#fafbfc}
-.td-thumb{width:52px;height:40px;border-radius:7px;object-fit:cover}
+.td-thumb{width:52px;height:40px;border-radius:7px;object-fit:cover;background:#e2e8f0}
+.td-thumb:not([src]),.slide-preview:not([src]),.gi img:not([src]){background:linear-gradient(135deg,#e2e8f0,#f4f7fb);display:block}
 .td-actions{display:flex;gap:6px;flex-wrap:wrap}
 
 /* ── BADGES ── */
@@ -273,6 +274,15 @@ tr:hover td{background:#fafbfc}
 /* ════════════════════════════════
    SUPABASE
 ════════════════════════════════ */
+function imgErr(el, size){
+  var svgs={
+    sm:"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2252%22 height=%2240%22%3E%3Crect width=%2252%22 height=%2240%22 fill=%22%23e2e8f0%22/%3E%3Ctext x=%2226%22 y=%2222%22 text-anchor=%22middle%22 font-size=%228%22 fill=%22%23999%22%3EIMG%3C/text%3E%3C/svg%3E",
+    md:"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22150%22 height=%22150%22%3E%3Crect width=%22150%22 height=%22150%22 fill=%22%23e2e8f0%22/%3E%3Ctext x=%2275%22 y=%2278%22 text-anchor=%22middle%22 font-size=%2212%22 fill=%22%23999%22%3EIMG%3C/text%3E%3C/svg%3E",
+    lg:"data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2290%22 height=%2260%22%3E%3Crect width=%2290%22 height=%2260%22 fill=%22%23e2e8f0%22/%3E%3Ctext x=%2245%22 y=%2232%22 text-anchor=%22middle%22 font-size=%229%22 fill=%22%23999%22%3EIMG%3C/text%3E%3C/svg%3E"
+  };
+  el.onerror=null; el.src=svgs[size]||svgs.sm;
+}
+
 const SB_URL  = 'https://iuskmfphmraighipmsmh.supabase.co';
 const SB_ANON = 'sb_publishable_473bcG4eRXPZfqKHR7T47A_qpYNQQWQ';
 const sb = supabase.createClient(SB_URL, SB_ANON);
@@ -380,7 +390,7 @@ function goPage(page){
   currentPage = page;
   qsa('.sb-item').forEach(el=>el.classList.toggle('on', el.dataset.page===page));
   const pages = {
-    dashboard, applications, enquiries, hero, courses, events, gallery, settings, live
+    dashboard: pageFn_dashboard, applications: pageFn_applications, enquiries: pageFn_enquiries, hero: pageFn_hero, courses: pageFn_courses, events: pageFn_events, gallery: pageFn_gallery, settings: pageFn_settings, live: pageFn_live
   };
   const fn = pages[page];
   if(fn) qs('#mainContent').innerHTML = fn();
@@ -432,7 +442,7 @@ function syncIndicator(){
 /* ════════════════════════════════
    DASHBOARD
 ════════════════════════════════ */
-function dashboard(){
+function pageFn_dashboard(){
   const pendingApps = DB.applications.filter(a=>a.status==='pending').length;
   const liveEvent   = DB.events.find(e=>e.is_live);
   const upcoming    = DB.events.filter(e=>new Date(e.date)>=new Date()).slice(0,3);
@@ -512,7 +522,7 @@ function dashboard(){
 /* ════════════════════════════════
    APPLICATIONS
 ════════════════════════════════ */
-function applications(){
+function pageFn_applications(){
   const filter = `<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">
     <button class="btn btn-sm btn-navy" onclick="filterApps('all',this)">All (${DB.applications.length})</button>
     <button class="btn btn-sm btn-ghost" onclick="filterApps('pending',this)">Pending</button>
@@ -563,7 +573,7 @@ function applications(){
 }
 
 window.filterApps = function(status, btn){
-  qsa('.btn-navy,.btn-ghost').forEach(b=>{if(b.onclick||b.getAttribute('onclick')?.includes('filterApps')){b.classList.remove('btn-navy');b.classList.add('btn-ghost');}});
+  document.querySelectorAll('[onclick*="filterApps"]').forEach(b=>{b.classList.remove('btn-navy');b.classList.add('btn-ghost');});
   btn.classList.remove('btn-ghost'); btn.classList.add('btn-navy');
   const rows = DB.applications.filter(a=>status==='all'||a.status===status);
   qs('#appTable').innerHTML = rows.map(a=>`
@@ -573,7 +583,7 @@ window.filterApps = function(status, btn){
       <td>${esc(a.course_name)}</td>
       <td>${esc(a.county||'')} ${esc(a.town||'')}</td>
       <td>${fmtDate(a.created_at)}</td>
-      <td><select class="app-status-sel" style="width:120px;font-size:.74px;padding:5px 8px" onchange="updateAppStatus(${a.id},this.value)">
+      <td><select class="app-status-sel" style="width:120px;font-size:.74rem;padding:5px 8px" onchange="updateAppStatus(${a.id},this.value)">
         <option value="pending" ${a.status==='pending'?'selected':''}>Pending</option>
         <option value="contacted" ${a.status==='contacted'?'selected':''}>Contacted</option>
         <option value="approved" ${a.status==='approved'?'selected':''}>Approved</option>
@@ -649,7 +659,7 @@ window.exportApplications = function(){
 /* ════════════════════════════════
    ENQUIRIES
 ════════════════════════════════ */
-function enquiries(){
+function pageFn_enquiries(){
   return `
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
     <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-envelope" style="color:var(--red);margin-right:8px"></i>Contact Enquiries</h1>
@@ -702,7 +712,7 @@ window.deleteEnquiry = async function(id){
 /* ════════════════════════════════
    HERO SLIDES
 ════════════════════════════════ */
-function hero(){
+function pageFn_hero(){
   return `
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
     <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-image" style="color:var(--red);margin-right:8px"></i>Hero Slides</h1>
@@ -711,7 +721,7 @@ function hero(){
   <div class="card">
     ${DB.hero_slides.length ? DB.hero_slides.map(s=>`
       <div class="slide-row">
-        <img src="${esc(s.background_url)}" class="slide-preview" alt="Slide" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='90' height='60'%3E%3Crect width='90' height='60' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='9' fill='%23aaa' font-family='sans-serif'%3EIMG%3C/text%3E%3C/svg%3E'">
+        <img src="${esc(s.background_url)}" class="slide-preview" alt="Slide" onerror="imgErr(this,'lg')">
         <div>
           <div style="font-size:.7rem;font-weight:700;letter-spacing:1px;color:var(--gold)">${esc(s.badge)}</div>
           <div style="font-size:.9rem;font-weight:700;color:var(--navy);margin:3px 0">${s.title?s.title.replace(/<[^>]+>/g,''):'—'}</div>
@@ -782,7 +792,7 @@ window.deleteHeroSlide = async function(id){
 /* ════════════════════════════════
    COURSES
 ════════════════════════════════ */
-function courses(){
+function pageFn_courses(){
   return `
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
     <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-book-open" style="color:var(--red);margin-right:8px"></i>Courses</h1>
@@ -794,7 +804,7 @@ function courses(){
         <thead><tr><th>Image</th><th>Course Name</th><th>Category</th><th>Duration</th><th>Fee</th><th>Mode</th><th>Featured</th><th>Order</th><th>Actions</th></tr></thead>
         <tbody>${DB.courses.map(c=>`
           <tr>
-            <td><img src="${esc(c.image_url)}" class="td-thumb" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='40'%3E%3Crect width='52' height='40' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='8' fill='%23aaa' font-family='sans-serif'%3EIMG%3C/text%3E%3C/svg%3E'"></td>
+            <td><img src="${esc(c.image_url)}" class="td-thumb" onerror="imgErr(this,'sm')"></td>
             <td><strong>${esc(c.name)}</strong>${c.what_you_learn?'<br><small style="color:var(--gray);font-size:.7rem">✓ Rich content</small>':''}</td>
             <td><span class="badge badge-navy">${esc(c.category)}</span></td>
             <td>${esc(c.duration)}</td>
@@ -839,24 +849,24 @@ function courseForm(c={}){
     <div class="fg s2"><label>Entry Requirements (comma-separated)</label><textarea id="c_req" rows="2" placeholder="KCSE certificate, Basic computer knowledge">${esc(c.requirements||'')}</textarea></div>
     <div class="fg s2"><label>Career Outcomes (comma-separated)</label><textarea id="c_careers" rows="2" placeholder="IT Support, Data Analyst, Web Developer">${esc(c.careers||'')}</textarea></div>
     <hr class="form-sep">
-    <div class="form-sep-label s2"><i class="fas fa-star"></i> What You'll Learn (pipe-separated | or JSON array)</div>
-    <div class="fg s2"><label>What You'll Learn <small style="font-weight:400;color:var(--gray)">(separate with | or use JSON array)</small></label>
+    <div class="form-sep-label s2"><i class="fas fa-star"></i> What You'll Learn</div>
+    <div class="fg s2"><label>What You'll Learn <small style="font-weight:400;color:var(--gray)">(separate items with | pipe)</small></label>
       <textarea id="c_learn" rows="3" placeholder="Practical computer skills|Microsoft Office suite|Internet & email|Digital literacy">${esc(c.what_you_learn||'')}</textarea></div>
     <hr class="form-sep">
     <div class="form-sep-label s2"><i class="fas fa-book-open"></i> Curriculum Modules (JSON)</div>
     <div class="fg s2"><label>Curriculum <small style="font-weight:400;color:var(--gray)">[{"title":"Module 1","topics":["Topic A","Topic B"]},…]</small></label>
-      <textarea id="c_curr" rows="5" placeholder='[{"title":"Introduction","topics":["Overview","Tools setup"]},{"title":"Core Skills","topics":["Hands-on practice","Assessment"]}]'>${esc(c.curriculum||'')}</textarea></div>
+      <textarea id="c_curr" rows="4" placeholder='[{"title":"Introduction","topics":["Overview","Tools"]},{"title":"Core Skills","topics":["Practice","Assessment"]}]'>${esc(c.curriculum||'')}</textarea></div>
     <hr class="form-sep">
     <div class="form-sep-label s2"><i class="fas fa-question-circle"></i> FAQs (JSON)</div>
     <div class="fg s2"><label>FAQs <small style="font-weight:400;color:var(--gray)">[{"q":"Question?","a":"Answer."},…]</small></label>
-      <textarea id="c_faqs" rows="4" placeholder='[{"q":"What are the entry requirements?","a":"KCSE or equivalent."}]'>${esc(c.faqs||'')}</textarea></div>
+      <textarea id="c_faqs" rows="3" placeholder='[{"q":"What are the entry requirements?","a":"KCSE or equivalent."}]'>${esc(c.faqs||'')}</textarea></div>
     <hr class="form-sep">
     <div class="form-sep-label s2"><i class="fas fa-calendar"></i> Intake Dates & Media</div>
-    <div class="fg s2"><label>Intake Months <small style="font-weight:400;color:var(--gray)">(comma-separated, or JSON array)</small></label>
+    <div class="fg s2"><label>Intake Months <small style="font-weight:400;color:var(--gray)">(comma-separated)</small></label>
       <input id="c_intakes" value="${esc(c.intake_dates||'')}" placeholder="January,March,May,July,September,November"></div>
     <div class="fg s2"><label>Main Image URL <span class="r">*</span></label><input id="c_img" value="${esc(c.image_url||'')}" placeholder="https://…" oninput="previewCourseImg(this.value)"></div>
     <div class="fg s2" id="c_img_prev_wrap" style="${c.image_url?'':'display:none'}">
-      <img id="c_img_prev" src="${esc(c.image_url||'')}" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;border:1px solid var(--border)" onerror="this.style.display='none'">
+      <img id="c_img_prev" src="${esc(c.image_url||'')}" style="width:100%;max-height:160px;object-fit:cover;border-radius:10px;border:1px solid var(--border)" onerror="imgErr(this,'sm')">
     </div>
     <div class="fg s2"><label>Gallery Image URLs (JSON array)</label><input id="c_gal" value="${esc(c.gallery_urls||'[]')}" placeholder='["https://…","https://…"]'></div>
     <div class="fg"><label>Sort Order</label><input id="c_order" type="number" value="${c.sort_order||99}"></div>
@@ -871,7 +881,6 @@ window.saveCourse = async function(id){
   const rawLearn = qs('#c_learn').value.trim();
   const rawCurr  = qs('#c_curr').value.trim();
   const rawFaqs  = qs('#c_faqs').value.trim();
-  // Validate JSON fields if non-empty
   if(rawCurr){ try{ JSON.parse(rawCurr); }catch(e){ toast('Curriculum JSON is invalid. Check format.','error'); return; } }
   if(rawFaqs){ try{ JSON.parse(rawFaqs); }catch(e){ toast('FAQs JSON is invalid. Check format.','error'); return; } }
   const payload = {
@@ -923,7 +932,7 @@ window.deleteCourse = async function(id){
 /* ════════════════════════════════
    EVENTS
 ════════════════════════════════ */
-function events(){
+function pageFn_events(){
   return `
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
     <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-calendar-alt" style="color:var(--red);margin-right:8px"></i>Events</h1>
@@ -935,7 +944,7 @@ function events(){
         <thead><tr><th>Thumb</th><th>Title</th><th>Date</th><th>Time</th><th>Location</th><th>Tag</th><th>Live</th><th>Actions</th></tr></thead>
         <tbody>${DB.events.map(e=>`
           <tr>
-            <td><img src="${esc(e.thumbnail)}" class="td-thumb" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='52' height='40'%3E%3Crect width='52' height='40' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='8' fill='%23aaa' font-family='sans-serif'%3EIMG%3C/text%3E%3C/svg%3E'"></td>
+            <td><img src="${esc(e.thumbnail)}" class="td-thumb" onerror="imgErr(this,'sm')"></td>
             <td><strong>${esc(e.title)}</strong></td>
             <td>${fmtDate(e.date)}</td>
             <td>${esc(e.time)}</td>
@@ -1034,7 +1043,7 @@ window.deleteEvent = async function(id){
 /* ════════════════════════════════
    GALLERY
 ════════════════════════════════ */
-function gallery(){
+function pageFn_gallery(){
   return `
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
     <h1 style="font-size:1.3rem;font-family:'Syne',sans-serif;color:var(--navy)"><i class="fas fa-images" style="color:var(--red);margin-right:8px"></i>Gallery</h1>
@@ -1042,10 +1051,10 @@ function gallery(){
   </div>
   <div class="card">
     <p style="font-size:.82rem;color:var(--gray);margin-bottom:14px">Click ✕ on an image to delete it. ${DB.gallery.length} images total.</p>
-    <div class="gal-grid" id="galGrid">
+    <div 
       ${DB.gallery.map(g=>`
         <div class="gi">
-          <img src="${esc(g.url||g)}" alt="${esc(g.caption||'Gallery')}" onerror="this.src='data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect width='150' height='150' fill='%23e2e8f0'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='12' fill='%23aaa' font-family='sans-serif'%3EIMG%3C/text%3E%3C/svg%3E'">
+          <img src="${esc(g.url||g)}" alt="${esc(g.caption||'Gallery')}" onerror="imgErr(this,'md')">
           <button class="gi-del" onclick="deleteGalleryItem(${g.id||0},'${esc(g.url||g)}')">×</button>
           <span class="gi-order">${g.sort_order!==undefined?g.sort_order:''}</span>
         </div>`).join('')}
@@ -1098,7 +1107,7 @@ function initGalleryDrop(){ /* drag-and-drop reorder placeholder */ }
 /* ════════════════════════════════
    SETTINGS
 ════════════════════════════════ */
-function settings(){
+function pageFn_settings(){
   const fields = [
     ['site_name','Site Name','text'],['phone1','Primary Phone','text'],
     ['phone2','Secondary Phone','text'],['whatsapp','WhatsApp Number (intl)','text'],
@@ -1145,7 +1154,7 @@ window.saveSettings = async function(){
 /* ════════════════════════════════
    LIVE STREAM
 ════════════════════════════════ */
-function live(){
+function pageFn_live(){
   const liveEvent = DB.events.find(e=>e.is_live);
   return `
   <div style="margin-bottom:20px">
