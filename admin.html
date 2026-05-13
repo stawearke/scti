@@ -227,7 +227,7 @@ const SB_URL  = 'https://iuskmfphmraighipmsmh.supabase.co';
 // IMPORTANT: You MUST replace this with your actual service_role key from Supabase
 // Go to: Project Settings → API → service_role (NOT anon key)
 // Without a valid service_role key, writes will fail with 401 errors
-const SB_SERVICE_ROLE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1c2ttZnBobXJhaWdoaXBtc21oIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODU4MTI5NiwiZXhwIjoyMDk0MTU3Mjk2fQ.2xR7sL5kM9nPqW1yZ8bC4dE6fG7hJ2kL3mN4oP5qR6sT7uV8wX9yZ0aB1cD2eF3gH4iJ5kL6mN7oP8qR9sT0uV'; // service_role key for admin writes
+const SB_SERVICE_ROLE = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1c2ttZnBobXJhaWdoaXBtc21oIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODU4MTI5NiwiZXhwIjoyMDk0MTU3Mjk2fQ.w-ZgyjgppGNYvl8kCbm0L373h5WzJAI2v0v0GyazOow'; // service_role key for admin writes
 const sb = supabase.createClient(SB_URL, SB_SERVICE_ROLE);
 
 /* ── AUTH (hardened) ──
