@@ -220,6 +220,11 @@ tr:hover td{background:#fafbfc}
 /* ── SUPABASE ── */
 const SB_URL  = 'https://iuskmfphmraighipmsmh.supabase.co';
 const SB_ANON = 'sb_publishable_473bcG4eRXPZfqKHR7T47A_qpYNQQWQ';
+// Use anon key for reads; for writes we use same key but RLS must allow it
+// TO FIX 401 errors: In Supabase Dashboard -> Authentication -> Policies
+// Enable INSERT/UPDATE/DELETE for anon role on: events, courses, gallery, 
+// hero_slides, settings, applications, contact_enquiries tables
+// OR replace SB_ANON above with your service_role key (Settings -> API)
 const sb = supabase.createClient(SB_URL, SB_ANON);
 
 /* ── AUTH ── */
@@ -460,7 +465,7 @@ function pgDashboard() {
       el.addEventListener('click', function(){ renderPage(el.dataset.goto); });
     });
     var stopBtn = document.getElementById('stopLiveBtn');
-    if (stopBtn) stopBtn.addEventListener('click', function(){ toggleLive(parseInt(stopBtn.dataset.liveid), false); });
+    if (stopBtn) stopBtn.addEventListener('click', function(){ toggleLive(stopBtn.dataset.liveid, false); });
   }, 50);
 
   return html;
@@ -518,12 +523,12 @@ document.addEventListener('click', function(e){
   }
   /* view application */
   if (e.target.closest('.view-app-btn')) {
-    var id = parseInt(e.target.closest('.view-app-btn').dataset.appid);
+    var id = e.target.closest('.view-app-btn').dataset.appid;
     viewApplication(id);
   }
   /* delete application */
   if (e.target.closest('.del-app-btn')) {
-    var id = parseInt(e.target.closest('.del-app-btn').dataset.appid);
+    var id = e.target.closest('.del-app-btn').dataset.appid;
     deleteApplication(id);
   }
   /* export csv */
@@ -532,11 +537,11 @@ document.addEventListener('click', function(e){
 
 document.addEventListener('change', function(e){
   if (e.target.classList.contains('app-status-sel')) {
-    var id = parseInt(e.target.dataset.appid);
+    var id = e.target.dataset.appid;
     updateAppStatus(id, e.target.value);
   }
   if (e.target.classList.contains('event-live-chk')) {
-    var id = parseInt(e.target.dataset.eid);
+    var id = e.target.dataset.eid;
     toggleLive(id, e.target.checked);
   }
 });
@@ -639,10 +644,10 @@ function pgEnquiries() {
 
   setTimeout(function(){
     document.querySelectorAll('.view-enq-btn').forEach(function(btn){
-      btn.addEventListener('click', function(){ viewEnquiry(parseInt(btn.dataset.enqid)); });
+      btn.addEventListener('click', function(){ viewEnquiry(btn.dataset.enqid); });
     });
     document.querySelectorAll('.del-enq-btn').forEach(function(btn){
-      btn.addEventListener('click', function(){ deleteEnquiry(parseInt(btn.dataset.enqid)); });
+      btn.addEventListener('click', function(){ deleteEnquiry(btn.dataset.enqid); });
     });
   }, 50);
 
@@ -693,10 +698,10 @@ function pgHero() {
 
   setTimeout(function(){
     document.querySelectorAll('.edit-slide-btn').forEach(function(btn){
-      btn.addEventListener('click', function(){ openSlideModal(parseInt(btn.dataset.sid)); });
+      btn.addEventListener('click', function(){ openSlideModal(btn.dataset.sid); });
     });
     document.querySelectorAll('.del-slide-btn').forEach(function(btn){
-      btn.addEventListener('click', function(){ deleteSlide(parseInt(btn.dataset.sid)); });
+      btn.addEventListener('click', function(){ deleteSlide(btn.dataset.sid); });
     });
     var addBtn = document.getElementById('addSlideBtn');
     if (addBtn) addBtn.addEventListener('click', function(){ openSlideModal(null); });
@@ -776,10 +781,10 @@ function pgCourses() {
 
   setTimeout(function(){
     document.querySelectorAll('.edit-course-btn').forEach(function(btn){
-      btn.addEventListener('click', function(){ openCourseModal(parseInt(btn.dataset.cid)); });
+      btn.addEventListener('click', function(){ openCourseModal(btn.dataset.cid); });
     });
     document.querySelectorAll('.del-course-btn').forEach(function(btn){
-      btn.addEventListener('click', function(){ deleteCourse(parseInt(btn.dataset.cid)); });
+      btn.addEventListener('click', function(){ deleteCourse(btn.dataset.cid); });
     });
     var addBtn = document.getElementById('addCourseBtn');
     if (addBtn) addBtn.addEventListener('click', function(){ openCourseModal(null); });
@@ -906,10 +911,10 @@ function pgEvents() {
   // Wire up AFTER HTML is in the DOM
   setTimeout(function(){
     document.querySelectorAll('.edit-event-btn').forEach(function(btn){
-      btn.addEventListener('click', function(){ openEventModal(parseInt(btn.dataset.eid)); });
+      btn.addEventListener('click', function(){ openEventModal(btn.dataset.eid); });
     });
     document.querySelectorAll('.del-event-btn').forEach(function(btn){
-      btn.addEventListener('click', function(){ deleteEvent(parseInt(btn.dataset.eid)); });
+      btn.addEventListener('click', function(){ deleteEvent(btn.dataset.eid); });
     });
     var addBtn = document.getElementById('addEventBtn');
     if (addBtn) addBtn.addEventListener('click', function(){ openEventModal(null); });
@@ -1002,7 +1007,7 @@ function pgGallery() {
 
   setTimeout(function(){
     document.querySelectorAll('.del-gal-btn').forEach(function(btn){
-      btn.addEventListener('click', function(){ deleteGallery(parseInt(btn.dataset.galid)); });
+      btn.addEventListener('click', function(){ deleteGallery(btn.dataset.galid); });
     });
     var addBtn = document.getElementById('addGalBtn');
     if (addBtn) addBtn.addEventListener('click', openGalleryModal);
@@ -1135,7 +1140,7 @@ function pgLive() {
 
   setTimeout(function(){
     document.querySelectorAll('.stop-live-btn').forEach(function(btn){
-      btn.addEventListener('click', function(){ toggleLive(parseInt(btn.dataset.eid), false); });
+      btn.addEventListener('click', function(){ toggleLive(btn.dataset.eid, false); });
     });
   }, 50);
 
