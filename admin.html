@@ -461,7 +461,7 @@ function pgDashboard() {
     });
     var stopBtn = document.getElementById('stopLiveBtn');
     if (stopBtn) stopBtn.addEventListener('click', function(){ toggleLive(parseInt(stopBtn.dataset.liveid), false); });
-  }, 0);
+  }, 50);
 
   return html;
 }
@@ -587,7 +587,7 @@ function viewApplication(id) {
       if (sel) updateAppStatus(a.id, sel.value);
       closeModal();
     });
-  }, 0);
+  }, 50);
 }
 
 async function updateAppStatus(id, status) {
@@ -644,7 +644,7 @@ function pgEnquiries() {
     document.querySelectorAll('.del-enq-btn').forEach(function(btn){
       btn.addEventListener('click', function(){ deleteEnquiry(parseInt(btn.dataset.enqid)); });
     });
-  }, 0);
+  }, 50);
 
   return '<div style="margin-bottom:20px"><h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-envelope" style="color:var(--red);margin-right:8px"></i>Enquiries</h1></div>' +
     '<div class="card" style="padding:0"><div class="tbl-wrap"><table>' +
@@ -700,7 +700,7 @@ function pgHero() {
     });
     var addBtn = document.getElementById('addSlideBtn');
     if (addBtn) addBtn.addEventListener('click', function(){ openSlideModal(null); });
-  }, 0);
+  }, 50);
 
   return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">' +
     '<h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-image" style="color:var(--red);margin-right:8px"></i>Hero Slides</h1>' +
@@ -725,7 +725,7 @@ function openSlideModal(id) {
   setTimeout(function(){
     var btn = document.getElementById('saveSlideBtnModal');
     if (btn) btn.addEventListener('click', function(){ saveSlide(editingId); });
-  }, 0);
+  }, 50);
 }
 
 async function saveSlide(id) {
@@ -783,7 +783,7 @@ function pgCourses() {
     });
     var addBtn = document.getElementById('addCourseBtn');
     if (addBtn) addBtn.addEventListener('click', function(){ openCourseModal(null); });
-  }, 0);
+  }, 50);
 
   return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">' +
     '<h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-book-open" style="color:var(--red);margin-right:8px"></i>Courses</h1>' +
@@ -828,7 +828,7 @@ function openCourseModal(id) {
   setTimeout(function(){
     var btn = document.getElementById('saveCourseBtn');
     if (btn) btn.addEventListener('click', function(){ saveCourse(editingId); });
-  }, 0);
+  }, 50);
 }
 
 async function saveCourse(id) {
@@ -891,11 +891,19 @@ function pgEvents() {
       (e.is_live ? '<span class="badge badge-live" style="font-size:.6rem"><i class="fas fa-circle"></i> LIVE</span>' : '') +
       '</label></td>' +
       '<td><div class="td-acts">' +
-      '<button class="btn btn-sm btn-navy edit-event-btn" data-eid="' + e.id + '"><i class="fas fa-pen"></i></button>' +
-      '<button class="btn btn-sm btn-danger del-event-btn" data-eid="' + e.id + '"><i class="fas fa-trash"></i></button>' +
+      '<button class="btn btn-sm btn-navy edit-event-btn" data-eid="' + e.id + '"><i class="fas fa-pen"></i> Edit</button>' +
+      '<button class="btn btn-sm btn-danger del-event-btn" data-eid="' + e.id + '"><i class="fas fa-trash"></i> Delete</button>' +
       '</div></td></tr>';
   }).join('') || '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray)">No events found</td></tr>';
 
+  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">' +
+    '<h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-calendar-alt" style="color:var(--red);margin-right:8px"></i>Events</h1>' +
+    '<button class="btn btn-red" id="addEventBtn"><i class="fas fa-plus"></i> Add Event</button></div>' +
+    '<div class="card" style="padding:0"><div class="tbl-wrap"><table>' +
+    '<thead><tr><th>Thumb</th><th>Title</th><th>Date</th><th>Time</th><th>Location</th><th>Tag</th><th>Live</th><th>Actions</th></tr></thead>' +
+    '<tbody>' + rows + '</tbody></table></div></div>';
+
+  // Wire up AFTER HTML is in the DOM
   setTimeout(function(){
     document.querySelectorAll('.edit-event-btn').forEach(function(btn){
       btn.addEventListener('click', function(){ openEventModal(parseInt(btn.dataset.eid)); });
@@ -905,14 +913,9 @@ function pgEvents() {
     });
     var addBtn = document.getElementById('addEventBtn');
     if (addBtn) addBtn.addEventListener('click', function(){ openEventModal(null); });
-  }, 0);
+  }, 50);
 
-  return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">' +
-    '<h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-calendar-alt" style="color:var(--red);margin-right:8px"></i>Events</h1>' +
-    '<button class="btn btn-red" id="addEventBtn"><i class="fas fa-plus"></i> Add Event</button></div>' +
-    '<div class="card" style="padding:0"><div class="tbl-wrap"><table>' +
-    '<thead><tr><th>Thumb</th><th>Title</th><th>Date</th><th>Time</th><th>Location</th><th>Tag</th><th>Live</th><th>Actions</th></tr></thead>' +
-    '<tbody>' + rows + '</tbody></table></div></div>';
+  return html;
 }
 
 function openEventModal(id) {
@@ -939,7 +942,7 @@ function openEventModal(id) {
   setTimeout(function(){
     var btn = document.getElementById('saveEventBtn');
     if (btn) btn.addEventListener('click', function(){ saveEvent(editingId); });
-  }, 0);
+  }, 50);
 }
 
 async function saveEvent(id) {
@@ -1003,7 +1006,7 @@ function pgGallery() {
     });
     var addBtn = document.getElementById('addGalBtn');
     if (addBtn) addBtn.addEventListener('click', openGalleryModal);
-  }, 0);
+  }, 50);
 
   return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">' +
     '<h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-images" style="color:var(--red);margin-right:8px"></i>Gallery (' + DB.gallery.length + ' images)</h1>' +
@@ -1023,7 +1026,7 @@ function openGalleryModal() {
   setTimeout(function(){
     var btn = document.getElementById('saveGalBtn');
     if (btn) btn.addEventListener('click', saveGallery);
-  }, 0);
+  }, 50);
 }
 
 async function saveGallery() {
@@ -1079,7 +1082,7 @@ function pgSettings() {
     if (btn) btn.addEventListener('click', saveSettings);
     var btn2 = document.getElementById('saveSettingsBtn2');
     if (btn2) btn2.addEventListener('click', saveSettings);
-  }, 0);
+  }, 50);
 
   return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">' +
     '<h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-cog" style="color:var(--red);margin-right:8px"></i>Site Settings</h1>' +
@@ -1134,7 +1137,7 @@ function pgLive() {
     document.querySelectorAll('.stop-live-btn').forEach(function(btn){
       btn.addEventListener('click', function(){ toggleLive(parseInt(btn.dataset.eid), false); });
     });
-  }, 0);
+  }, 50);
 
   return '<div style="margin-bottom:20px"><h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-video" style="color:var(--red);margin-right:8px"></i>Live Stream Control</h1></div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">' +
