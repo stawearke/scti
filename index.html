@@ -6,7 +6,7 @@
 <title>SCTI | Skymo Creative Training Institute — Empowering Skills. Creating Leaders.</title>
 <meta name="description" content="Skymo Creative Training Institute offers hands-on courses in ICT, Creative Media & Business. Located in Ruiru, opposite Tatu City, Nairobi.">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflFare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -516,7 +516,7 @@ let slideIdx=0, slideTimer=null;
 let chatHistory=[], chatLoading=false;
 
 /* ═══════════════════════════════════════════
-   DEFAULTS (fallback if DB empty)
+   DEFAULTS (only used on NETWORK ERROR, not on empty data)
 ═══════════════════════════════════════════ */
 const DEF_SETTINGS={site_name:'Skymo Creative Training Institute',phone1:'0113 50 40 43',phone2:'0724 33 33 13',whatsapp:'+254113504043',email:'skymocreativetraininginstitute@gmail.com',address:'Ruiru Bypass, Opposite Tatu City, Nairobi',facebook:'https://facebook.com/skymocreative',instagram:'https://instagram.com/skymocreative',tiktok:'https://tiktok.com/@skymocreative',youtube:'https://youtube.com/@skymocreative',twitter:'https://x.com/skymocreative',about_text:'Located in Ruiru, opposite Tatu City, SCTI delivers industry-driven courses blending creativity with technology — designed around what employers actually need.',footer_text:'Empowering Skills. Creating Leaders.',cta_title:'Ready to Start Your Journey?',cta_subtitle:'Intakes open all year. Call or WhatsApp us today.',students_count:'2,000+',courses_count:'12+',years_count:'8+',placement_rate:'92%',working_hours:'Mon–Fri 8am–5pm, Sat 9am–1pm'};
 const DEF_SLIDES=[{id:1,background_url:'https://images.pexels.com/photos/5428836/pexels-photo-5428836.jpeg?auto=compress&cs=tinysrgb&w=1400',badge:'SKILLS THAT PAY',title:"Transform Your Future<br>with <span class='g'>SCTI</span>",subtitle:'Industry-driven, hands-on training in Technology, Creative Media & Business.',sort_order:1},{id:2,background_url:'https://images.pexels.com/photos/5380642/pexels-photo-5380642.jpeg?auto=compress&cs=tinysrgb&w=1400',badge:'ICT & TECHNOLOGY',title:"Cyber Security,<br>Web Dev & <span class='g'>More</span>",subtitle:'Prepare for high-demand tech careers taught by industry professionals.',sort_order:2},{id:3,background_url:'https://images.pexels.com/photos/2751868/pexels-photo-2751868.jpeg?auto=compress&cs=tinysrgb&w=1400',badge:'CREATIVE MEDIA',title:"Film, Design,<br>Photography & <span class='g'>DJ</span>",subtitle:'Unleash your creativity. Build a career doing what you love.',sort_order:3}];
@@ -525,28 +525,49 @@ const DEF_COURSES=[{id:1,name:'ICT & Computer Studies',category:'ICT & Technolog
 const DEF_GALLERY=['https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/2751868/pexels-photo-2751868.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/5380642/pexels-photo-5380642.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/167636/pexels-photo-167636.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/270404/pexels-photo-270404.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/1586516/pexels-photo-1586516.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/2774550/pexels-photo-2774550.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/159823/kid-girl-paint-drawing-159823.jpeg?auto=compress&cs=tinysrgb&w=600'].map((url,i)=>({id:i+1,url,sort_order:i,caption:'SCTI Campus'}));
 
 /* ═══════════════════════════════════════════
-   LOAD DATA
+   LOAD DATA — NO FALLBACK ON EMPTY (only on network error)
 ═══════════════════════════════════════════ */
 async function loadAllData(){
+  let loadError = false;
   try{
-    const [evR,coR,galR,heroR,setR]=await Promise.all([
+    const [evR,coR,galR,heroR,setR] = await Promise.all([
       _sb.from('events').select('*').order('date',{ascending:true}),
       _sb.from('courses').select('*').order('sort_order',{ascending:true}),
       _sb.from('gallery').select('*').order('sort_order',{ascending:true}),
       _sb.from('hero_slides').select('*').order('sort_order',{ascending:true}),
       _sb.from('settings').select('*')
     ]);
-    if(evR.data?.length)  DB.events=evR.data;
-    if(coR.data?.length)  DB.courses=coR.data;
-    if(galR.data?.length) DB.gallery=galR.data;
-    if(heroR.data?.length)DB.hero_slides=heroR.data;
-    if(setR.data?.length){DB.settings={};setR.data.forEach(s=>DB.settings[s.key]=s.value);}
-  }catch(e){console.warn('Supabase error:',e);}
-  if(!DB.events.length)    DB.events=DEF_EVENTS;
-  if(!DB.courses.length)   DB.courses=DEF_COURSES;
-  if(!DB.gallery.length)   DB.gallery=DEF_GALLERY;
-  if(!DB.hero_slides.length)DB.hero_slides=DEF_SLIDES;
-  if(!Object.keys(DB.settings).length)DB.settings=DEF_SETTINGS;
+    
+    // Only assign if no error — empty arrays are valid (means no data in DB)
+    if (!evR.error) DB.events = evR.data || [];
+    if (!coR.error) DB.courses = coR.data || [];
+    if (!galR.error) DB.gallery = galR.data || [];
+    if (!heroR.error) DB.hero_slides = heroR.data || [];
+    if (!setR.error && setR.data) {
+      DB.settings = {};
+      setR.data.forEach(s => DB.settings[s.key] = s.value);
+    }
+    
+    // Check if any error occurred that prevents loading
+    if (evR.error || coR.error || galR.error || heroR.error || setR.error) {
+      loadError = true;
+      console.warn('Some data failed to load from Supabase:', {evR, coR, galR, heroR, setR});
+    }
+  } catch(e){
+    loadError = true;
+    console.error('Network error loading data:', e);
+  }
+  
+  // ONLY use defaults if there was a NETWORK ERROR, not if data is empty
+  if (loadError) {
+    console.warn('⚠️ Using fallback data due to network error');
+    if (!DB.events.length) DB.events = DEF_EVENTS;
+    if (!DB.courses.length) DB.courses = DEF_COURSES;
+    if (!DB.gallery.length) DB.gallery = DEF_GALLERY;
+    if (!DB.hero_slides.length) DB.hero_slides = DEF_SLIDES;
+    if (!Object.keys(DB.settings).length) DB.settings = DEF_SETTINGS;
+  }
+  
   buildAnnBar(); buildDDEvents(); render();
 }
 
@@ -772,7 +793,10 @@ function courseCard(c){
     </div>
   </div>`;
 }
-function goDetail(id){ go('detail', DB.courses.find(c=>c.id==id)||null); }
+function goDetail(id){ 
+  const idStr = String(id);
+  go('detail', DB.courses.find(c => String(c.id) === idStr) || null); 
+}
 function goApply(id){ SEL_COURSE=DB.courses.find(c=>c.id==id)||null; go('apply'); }
 
 function filterCat(cat,btn){
@@ -826,7 +850,7 @@ function renderDetail(){
   ];
   const faqList=faqs.length?faqs:defFaqs;
 
-  const related=DB.courses.filter(x=>x.id!==c.id&&x.category===c.category).slice(0,3);
+  const related=DB.courses.filter(x=>String(x.id)!==String(c.id)&&x.category===c.category).slice(0,3);
   const careers=(c.careers||'').split(',').map(s=>s.trim()).filter(Boolean);
   const requirements=(c.requirements||'').split(',').map(s=>s.trim()).filter(Boolean);
 
@@ -1111,7 +1135,7 @@ function eventCard(e){
 }
 
 function openVid(id){
-  const e=DB.events.find(x=>x.id==id||x.id===id);
+  const e=DB.events.find(x=>String(x.id)===String(id));
   if(!e)return;
   document.getElementById('vidTitle').textContent=e.title;
   document.getElementById('vidDesc').textContent=`${e.date_label||fmtDate(e.date)} · ${e.time} · ${e.location}`;
@@ -1531,7 +1555,7 @@ function renderContact(){
         </div>
       </div>
       <div style="border-radius:var(--rlg);overflow:hidden;height:360px;border:1px solid var(--border)">
-        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.7!2d36.96!3d-1.17!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMcKwMTAnMTIuMCJTIDM2wrA1Nyc0OC4wIkU!5e0!3m2!1sen!2ske!4v1" width="100%" height="100%" style="border:0" allowfullscreen loading="lazy"></iframe>
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.75!2d36.9585!3d-1.1485!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f3f5b5b5b5b5b%3A0x0!2zMcKwMDgnNTQuNiJTIDM2wrA1Nyc0OC4wIkU!5e0!3m2!1sen!2ske!4v1" width="100%" height="100%" style="border:0" allowfullscreen loading="lazy"></iframe>
       </div>
     </div>
   </section>
@@ -1628,34 +1652,10 @@ function goSlide(i){slideIdx=i;updateSlide();}
 function buildWhyStats(){}
 
 /* ═══════════════════════════════════════════
-   AI CHATBOT
+   AI CHATBOT — NOTE: Requires backend proxy to work (API key cannot be exposed in browser)
+   The chatbot currently shows a demo response. To enable real AI, set up a Cloudflare Worker or Supabase Edge Function.
 ═══════════════════════════════════════════ */
 function toggleChat(){document.getElementById('chatWin').classList.toggle('on');}
-
-function buildSystemPrompt(){
-  const courseList=DB.courses.map(c=>`- ${c.name} (${c.category}, ${c.duration}, ${c.fee})`).join('\n');
-  const eventList=DB.events.map(e=>`- ${e.title}: ${e.date_label||fmtDate(e.date)}, ${e.time}, ${e.location}`).join('\n');
-  return`You are the AI Guide for Skymo Creative Training Institute (SCTI), a professional training institute in Ruiru, Kenya (opposite Tatu City). Be warm, helpful, and concise.
-
-ABOUT SCTI:
-- Location: ${S('address')}
-- Phone: ${S('phone1')} / ${S('phone2')}
-- WhatsApp: ${S('whatsapp')}
-- Email: ${S('email')}
-- Hours: ${S('working_hours')}
-
-COURSES OFFERED:
-${courseList}
-
-UPCOMING EVENTS:
-${eventList}
-
-STUDY OPTIONS: Certificate, Diploma, Short Course | Full-time, Part-time, Online | Rolling intakes year-round
-
-APPLICATION: Apply online, or call/WhatsApp ${S('phone1')}. Required docs: National ID, passport photo, academic certificate.
-
-Answer ANY question from prospective students. Guide them toward SCTI's offerings. Keep responses concise and conversational. Use markdown for bold/lists where helpful.`;
-}
 
 async function sendMsg(){
   if(chatLoading)return;
@@ -1670,23 +1670,40 @@ async function sendMsg(){
   msgs.innerHTML+=`<div class="mb" id="${tid}"><div class="mb-typing"><span></span><span></span><span></span></div></div>`;
   msgs.scrollTop=msgs.scrollHeight;
   chatLoading=true;
-  try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:buildSystemPrompt(),messages:chatHistory.slice(-10)})
-    });
-    const data=await res.json();
-    const reply=data.content?.[0]?.text||"Sorry, I'm having trouble. Please call us on "+S('phone1');
+  
+  // Simple rule-based responses (since API key cannot be exposed in browser)
+  // For real AI, replace this with a call to your backend proxy
+  setTimeout(() => {
+    let reply = getSimpleReply(txt.toLowerCase());
+    document.getElementById(tid)?.remove();
+    msgs.innerHTML+=`<div class="mb"><div class="mb-bot">${reply}</div></div>`;
     chatHistory.push({role:'assistant',content:reply});
-    document.getElementById(tid)?.remove();
-    msgs.innerHTML+=`<div class="mb"><div class="mb-bot">${formatBotReply(reply)}</div></div>`;
-  }catch(e){
-    document.getElementById(tid)?.remove();
-    msgs.innerHTML+=`<div class="mb"><div class="mb-bot">Sorry, connection issue. Please call <strong>${S('phone1')}</strong>!</div></div>`;
+    chatLoading=false;
+    msgs.scrollTop=msgs.scrollHeight;
+  }, 500);
+}
+
+function getSimpleReply(msg){
+  if(msg.includes('course') || msg.includes('study') || msg.includes('learn')){
+    return `We offer courses in <strong>ICT & Technology, Creative Media, and Business</strong>. Popular courses include Cyber Security, Film Production, Digital Marketing, Web Design, Photography, and Deejaying. Check our <a onclick="go('courses')" style="color:var(--red);cursor:pointer">Courses page</a> for the full list!`;
   }
-  chatLoading=false;
-  msgs.scrollTop=msgs.scrollHeight;
+  if(msg.includes('fee') || msg.includes('cost') || msg.includes('price')){
+    return `Course fees range from <strong>Ksh 18,000 to Ksh 45,000</strong> depending on the course and duration. Payment plans are available — contact our admissions team at ${S('phone1')} for details.`;
+  }
+  if(msg.includes('apply') || msg.includes('application') || msg.includes('admission')){
+    return `You can apply online through our <a onclick="go('apply')" style="color:var(--red);cursor:pointer">Application Form</a>. Required documents: Passport photo, National ID (front & back), and academic certificate. We'll call you within 24 hours!`;
+  }
+  if(msg.includes('location') || msg.includes('address') || msg.includes('where')){
+    return `We're located at <strong>${S('address')}</strong>. Open ${S('working_hours')}. Call ${S('phone1')} for directions!`;
+  }
+  if(msg.includes('phone') || msg.includes('call') || msg.includes('contact')){
+    return `Call us: ${S('phone1')} / ${S('phone2')} | WhatsApp: ${S('whatsapp')} | Email: ${S('email')}`;
+  }
+  if(msg.includes('event') || msg.includes('live') || msg.includes('workshop')){
+    const upcoming = DB.events.slice(0,2).map(e => e.title).join(' or ');
+    return upcoming ? `Upcoming events: ${upcoming}. Check our <a onclick="go('events')" style="color:var(--red);cursor:pointer">Events page</a> for details and live streams!` : `Visit our Events page to see what's happening at SCTI — workshops, open days, and graduation ceremonies!`;
+  }
+  return `Thanks for your question! For more details, please call us at ${S('phone1')} or WhatsApp ${S('whatsapp')}. You can also browse our <a onclick="go('courses')" style="color:var(--red);cursor:pointer">Courses</a> or fill out the <a onclick="go('apply')" style="color:var(--red);cursor:pointer">Application Form</a>. I'm here to help!`;
 }
 
 function formatBotReply(t){
