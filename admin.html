@@ -431,7 +431,7 @@ function closeModal(){ qs('#globalModal').classList.remove('on'); }
 ════════════════════════════════ */
 function fmtDate(d){ if(!d) return ''; return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
 function fmtTs(d){ if(!d) return ''; return new Date(d).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
-function esc(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function esc(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/`/g,'&#96;'); }
 
 /* ════════════════════════════════
    SYNC INDICATOR
@@ -602,7 +602,7 @@ window.filterApps = function(status, btn){
 
 window.viewApplication = function(id){
   const a = DB.applications.find(x=>x.id===id); if(!a) return;
-  openModal(`Application — ${a.full_name}`, `
+  openModal("Application — " + esc(a.full_name) + "", `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       ${[['Full Name',a.full_name],['Email',a.email],['Phone',a.phone],['Date of Birth',fmtDate(a.date_of_birth)],['Gender',a.gender],['National ID',a.national_id],['County',a.county],['Town',a.town],['Guardian',a.guardian_name],['Guardian Phone',a.guardian_phone],['Relation',a.guardian_relationship],['Education',a.highest_education],['School',a.school_name],['Grad Year',a.graduation_year],['Course',a.course_name],['Level',a.study_level],['Mode',a.study_mode],['Intake',a.intake_month],['How Heard',a.how_heard],['Applied',fmtTs(a.created_at)]].map(([k,v])=>`
         <div style="padding:10px 12px;background:var(--gray-lt);border-radius:8px">
@@ -691,7 +691,7 @@ function pageFn_enquiries(){
 
 window.viewEnquiry = function(id){
   const e = DB.enquiries.find(x=>x.id===id); if(!e) return;
-  openModal(`Enquiry from ${e.name}`,`
+  openModal("Enquiry from " + esc(e.name),`
     <div style="display:grid;gap:10px">
       ${[['Name',e.name],['Email',e.email],['Phone',e.phone||'—'],['Subject',e.subject||'—'],['Date',fmtTs(e.created_at)]].map(([k,v])=>`
         <div style="padding:10px;background:var(--gray-lt);border-radius:8px"><span style="font-size:.7rem;color:var(--gray);font-weight:700">${k}</span><div style="font-size:.85rem;font-weight:600;color:var(--navy);margin-top:2px">${esc(v)}</div></div>`).join('')}
@@ -833,7 +833,7 @@ window.openAddCourseModal = function(){
 
 window.editCourse = function(id){
   const c = DB.courses.find(x=>x.id===id); if(!c) return;
-  openModal('Edit Course: '+c.name, courseForm(c),
+  openModal('Edit Course', courseForm(c),
   `<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
    <button class="btn btn-red" onclick="saveCourse(${id})"><i class="fas fa-save"></i> Save Changes</button>`,'900px');
 };
@@ -924,7 +924,7 @@ window.previewCourseImg = function(url){
 };
 
 window.deleteCourse = async function(id){
-  if(!confirm('Delete this course? Applications referencing it are not deleted.')) return;
+  if(!confirm('Delete this course?')) return;
   const {error} = await sb.from('courses').delete().eq('id',id);
   if(error){ toast('Delete failed','error'); return; }
   DB.courses = DB.courses.filter(x=>x.id!==id);
@@ -1057,7 +1057,7 @@ function pageFn_gallery(){
       ${DB.gallery.map(g=>`
         <div class="gi">
           <img src="${esc(g.url||g)}" alt="${esc(g.caption||'Gallery')}" onerror="imgErr(this,'md')">
-          <button class="gi-del" onclick="deleteGalleryItem(${g.id||0},'${esc(g.url||g)}')">×</button>
+          <button class="gi-del" onclick="deleteGalleryItem(${g.id||0})" data-url="${esc(g.url||g)}">×</button>
           <span class="gi-order">${g.sort_order!==undefined?g.sort_order:''}</span>
         </div>`).join('')}
     </div>
@@ -1092,13 +1092,16 @@ window.saveGalleryImages = async function(){
   updateCounts(); closeModal(); goPage('gallery'); toast(`${urls.length} image(s) added!`);
 };
 
-window.deleteGalleryItem = async function(id, url){
+window.deleteGalleryItem = async function(id, urlFallback){
   if(!confirm('Delete this image?')) return;
   if(id && id!==0){
     const {error} = await sb.from('gallery').delete().eq('id',id);
     if(error){ toast('Delete failed','error'); return; }
     DB.gallery = DB.gallery.filter(x=>x.id!==id);
   } else {
+    // fallback: match by url stored in data-url attribute
+    const btn = document.querySelector('.gi-del[onclick*="deleteGalleryItem(0"]');
+    const url = btn ? btn.dataset.url : urlFallback;
     DB.gallery = DB.gallery.filter(x=>(x.url||x)!==url);
   }
   updateCounts(); goPage('gallery'); toast('Image deleted');
