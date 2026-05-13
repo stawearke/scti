@@ -142,12 +142,6 @@ tr:hover td{background:#fafbfc}
 @keyframes spin{to{transform:rotate(360deg)}}
 .empty-state{text-align:center;padding:52px 24px;color:var(--gray)}
 .empty-state i{font-size:3rem;opacity:.18;margin-bottom:14px;color:var(--navy);display:block}
-/* CURRICULUM BUILDER */
-.curr-mod-row{background:var(--gray-lt);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative}
-.curr-mod-row .mod-del{position:absolute;top:8px;right:8px;background:none;border:none;color:var(--gray);cursor:pointer;font-size:.9rem;transition:.2s}
-.curr-mod-row .mod-del:hover{color:var(--red)}
-.curr-mod-row .mod-num{font-size:.7rem;font-weight:700;color:var(--red);letter-spacing:1px;margin-bottom:8px}
-.curr-mod-row input{margin-bottom:8px}
 /* RESPONSIVE */
 @media(max-width:900px){
   :root{--sidebar:0px}
@@ -299,7 +293,12 @@ async function loadAll() {
 function S(k) { return DB.settings[k] || ''; }
 function h(s) {
   if (!s) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
 }
 function fmtD(d) { if(!d) return ''; return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
 function fmtTS(d) { if(!d) return ''; return new Date(d).toLocaleString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); }
@@ -337,9 +336,15 @@ function renderPage(page) {
     el.classList.toggle('on', el.dataset.page === page);
   });
   var map = {
-    dashboard: pgDashboard, applications: pgApplications, enquiries: pgEnquiries,
-    hero: pgHero, courses: pgCourses, events: pgEvents,
-    gallery: pgGallery, settings: pgSettings, live: pgLive
+    dashboard: pgDashboard,
+    applications: pgApplications,
+    enquiries: pgEnquiries,
+    hero: pgHero,
+    courses: pgCourses,
+    events: pgEvents,
+    gallery: pgGallery,
+    settings: pgSettings,
+    live: pgLive
   };
   var fn = map[page];
   document.getElementById('mainContent').innerHTML = fn ? fn() : '<p>Not found</p>';
@@ -374,12 +379,13 @@ document.getElementById('globalModal').addEventListener('click', function(e){
   if (e.target === this) closeModal();
 });
 
-/* ── FIELD HELPERS ── */
-function fld(id, label, value, type, placeholder) {
+/* ── HELPERS for building HTML ── */
+function fld(id, label, value, type, placeholder, extra) {
   type = type || 'text';
   var ph = placeholder ? ' placeholder="' + h(placeholder) + '"' : '';
+  var ex = extra || '';
   return '<div class="fg"><label class="form-label">' + label + '</label>' +
-    '<input id="' + id + '" type="' + type + '" value="' + h(value||'') + '"' + ph + '></div>';
+    '<input id="' + id + '" type="' + type + '" value="' + h(value||'') + '"' + ph + ex + '></div>';
 }
 function fldTA(id, label, value, rows, placeholder) {
   rows = rows || 2;
@@ -410,7 +416,7 @@ function pgDashboard() {
     '<div class="card" style="border-left:4px solid var(--red);margin-bottom:20px">' +
     '<div class="card-hdr"><div class="ch-left"><div class="ch-icon"><i class="fas fa-video"></i></div>' +
     '<h2>&#128308; Live Event Active</h2></div>' +
-    '<button class="btn btn-sm btn-danger" id="stopLiveBtn" data-liveid="' + live.id + '"><i class="fas fa-stop-circle"></i> Stop Live</button></div>' +
+    '<button class="btn btn-sm btn-danger" data-liveid="' + live.id + '" id="stopLiveBtn"><i class="fas fa-stop-circle"></i> Stop Live</button></div>' +
     '<p style="font-size:.88rem;color:var(--navy);font-weight:600">' + h(live.title) + '</p>' +
     '<p style="font-size:.8rem;color:var(--gray);margin-top:4px">' + h(live.location) + ' &middot; ' + h(live.time) + '</p></div>'
   ) : '';
@@ -488,7 +494,7 @@ function buildAppRows(apps) {
       '<td><strong>' + h(a.full_name) + '</strong><br><span style="font-size:.72rem;color:var(--gray)">' + h(a.email) + '</span></td>' +
       '<td>' + h(a.phone) + '</td>' +
       '<td>' + h(a.course_name) + '</td>' +
-      '<td>' + h(((a.county||'') + ' ' + (a.town||'')).trim()) + '</td>' +
+      '<td>' + h((a.county||'') + ' ' + (a.town||'')).trim() + '</td>' +
       '<td>' + fmtD(a.created_at) + '</td>' +
       '<td><select class="app-status-sel" data-appid="' + a.id + '" style="width:120px;font-size:.8rem;padding:5px 8px">' + statusOpts + '</select></td>' +
       '<td><div class="td-acts">' +
@@ -501,6 +507,7 @@ function buildAppRows(apps) {
 }
 
 document.addEventListener('click', function(e){
+  /* app filter buttons */
   if (e.target.classList.contains('app-filter-btn')) {
     document.querySelectorAll('.app-filter-btn').forEach(function(b){ b.classList.remove('btn-navy'); b.classList.add('btn-ghost'); });
     e.target.classList.remove('btn-ghost'); e.target.classList.add('btn-navy');
@@ -509,21 +516,28 @@ document.addEventListener('click', function(e){
     var tb = document.getElementById('appTbody');
     if (tb) tb.innerHTML = buildAppRows(filtered);
   }
-  if (e.target.closest && e.target.closest('.view-app-btn')) {
-    viewApplication(parseInt(e.target.closest('.view-app-btn').dataset.appid));
+  /* view application */
+  if (e.target.closest('.view-app-btn')) {
+    var id = parseInt(e.target.closest('.view-app-btn').dataset.appid);
+    viewApplication(id);
   }
-  if (e.target.closest && e.target.closest('.del-app-btn')) {
-    deleteApplication(parseInt(e.target.closest('.del-app-btn').dataset.appid));
+  /* delete application */
+  if (e.target.closest('.del-app-btn')) {
+    var id = parseInt(e.target.closest('.del-app-btn').dataset.appid);
+    deleteApplication(id);
   }
-  if (e.target.id === 'exportCsvBtn' || (e.target.closest && e.target.closest('#exportCsvBtn'))) exportCSV();
+  /* export csv */
+  if (e.target.id === 'exportCsvBtn' || e.target.closest('#exportCsvBtn')) exportCSV();
 });
 
 document.addEventListener('change', function(e){
   if (e.target.classList.contains('app-status-sel')) {
-    updateAppStatus(parseInt(e.target.dataset.appid), e.target.value);
+    var id = parseInt(e.target.dataset.appid);
+    updateAppStatus(id, e.target.value);
   }
   if (e.target.classList.contains('event-live-chk')) {
-    toggleLive(parseInt(e.target.dataset.eid), e.target.checked);
+    var id = parseInt(e.target.dataset.eid);
+    toggleLive(id, e.target.checked);
   }
 });
 
@@ -748,8 +762,7 @@ function pgCourses() {
   var rows = DB.courses.map(function(c){
     return '<tr>' +
       '<td><img class="td-thumb" src="' + h(c.image_url||'') + '" onerror="imgFail(this)" alt=""></td>' +
-      '<td><strong>' + h(c.name) + '</strong>' + (c.featured ? ' <span class="badge badge-gold">&#11088;</span>' : '') +
-      (c.what_you_learn ? '<br><span style="font-size:.68rem;color:#10b981;font-weight:700">&#10003; Rich content</span>' : '') + '</td>' +
+      '<td><strong>' + h(c.name) + '</strong>' + (c.featured ? ' <span class="badge badge-gold">&#11088;</span>' : '') + '</td>' +
       '<td><span class="badge badge-navy">' + h(c.category) + '</span></td>' +
       '<td>' + h(c.duration) + '</td>' +
       '<td>' + h(c.fee) + '</td>' +
@@ -798,19 +811,11 @@ function openCourseModal(id) {
     fldTA('c_req','Requirements (comma-separated)',c.requirements,2,'KCSE certificate, Basic computer knowledge') +
     fldTA('c_careers','Career Outcomes (comma-separated)',c.careers,2,'IT Support, Web Developer') +
     '<div class="form-sep"></div>' +
-    '<div class="form-sep-lbl s2"><i class="fas fa-star"></i> What You\'ll Learn</div>' +
-    fldTA('c_learn','Key Learning Outcomes <small style="font-weight:400;color:var(--gray)">— separate with a pipe |</small>',c.what_you_learn,2,'Computer skills|Microsoft Office|Internet use') +
-    '<div class="form-sep"></div>' +
-    '<div class="form-sep-lbl s2"><i class="fas fa-book-open"></i> Curriculum Modules</div>' +
-    '<div class="fg s2"><label class="form-label">Modules <small style="font-weight:400;color:var(--gray)">— add a module title and its topics</small></label>' +
-    '<div id="currBuilder" style="display:flex;flex-direction:column;gap:10px;margin-bottom:10px"></div>' +
-    '<button type="button" class="btn btn-ghost btn-sm" id="addModBtn"><i class="fas fa-plus"></i> Add Module</button>' +
-    '<input type="hidden" id="c_curr" value="' + h(c.curriculum||'') + '"></div>' +
-    '<div class="form-sep"></div>' +
-    '<div class="form-sep-lbl s2"><i class="fas fa-calendar"></i> Intake &amp; Media</div>' +
+    '<div class="form-sep-lbl s2"><i class="fas fa-star"></i> Extra Content</div>' +
+    fldTA('c_learn','What You\'ll Learn (pipe | separated)',c.what_you_learn,2,'Computer skills|Microsoft Office|Internet use') +
     fldTA('c_intake','Intake Months (comma-separated)',c.intake_dates,1,'January,March,May') +
     '<div class="fg s2">' + fld('c_img','Main Image URL *',c.image_url,'text','https://…').replace('class="fg"','') + '</div>' +
-    fldTA('c_gal','Gallery Image URLs (JSON array)',c.gallery_urls||'[]',1,'["https://…","https://…"]') +
+    fldTA('c_gal','Gallery URLs (JSON array)',c.gallery_urls||'[]',1,'["https://…"]') +
     fld('c_order','Sort Order',c.sort_order||99,'number') +
     '<div class="fg" style="display:flex;align-items:center;gap:10px;padding-top:22px">' +
     '<input type="checkbox" id="c_featured"' + (c.featured?' checked':'') + ' style="width:18px;height:18px">' +
@@ -819,70 +824,18 @@ function openCourseModal(id) {
 
   var foot = '<button class="btn btn-ghost" onclick="closeModal()">Cancel</button>' +
     '<button class="btn btn-red" id="saveCourseBtn"><i class="fas fa-save"></i> ' + (id?'Save Changes':'Add Course') + '</button>';
-  openModal(id ? 'Edit Course: ' + h(c.name) : 'Add New Course', body, foot, '900px');
-
+  openModal(id ? 'Edit Course' : 'Add Course', body, foot, '900px');
   setTimeout(function(){
-    var saveBtn = document.getElementById('saveCourseBtn');
-    if (saveBtn) saveBtn.addEventListener('click', function(){ saveCourse(editingId); });
-    var addMod = document.getElementById('addModBtn');
-    if (addMod) addMod.addEventListener('click', function(){ addCurrModule(); });
-    initCurrBuilder();
-  }, 50);
-}
-
-/* ── CURRICULUM BUILDER ── */
-function addCurrModule(title, topics) {
-  var builder = document.getElementById('currBuilder');
-  if (!builder) return;
-  var idx = builder.children.length;
-  var div = document.createElement('div');
-  div.className = 'curr-mod-row';
-  div.innerHTML =
-    '<button type="button" class="mod-del" title="Remove module"><i class="fas fa-times"></i></button>' +
-    '<div class="mod-num">MODULE ' + (idx+1) + '</div>' +
-    '<input placeholder="Module title  e.g. Introduction & Foundations" value="' + h(title||'') + '" oninput="syncCurr()">' +
-    '<textarea placeholder="One topic per line&#10;e.g.&#10;Course overview&#10;Tools setup" rows="3" oninput="syncCurr()">' + h(topics||'') + '</textarea>';
-  div.querySelector('.mod-del').addEventListener('click', function(){
-    div.remove();
-    syncCurr();
-    renumberModules();
-  });
-  builder.appendChild(div);
-  syncCurr();
-}
-
-function renumberModules() {
-  var builder = document.getElementById('currBuilder');
-  if (!builder) return;
-  builder.querySelectorAll('.mod-num').forEach(function(el, i){ el.textContent = 'MODULE ' + (i+1); });
-}
-
-function syncCurr() {
-  var builder = document.getElementById('currBuilder');
-  var hidden  = document.getElementById('c_curr');
-  if (!builder || !hidden) return;
-  var modules = [];
-  builder.querySelectorAll('.curr-mod-row').forEach(function(row){
-    var titleEl  = row.querySelector('input');
-    var topicsEl = row.querySelector('textarea');
-    var t = titleEl  ? titleEl.value.trim()  : '';
-    var p = topicsEl ? topicsEl.value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean) : [];
-    if (t || p.length) modules.push({title:t, topics:p});
-  });
-  hidden.value = JSON.stringify(modules);
-}
-
-function initCurrBuilder() {
-  var hidden = document.getElementById('c_curr');
-  if (!hidden || !hidden.value) return;
-  var modules = [];
-  try { modules = JSON.parse(hidden.value); } catch(e) { return; }
-  modules.forEach(function(m){
-    addCurrModule(m.title||'', (m.topics||[]).join('\n'));
-  });
+    var btn = document.getElementById('saveCourseBtn');
+    if (btn) btn.addEventListener('click', function(){ saveCourse(editingId); });
+  }, 0);
 }
 
 async function saveCourse(id) {
+  var rawCurr = gv('c_curr');
+  var rawFaqs = gv('c_faqs');
+  if (rawCurr) { try { JSON.parse(rawCurr); } catch(e) { toast('Curriculum JSON invalid','err'); return; } }
+  if (rawFaqs) { try { JSON.parse(rawFaqs); } catch(e) { toast('FAQs JSON invalid','err'); return; } }
   var payload = {
     name:          gv('c_name'),
     category:      gv('c_cat'),
@@ -894,7 +847,6 @@ async function saveCourse(id) {
     requirements:  gv('c_req'),
     careers:       gv('c_careers'),
     what_you_learn:gv('c_learn'),
-    curriculum:    gv('c_curr'),
     intake_dates:  gv('c_intake'),
     image_url:     gv('c_img'),
     gallery_urls:  gv('c_gal'),
@@ -1060,7 +1012,7 @@ function pgGallery() {
 }
 
 function openGalleryModal() {
-  var body = '<div class="fg s2"><label class="form-label">Image URLs — one per line</label>' +
+  var body = '<div class="fg s2"><label class="form-label">Image URLs (one per line)</label>' +
     '<textarea id="g_urls" rows="6" placeholder="https://images.pexels.com/…\nhttps://…"></textarea></div>' +
     '<div class="form-grid" style="margin-top:12px">' +
     fld('g_caption','Caption','SCTI Campus','text') +
@@ -1102,8 +1054,8 @@ async function deleteGallery(id) {
 function pgSettings() {
   var fields = [
     ['site_name','Site Name','text'],['phone1','Primary Phone','text'],
-    ['phone2','Secondary Phone','text'],['whatsapp','WhatsApp (intl format)','text'],
-    ['email','Email Address','email'],['address','Physical Address','text'],
+    ['phone2','Secondary Phone','text'],['whatsapp','WhatsApp (intl)','text'],
+    ['email','Email','email'],['address','Address','text'],
     ['working_hours','Working Hours','text'],['students_count','Students Count','text'],
     ['courses_count','Courses Count','text'],['years_count','Years','text'],
     ['placement_rate','Placement Rate','text'],['about_text','About Text','textarea'],
@@ -1123,16 +1075,17 @@ function pgSettings() {
   }).join('');
 
   setTimeout(function(){
-    document.querySelectorAll('.save-settings-btn').forEach(function(btn){
-      btn.addEventListener('click', saveSettings);
-    });
+    var btn = document.getElementById('saveSettingsBtn');
+    if (btn) btn.addEventListener('click', saveSettings);
+    var btn2 = document.getElementById('saveSettingsBtn2');
+    if (btn2) btn2.addEventListener('click', saveSettings);
   }, 0);
 
   return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">' +
     '<h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-cog" style="color:var(--red);margin-right:8px"></i>Site Settings</h1>' +
-    '<button class="btn btn-red save-settings-btn"><i class="fas fa-save"></i> Save All</button></div>' +
+    '<button class="btn btn-red" id="saveSettingsBtn"><i class="fas fa-save"></i> Save All</button></div>' +
     '<div class="card"><div class="settings-grid">' + fieldsHtml + '</div>' +
-    '<div style="margin-top:20px;text-align:right"><button class="btn btn-red btn-lg save-settings-btn"><i class="fas fa-save"></i> Save All Settings</button></div></div>';
+    '<div style="margin-top:20px;text-align:right"><button class="btn btn-red btn-lg" id="saveSettingsBtn2"><i class="fas fa-save"></i> Save All Settings</button></div></div>';
 }
 
 async function saveSettings() {
@@ -1154,48 +1107,47 @@ async function saveSettings() {
 ═══════════════════════════════ */
 function pgLive() {
   var liveEv = DB.events.find(function(e){ return e.is_live; });
-
   var statusHtml = liveEv ? (
     '<div style="background:var(--red-lt);border:1px solid rgba(196,30,58,.25);border-radius:12px;padding:16px;margin-bottom:16px">' +
     '<span class="badge badge-live" style="margin-bottom:8px"><i class="fas fa-circle"></i> LIVE</span>' +
     '<p style="font-size:.9rem;font-weight:700;color:var(--navy)">' + h(liveEv.title) + '</p>' +
-    '<p style="font-size:.8rem;color:var(--gray)">' + h(liveEv.location||'') + ' &middot; ' + h(liveEv.time||'') + '</p>' +
-    (liveEv.video_url ? '<p style="font-size:.75rem;color:var(--gray);margin-top:6px;word-break:break-all">' + h(liveEv.video_url) + '</p>' : '') +
-    '</div>' +
-    '<button class="btn btn-danger btn-lg stop-live-btn" style="width:100%;justify-content:center" data-liveid="' + liveEv.id + '"><i class="fas fa-stop-circle"></i> Stop Live Stream</button>'
+    '<p style="font-size:.8rem;color:var(--gray)">' + h(liveEv.location||'') + ' &middot; ' + h(liveEv.time||'') + '</p></div>' +
+    '<button class="btn btn-danger btn-lg stop-live-btn" data-eid="' + liveEv.id + '" style="width:100%;justify-content:center"><i class="fas fa-stop-circle"></i> Stop Live Stream</button>'
   ) : (
-    '<div style="text-align:center;padding:32px 20px;background:var(--gray-lt);border-radius:12px;margin-bottom:16px">' +
+    '<div style="text-align:center;padding:32px;background:var(--gray-lt);border-radius:12px;margin-bottom:16px">' +
     '<i class="fas fa-video" style="font-size:2.5rem;opacity:.2;color:var(--navy)"></i>' +
     '<p style="color:var(--gray);font-size:.85rem;margin-top:10px">No event is currently live</p></div>' +
-    '<p style="font-size:.8rem;color:var(--gray)">Go to <strong>Events</strong> and toggle the Live switch on any event to start streaming.</p>'
+    '<p style="font-size:.8rem;color:var(--gray)">Go to <strong>Events</strong> and check the Live toggle.</p>'
   );
 
   var eventList = DB.events.map(function(e){
     return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">' +
       '<div><p style="font-size:.83rem;font-weight:600;color:var(--navy)">' + h(e.title) + '</p>' +
       '<p style="font-size:.74rem;color:var(--gray)">' + fmtD(e.date) + '</p></div>' +
-      '<label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0">' +
+      '<label style="display:flex;align-items:center;gap:8px;cursor:pointer">' +
       '<input type="checkbox" class="event-live-chk" data-eid="' + e.id + '"' + (e.is_live?' checked':'') + '>' +
       (e.is_live ? '<span class="badge badge-live" style="font-size:.6rem">LIVE</span>' : '') +
       '</label></div>';
-  }).join('') || '<p style="text-align:center;padding:20px;color:var(--gray)">No events yet.</p>';
+  }).join('') || '<p style="text-align:center;padding:20px;color:var(--gray)">No events yet</p>';
 
   setTimeout(function(){
     document.querySelectorAll('.stop-live-btn').forEach(function(btn){
-      btn.addEventListener('click', function(){ toggleLive(parseInt(btn.dataset.liveid), false); });
+      btn.addEventListener('click', function(){ toggleLive(parseInt(btn.dataset.eid), false); });
     });
   }, 0);
 
   return '<div style="margin-bottom:20px"><h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-video" style="color:var(--red);margin-right:8px"></i>Live Stream Control</h1></div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">' +
     '<div class="card"><div class="card-hdr"><div class="ch-left"><div class="ch-icon"><i class="fas fa-circle"></i></div><h2>Current Status</h2></div></div>' + statusHtml + '</div>' +
-    '<div class="card"><div class="card-hdr"><div class="ch-left"><div class="ch-icon"><i class="fas fa-list"></i></div><h2>Set Any Event Live</h2></div></div>' + eventList + '</div></div>';
+    '<div class="card"><div class="card-hdr"><div class="ch-left"><div class="ch-icon"><i class="fas fa-list"></i></div><h2>Set Event Live</h2></div></div>' + eventList + '</div></div>';
 }
 
+/* ── GLOBALS ── */
+window.imgFail   = function(el){ el.onerror=null; el.style.background='#e2e8f0'; el.removeAttribute('src'); };
+window.closeModal  = closeModal;
+window.renderPage  = renderPage;
+
 /* ── BOOT ── */
-window.closeModal = closeModal;
-window.imgFail = imgFail;
-window.syncCurr = syncCurr;
 if (authed) initApp();
 
 })();
