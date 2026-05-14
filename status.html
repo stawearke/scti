@@ -13,7 +13,11 @@
         .container{max-width:700px;margin:0 auto}
         .card{background:white;border-radius:22px;padding:40px;box-shadow:0 25px 50px rgba(0,0,0,0.3);margin-top:40px}
         .logo{display:flex;align-items:center;gap:12px;margin-bottom:30px;justify-content:center}
-        .logo-mark{background:#C41E3A;width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:14px;color:white}
+        /* Updated logo image style */
+        .logo-img{height:52px;width:auto;max-width:160px;object-fit:contain;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.15));}
+        .logo-text{text-align:left;}
+        .logo-text strong{font-size:1.1rem;color:#0a2540;display:block;line-height:1.2}
+        .logo-text small{font-size:.7rem;color:#C41E3A;font-weight:600;letter-spacing:1px}
         h1{font-family:'Syne',sans-serif;font-size:1.5rem;color:#0a2540;text-align:center;margin-bottom:8px}
         .sub{text-align:center;color:#666;margin-bottom:30px}
         input{width:100%;padding:14px 18px;border:2px solid #e0e0e0;border-radius:12px;font-size:16px;font-family:'Outfit',sans-serif;transition:all 0.3s}
@@ -48,8 +52,12 @@
 <div class="container">
     <div class="card">
         <div class="logo">
-            <div class="logo-mark">SC<br>TI</div>
-            <div><strong style="font-size:1.1rem">SCTI</strong><br><small style="color:#666">Application Status</small></div>
+            <!-- Updated with school logo image (transparent background, visible) -->
+            <img class="logo-img" src="https://www.image2url.com/r2/default/images/1778757908592-978ea6c4-d9a5-415b-bbbd-9691a3d324de.png" alt="Skymo Creative Training Institute Logo">
+            <div class="logo-text">
+                <strong>SCTI</strong>
+                <small>Application Status</small>
+            </div>
         </div>
         <h1>🔍 Check Your Application Status</h1>
         <p class="sub">Enter your email address or phone number</p>
