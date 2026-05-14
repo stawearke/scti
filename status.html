@@ -20,6 +20,7 @@
         input:focus{outline:none;border-color:#C41E3A;box-shadow:0 0 0 3px rgba(196,30,58,0.1)}
         button{width:100%;margin-top:15px;padding:14px;background:#C41E3A;color:white;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;transition:all 0.3s}
         button:hover{background:#9e1830;transform:translateY(-2px)}
+        button:disabled{opacity:0.6;cursor:not-allowed}
         .result{animation:fadeIn 0.5s ease;margin-top:30px}
         @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
         .app-card{border:1px solid #e0e0e0;border-radius:16px;padding:24px;margin-bottom:20px;background:#fafafa}
@@ -40,6 +41,7 @@
         @keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
         .error{background:#f8d7da;color:#721c24;padding:15px;border-radius:12px;margin-top:20px}
         .back-home{display:inline-block;margin-top:20px;text-align:center;width:100%;color:#C41E3A;text-decoration:none;font-weight:600}
+        .back-home:hover{text-decoration:underline}
     </style>
 </head>
 <body>
@@ -53,7 +55,7 @@
         <p class="sub">Enter your email address or phone number</p>
         
         <input type="text" id="searchInput" placeholder="Email or Phone Number" autocomplete="off">
-        <button onclick="checkStatus()"><i class="fas fa-search"></i> Check Status</button>
+        <button onclick="checkStatus()" id="checkBtn"><i class="fas fa-search"></i> Check Status</button>
         
         <div id="result"></div>
         
@@ -69,68 +71,115 @@
 </div>
 
 <script>
+// Initialize Supabase client first
 const SUPABASE_URL = 'https://iuskmfphmraighipmsmh.supabase.co';
 const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1c2ttZnBobXJhaWdoaXBtc21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1ODEyOTYsImV4cCI6MjA5NDE1NzI5Nn0.Yfbj26m0cxGfCBTvEmuPAXpemLPhxBws8N3JvHF1HFI';
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+// Wait for Supabase to be available
+let supabaseClient = null;
+
+// Initialize after script loads
+function initSupabase() {
+    if (typeof supabase !== 'undefined' && supabase.createClient) {
+        supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+        console.log('Supabase initialized');
+        return true;
+    } else {
+        console.log('Waiting for Supabase...');
+        return false;
+    }
+}
+
+// Try to initialize immediately or wait
+if (!initSupabase()) {
+    // If supabase not ready yet, wait a bit
+    setTimeout(function() {
+        if (!initSupabase()) {
+            console.error('Supabase failed to load');
+            document.getElementById('result').innerHTML = '<div class="error">❌ Error loading application. Please refresh the page.</div>';
+        }
+    }, 500);
+}
 
 async function checkStatus() {
     const searchTerm = document.getElementById('searchInput').value.trim();
     const resultDiv = document.getElementById('result');
+    const checkBtn = document.getElementById('checkBtn');
+    
+    if (!supabaseClient) {
+        resultDiv.innerHTML = '<div class="error">❌ System is initializing. Please wait a moment and try again.</div>';
+        return;
+    }
     
     if (!searchTerm) {
         resultDiv.innerHTML = '<div class="error">⚠️ Please enter your email or phone number</div>';
         return;
     }
     
+    // Disable button while loading
+    checkBtn.disabled = true;
+    checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+    
     resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p style="margin-top:15px">Checking your application...</p></div>';
     
-    const { data, error } = await supabase
-        .from('applications')
-        .select('full_name, email, phone, course_name, status, created_at, study_mode, intake_month, updated_at')
-        .or(`email.eq.${searchTerm},phone.eq.${searchTerm}`)
-        .order('created_at', { ascending: false });
-    
-    if (error) {
-        resultDiv.innerHTML = `<div class="error">❌ Error checking status. Please try again later.</div>`;
-        return;
-    }
-    
-    if (!data || data.length === 0) {
-        resultDiv.innerHTML = `<div class="error">🔍 No application found with "${searchTerm}".<br><br>Please check your email/phone or contact our admissions office.</div>`;
-        return;
-    }
-    
-    let html = '';
-    data.forEach(app => {
-        const statusConfig = {
-            pending: { text: '📋 Pending Review', class: 'status-pending', message: 'Your application is being reviewed by our admissions team. We will contact you within 3-5 business days.' },
-            contacted: { text: '📞 Contacted', class: 'status-contacted', message: 'Our team has reviewed your application and will contact you shortly to discuss the next steps.' },
-            approved: { text: '✅ Approved!', class: 'status-approved', message: 'Congratulations! Your application has been approved. You will receive registration details via email within 24 hours.' },
-            rejected: { text: '❌ Not Selected', class: 'status-rejected', message: 'We regret to inform you that your application was not successful at this time. We encourage you to apply for other programs.' }
-        };
-        const config = statusConfig[app.status] || statusConfig.pending;
+    try {
+        const { data, error } = await supabaseClient
+            .from('applications')
+            .select('full_name, email, phone, course_name, status, created_at, study_mode, intake_month, updated_at')
+            .or(`email.eq.${searchTerm},phone.eq.${searchTerm}`)
+            .order('created_at', { ascending: false });
         
-        html += `
-            <div class="app-card">
-                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:20px">
-                    <h3 style="color:#0a2540">${escapeHtml(app.full_name)}</h3>
-                    <span class="status-badge ${config.class}">${config.text}</span>
+        if (error) {
+            console.error('Supabase error:', error);
+            resultDiv.innerHTML = `<div class="error">❌ Error checking status: ${error.message}. Please try again later.</div>`;
+            return;
+        }
+        
+        if (!data || data.length === 0) {
+            resultDiv.innerHTML = `<div class="error">🔍 No application found with "${searchTerm}".<br><br>Please check your email/phone or contact our admissions office.</div>`;
+            return;
+        }
+        
+        let html = '';
+        data.forEach(app => {
+            const statusConfig = {
+                pending: { text: '📋 Pending Review', class: 'status-pending', message: 'Your application is being reviewed by our admissions team. We will contact you within 3-5 business days.' },
+                contacted: { text: '📞 Contacted', class: 'status-contacted', message: 'Our team has reviewed your application and will contact you shortly to discuss the next steps.' },
+                approved: { text: '✅ Approved!', class: 'status-approved', message: 'Congratulations! Your application has been approved. You will receive registration details via email within 24 hours.' },
+                rejected: { text: '❌ Not Selected', class: 'status-rejected', message: 'We regret to inform you that your application was not successful at this time. We encourage you to apply for other programs.' }
+            };
+            const config = statusConfig[app.status] || statusConfig.pending;
+            
+            html += `
+                <div class="app-card">
+                    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:20px">
+                        <h3 style="color:#0a2540">${escapeHtml(app.full_name)}</h3>
+                        <span class="status-badge ${config.class}">${config.text}</span>
+                    </div>
+                    <div class="info-row"><span class="info-label">📧 Email:</span><span class="info-value">${escapeHtml(app.email)}</span></div>
+                    <div class="info-row"><span class="info-label">📞 Phone:</span><span class="info-value">${escapeHtml(app.phone)}</span></div>
+                    <div class="info-row"><span class="info-label">📚 Course:</span><span class="info-value">${escapeHtml(app.course_name)}</span></div>
+                    <div class="info-row"><span class="info-label">🎓 Study Mode:</span><span class="info-value">${escapeHtml(app.study_mode || 'N/A')}</span></div>
+                    <div class="info-row"><span class="info-label">📅 Intake:</span><span class="info-value">${escapeHtml(app.intake_month || 'N/A')}</span></div>
+                    <div class="info-row"><span class="info-label">📆 Applied:</span><span class="info-value">${new Date(app.created_at).toLocaleDateString()}</span></div>
+                    <div class="info-row"><span class="info-label">🕒 Last Updated:</span><span class="info-value">${new Date(app.updated_at || app.created_at).toLocaleDateString()}</span></div>
+                    <div class="message-box">
+                        <strong>📢 Status Update:</strong><br>
+                        ${config.message}
+                    </div>
                 </div>
-                <div class="info-row"><span class="info-label">📧 Email:</span><span class="info-value">${escapeHtml(app.email)}</span></div>
-                <div class="info-row"><span class="info-label">📞 Phone:</span><span class="info-value">${escapeHtml(app.phone)}</span></div>
-                <div class="info-row"><span class="info-label">📚 Course:</span><span class="info-value">${escapeHtml(app.course_name)}</span></div>
-                <div class="info-row"><span class="info-label">🎓 Study Mode:</span><span class="info-value">${escapeHtml(app.study_mode || 'N/A')}</span></div>
-                <div class="info-row"><span class="info-label">📅 Intake:</span><span class="info-value">${escapeHtml(app.intake_month || 'N/A')}</span></div>
-                <div class="info-row"><span class="info-label">📆 Applied:</span><span class="info-value">${new Date(app.created_at).toLocaleDateString()}</span></div>
-                <div class="info-row"><span class="info-label">🕒 Last Updated:</span><span class="info-value">${new Date(app.updated_at || app.created_at).toLocaleDateString()}</span></div>
-                <div class="message-box">
-                    <strong>📢 Status Update:</strong><br>
-                    ${config.message}
-                </div>
-            </div>
-        `;
-    });
-    resultDiv.innerHTML = html;
+            `;
+        });
+        resultDiv.innerHTML = html;
+        
+    } catch (err) {
+        console.error('Unexpected error:', err);
+        resultDiv.innerHTML = `<div class="error">❌ An unexpected error occurred. Please try again or contact our admissions office.</div>`;
+    } finally {
+        // Re-enable button
+        checkBtn.disabled = false;
+        checkBtn.innerHTML = '<i class="fas fa-search"></i> Check Status';
+    }
 }
 
 function escapeHtml(str) {
@@ -143,9 +192,15 @@ function escapeHtml(str) {
     });
 }
 
+// Allow Enter key to search
 document.getElementById('searchInput').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') checkStatus();
+    if (e.key === 'Enter') {
+        checkStatus();
+    }
 });
+
+// Log when page is ready
+console.log('Status page loaded, Supabase client ready:', !!supabaseClient);
 </script>
 </body>
 </html>
