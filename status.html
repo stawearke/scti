@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Application Status - SCTI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .status-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-top: 40px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #0a2540;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .search-box {
+            margin-bottom: 30px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 15px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: #C41E3A;
+            box-shadow: 0 0 0 3px rgba(196,30,58,0.1);
+        }
+        
+        .search-box button {
+            width: 100%;
+            margin-top: 15px;
+            padding: 15px;
+            background: #C41E3A;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .search-box button:hover {
+            background: #9e1830;
+            transform: translateY(-2px);
+        }
+        
+        .search-box button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .result-container {
+            margin-top: 30px;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .application-detail {
+            border: 1px solid #e0e0e0;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            background: #fafafa;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-contacted {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .info-value {
+            color: #1a1a2e;
+        }
+        
+        .message-box {
+            background: #f0f8ff;
+            padding: 16px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 4px solid #C41E3A;
+        }
+        
+        .help-section {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .help-section a {
+            color: #C41E3A;
+            text-decoration: none;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #C41E3A;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="status-card">
+        <div class="header">
+            <h1>🔍 Check Your Application Status</h1>
+            <p>Enter your email address or phone number to track your application</p>
+        </div>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Email or Phone Number" autocomplete="off">
+            <button onclick="checkStatus()">Check Status</button>
+        </div>
+        
+        <div id="result"></div>
+        
+        <div class="help-section">
+            <strong>📌 Need Help?</strong><br>
+            Contact our admissions office:<br>
+            📧 <a href="mailto:admissions@scti.ac.ke">admissions@scti.ac.ke</a> | 📞 +254 700 000 000
+        </div>
+    </div>
+</div>
+
+<script>
+const SB_URL = 'https://iuskmfphmraighipmsmh.supabase.co';
+const SB_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1c2ttZnBobXJhaWdoaXBtc21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1ODEyOTYsImV4cCI6MjA5NDE1NzI5Nn0.LUGUTp4uiCZwFk5rND1LS0s1_QOLacrjPV8Wqhqup7M';
+
+const supabase = supabase.createClient(SB_URL, SB_ANON_KEY);
+
+async function checkStatus() {
+    const searchTerm = document.getElementById('searchInput').value.trim();
+    const resultDiv = document.getElementById('result');
+    
+    if (!searchTerm) {
+        resultDiv.innerHTML = '<div class="error-message">⚠️ Please enter your email or phone number</div>';
+        return;
+    }
+    
+    resultDiv.innerHTML = '<div class="loading"><div class="spinner"></div><p style="margin-top:15px;color:#666;">Checking your application...</p></div>';
+    
+    const { data, error } = await supabase
+        .from('applications')
+        .select('full_name, email, phone, course_name, status, created_at, study_mode, intake_month, updated_at')
+        .or(`email.eq.${searchTerm},phone.eq.${searchTerm}`)
+        .order('created_at', { ascending: false });
+    
+    if (error) {
+        resultDiv.innerHTML = `<div class="error-message">❌ Error checking status. Please try again later.</div>`;
+        console.error('Error:', error);
+        return;
+    }
+    
+    if (!data || data.length === 0) {
+        resultDiv.innerHTML = `<div class="error-message">🔍 No application found with "${searchTerm}".<br>Please check your email/phone or contact our admissions office.</div>`;
+        return;
+    }
+    
+    // Display results
+    let html = '<div class="result-container">';
+    data.forEach(app => {
+        const statusConfig = {
+            pending: { text: '📋 Pending Review', class: 'status-pending', message: 'Your application is being reviewed by our admissions team. We will update you within 3-5 business days.' },
+            contacted: { text: '📞 Contacted', class: 'status-contacted', message: 'Our admissions team has reviewed your application and will contact you shortly to discuss the next steps.' },
+            approved: { text: '✅ Approved!', class: 'status-approved', message: 'Congratulations! Your application has been approved. You will receive registration details via email within 24 hours.' },
+            rejected: { text: '❌ Not Selected', class: 'status-rejected', message: 'We regret to inform you that your application was not successful at this time. We encourage you to apply for other programs.' }
+        };
+        const config = statusConfig[app.status] || statusConfig.pending;
+        
+        html += `
+            <div class="application-detail">
+                <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:20px">
+                    <h2 style="color:#0a2540;margin:0">${escapeHtml(app.full_name)}</h2>
+                    <span class="status-badge ${config.class}">${config.text}</span>
+                </div>
+                
+                <div class="info-row">
+                    <span class="info-label">📧 Email:</span>
+                    <span class="info-value">${escapeHtml(app.email)}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">📞 Phone:</span>
+                    <span class="info-value">${escapeHtml(app.phone)}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">📚 Course:</span>
+                    <span class="info-value">${escapeHtml(app.course_name)}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">🎓 Study Mode:</span>
+                    <span class="info-value">${escapeHtml(app.study_mode || 'N/A')}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">📅 Intake:</span>
+                    <span class="info-value">${escapeHtml(app.intake_month || 'N/A')}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">📆 Application Date:</span>
+                    <span class="info-value">${new Date(app.created_at).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'})}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">🕒 Last Updated:</span>
+                    <span class="info-value">${new Date(app.updated_at || app.created_at).toLocaleDateString('en-GB', {day:'numeric', month:'long', year:'numeric'})}</span>
+                </div>
+                
+                <div class="message-box">
+                    <strong>📢 Status Update:</strong><br>
+                    ${config.message}
+                </div>
+            </div>
+        `;
+    });
+    html += '</div>';
+    resultDiv.innerHTML = html;
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/[&<>]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        return m;
+    });
+}
+
+// Allow Enter key to search
+document.getElementById('searchInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        checkStatus();
+    }
+});
+</script>
+</body>
+</html>
