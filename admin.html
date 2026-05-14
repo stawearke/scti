@@ -206,20 +206,15 @@ const sb = supabase.createClient(SB_URL, SB_SERVICE_ROLE);
 
 // Login credentials: admin / scti@2025
 const CRED_USER = 'admin';
-const CRED_HASH = 'b2d5eeae6bf6773c60327cbfba4d00f0a7b5f7e4b2fb7d49b47c96d0fbd6c5d5';
-
-async function sha256(msg) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
-  return [...new Uint8Array(buf)].map(x => x.toString(16).padStart(2,'0')).join('');
-}
+const CRED_PASSWORD = 'scti@2025';
 
 let authed = sessionStorage.getItem('scti_adm') === '1';
 
-async function doLogin() {
+function doLogin() {
   const u = document.getElementById('loginUser').value.trim();
   const p = document.getElementById('loginPass').value;
-  const hashed = await sha256(p);
-  if (u === CRED_USER && hashed === CRED_HASH) {
+  
+  if (u === CRED_USER && p === CRED_PASSWORD) {
     sessionStorage.setItem('scti_adm','1');
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('appShell').style.display = 'block';
