@@ -206,7 +206,7 @@ const sb = supabase.createClient(SB_URL, SB_SERVICE_ROLE);
 
 // Login credentials: admin / scti@2025
 const CRED_USER = 'admin';
-const CRED_HASH = 'b6cbc0220e8212bc5aa569a38f101873e9eccebc45d2a1d9b772cab47823b7f5';
+const CRED_HASH = 'b2d5eeae6bf6773c60327cbfba4d00f0a7b5f7e4b2fb7d49b47c96d0fbd6c5d5';
 
 async function sha256(message) {
   const msgBuffer = new TextEncoder().encode(message);
@@ -453,11 +453,12 @@ async function updateAppStatus(id, status) {
   }
 }
 
+// Email notification function - Opens Gmail Web directly (FIXED - no blank page)
 async function sendStatusEmail(email, name, status, course) {
   const statusMessages = {
     'pending': {
       subject: 'Application Received - SCTI',
-      message: `Dear ${name},\n\nThank you for applying to SCTI. Your application for ${course} has been received and is under review by our admissions team.\n\nWe will contact you within 3-5 business days with an update.\n\nYou can check your application status anytime at:\nhttps://yourdomain.com/status\n\nRegards,\nSCTI Admissions Office`
+      message: `Dear ${name},\n\nThank you for applying to SCTI. Your application for ${course} has been received and is under review by our admissions team.\n\nWe will contact you within 3-5 business days with an update.\n\nYou can check your application status anytime.\n\nRegards,\nSCTI Admissions Office`
     },
     'processing': {
       subject: 'Application Update - SCTI',
@@ -474,10 +475,13 @@ async function sendStatusEmail(email, name, status, course) {
   };
   
   const info = statusMessages[status] || statusMessages.pending;
-  const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(info.subject)}&body=${encodeURIComponent(info.message)}`;
-  window.open(mailtoLink, '_blank');
-  console.log(`Email notification prepared for ${email} - Status: ${status}`);
-  toast(`Email prepared for ${name}. Click Send in your email client.`, 'info');
+  
+  // Open Gmail compose window (works on any browser, no blank page)
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(info.subject)}&body=${encodeURIComponent(info.message)}`;
+  window.open(gmailUrl, '_blank');
+  
+  console.log(`Gmail opened for ${email} - Status: ${status}`);
+  toast(`📧 Opening Gmail to send to ${name}`, 'info');
 }
 
 async function deleteApplication(id) {
@@ -520,7 +524,7 @@ function viewApplication(id) {
 // Enquiries Page
 function pgEnquiries() {
   var rows = DB.enquiries.length ? DB.enquiries.map(function(e){ 
-    return '<tr><td><strong>'+h(e.name)+'</strong></td><td>'+h(e.email)+'</td><td>'+h(e.phone||'—')+'</td><td>'+h(e.subject||'—')+'</td><td>'+fmtD(e.created_at)+'</td><td><div class="td-acts"><button class="btn btn-sm btn-navy view-enq-btn" data-enqid="'+e.id+'"><i class="fas fa-eye"></i> View</button><a class="btn btn-sm btn-outline" href="mailto:'+h(e.email)+'"><i class="fas fa-envelope"></i></a><button class="btn btn-sm btn-danger del-enq-btn" data-enqid="'+e.id+'"><i class="fas fa-trash"></i></button></div></td></tr>'; 
+    return '<tr><td><strong>'+h(e.name)+'</strong></td><td>'+h(e.email)+'</td><td>'+h(e.phone||'—')+'</td><td style="max-width:300px;">'+h(e.message||'')+'</td><td>'+fmtTS(e.created_at)+'</td><td><div class="td-acts"><button class="btn btn-sm btn-navy view-enq-btn" data-enqid="'+e.id+'"><i class="fas fa-eye"></i> View</button><a class="btn btn-sm btn-outline" href="mailto:'+h(e.email)+'"><i class="fas fa-reply"></i></a><button class="btn btn-sm btn-danger del-enq-btn" data-enqid="'+e.id+'"><i class="fas fa-trash"></i></button></div></td></tr>'; 
   }).join('') : '<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray)">No enquiries yet</td></tr>';
   
   setTimeout(function(){ 
@@ -528,7 +532,7 @@ function pgEnquiries() {
     document.querySelectorAll('.del-enq-btn').forEach(function(btn){ btn.addEventListener('click', function(){ deleteEnquiry(btn.dataset.enqid); }); }); 
   }, 50);
   
-  return '<div style="margin-bottom:20px"><h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-envelope" style="color:var(--red);margin-right:8px"></i>Enquiries</h1></div><div class="card" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Subject</th><th>Date</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+  return '<div style="margin-bottom:20px"><h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-envelope" style="color:var(--red);margin-right:8px"></i>Enquiries</h1></div><div class="card" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Message</th><th>Date</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
 }
 
 function viewEnquiry(id) {
@@ -643,8 +647,8 @@ async function deleteCourse(id) {
 // Events Page
 function pgEvents() {
   var rows = DB.events.length ? DB.events.map(function(e){ 
-    return '<tr><td><img class="td-thumb" src="'+h(e.thumbnail||'')+'" onerror="imgFail(this)" alt=""></td><td><strong>'+h(e.title)+'</strong></td><td>'+fmtD(e.date)+'</td><td>'+h(e.time||'')+'</td><td>'+h(e.location||'')+'</td><td><span class="badge badge-navy">'+h(e.tag||'')+'</span></td><td><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" class="event-live-chk" data-eid="'+e.id+'"'+(e.is_live?' checked':'')+'>'+(e.is_live?'<span class="badge badge-live" style="font-size:.6rem"><i class="fas fa-circle"></i> LIVE</span>':'')+'</label></td><td><div class="td-acts"><button class="btn btn-sm btn-navy edit-event-btn" data-eid="'+e.id+'"><i class="fas fa-pen"></i> Edit</button><button class="btn btn-sm btn-danger del-event-btn" data-eid="'+e.id+'"><i class="fas fa-trash"></i></button></div></tr>';
-  }).join('') : '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray)">No events yet. </tr>';
+    return '<tr><td><img class="td-thumb" src="'+h(e.thumbnail||'')+'" onerror="imgFail(this)" alt=""></td><td><strong>'+h(e.title)+'</strong></td><td>'+fmtD(e.date)+'</td><td>'+h(e.time||'')+'</td><td>'+h(e.location||'')+'</td><td><span class="badge badge-navy">'+h(e.tag||'')+'</span></td><td><label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" class="event-live-chk" data-eid="'+e.id+'"'+(e.is_live?' checked':'')+'>'+(e.is_live?'<span class="badge badge-live" style="font-size:.6rem"><i class="fas fa-circle"></i> LIVE</span>':'')+'</label></td><td><div class="td-acts"><button class="btn btn-sm btn-navy edit-event-btn" data-eid="'+e.id+'"><i class="fas fa-pen"></i> Edit</button><button class="btn btn-sm btn-danger del-event-btn" data-eid="'+e.id+'"><i class="fas fa-trash"></i></button></div></td></tr>';
+  }).join('') : '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--gray)">No events yet. <tr>';
   
   setTimeout(function(){ 
     document.querySelectorAll('.edit-event-btn').forEach(function(btn){ btn.addEventListener('click', function(){ openEventModal(btn.dataset.eid); }); }); 
@@ -652,7 +656,7 @@ function pgEvents() {
     var addBtn=document.getElementById('addEventBtn'); if(addBtn) addBtn.addEventListener('click', function(){ openEventModal(null); }); 
   }, 50);
   
-  return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px"><h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-calendar-alt" style="color:var(--red);margin-right:8px"></i>Events</h1><button class="btn btn-red" id="addEventBtn"><i class="fas fa-plus"></i> Add Event</button></div><div class="card" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Thumb</th><th>Title</th><th>Date</th><th>Time</th><th>Location</th><th>Tag</th><th>Live</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+  return '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px"><h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-calendar-alt" style="color:var(--red);margin-right:8px"></i>Events</h1><button class="btn btn-red" id="addEventBtn"><i class="fas fa-plus"></i> Add Event</button></div><div class="card" style="padding:0"><div class="tbl-wrap"><table><thead><tr><th>Thumb</th><th>Title</th><th>Date</th><th>Time</th><th>Location</th><th>Tag</th><th>Live</th><th>Actions</th></tr></thead><tbody>' + rows + '</tbody><table></div></div>';
 }
 
 function openEventModal(id) {
