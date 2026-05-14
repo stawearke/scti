@@ -372,49 +372,53 @@ function pgApplications() {
 function buildAppRows(apps) {
   if (!apps.length) return '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--gray)">No applications found</td></tr>';
   return apps.map(function(a){
-    var statusOpts = ['pending','contacted','approved','rejected'].map(function(s){ return '<option value="'+s+'"'+(a.status===s?' selected':'')+'>'+s+'</option>'; }).join('');
+    var statusOpts = ['pending','contacted','approved','rejected'].map(function(s){ return '<option value="'+s+'"'+(a.status===s?' selected':'')+'>'+s.charAt(0).toUpperCase()+s.slice(1)+'</option>'; }).join('');
     return '<tr><td><strong>'+h(a.full_name)+'</strong><br><span style="font-size:.72rem;color:var(--gray)">'+h(a.email)+'</span></td><td>'+h(a.phone)+'</td><td>'+h(a.course_name)+'</td><td>'+h(((a.county||'')+' '+(a.town||'')).trim())+'</td><td>'+fmtD(a.created_at)+'</td><td><select class="app-status-sel" data-appid="'+a.id+'" style="width:120px;font-size:.8rem;padding:5px 8px">'+statusOpts+'</select></td><td><div class="td-acts"><button class="btn btn-sm btn-navy view-app-btn" data-appid="'+a.id+'"><i class="fas fa-eye"></i></button><a class="btn btn-sm btn-gold" href="https://wa.me/'+(a.phone||'').replace(/\D/g,'') + '" target="_blank"><i class="fab fa-whatsapp"></i></a><a class="btn btn-sm btn-outline" href="mailto:'+h(a.email)+'"><i class="fas fa-envelope"></i></a><button class="btn btn-sm btn-danger del-app-btn" data-appid="'+a.id+'"><i class="fas fa-trash"></i></button></div></td></tr>';
   }).join('');
 }
 
-document.addEventListener('click', function(e){
-  if (e.target.classList.contains('app-filter-btn')) {
-    document.querySelectorAll('.app-filter-btn').forEach(function(b){ b.classList.remove('btn-navy'); b.classList.add('btn-ghost'); });
-    e.target.classList.remove('btn-ghost'); e.target.classList.add('btn-navy');
-    var status = e.target.dataset.status;
-    var filtered = status==='all' ? DB.applications : DB.applications.filter(function(a){ return a.status===status; });
-    var tb = document.getElementById('appTbody');
-    if (tb) tb.innerHTML = buildAppRows(filtered);
-  }
-  if (e.target.closest('.view-app-btn')) { viewApplication(e.target.closest('.view-app-btn').dataset.appid); }
-  if (e.target.closest('.del-app-btn')) { deleteApplication(e.target.closest('.del-app-btn').dataset.appid); }
-  if (e.target.id === 'exportCsvBtn' || e.target.closest('#exportCsvBtn')) exportCSV();
-});
-
-document.addEventListener('change', function(e){
-  if (e.target.classList.contains('app-status-sel')) { updateAppStatus(e.target.dataset.appid, e.target.value); }
-  if (e.target.classList.contains('event-live-chk')) { toggleLive(e.target.dataset.eid, e.target.checked); }
-});
-
-function viewApplication(id) {
-  var a = DB.applications.find(function(x){ return x.id==id; });
-  if (!a) return;
-  var fields = [['Full Name',a.full_name],['Email',a.email],['Phone',a.phone],['Date of Birth',fmtD(a.date_of_birth)],['Gender',a.gender],['National ID',a.national_id],['County',a.county],['Town',a.town],['Guardian',a.guardian_name],['Guardian Phone',a.guardian_phone],['Relationship',a.guardian_relationship],['Education',a.highest_education],['School',a.school_name],['Grad Year',a.graduation_year],['Course',a.course_name],['Level',a.study_level],['Mode',a.study_mode],['Intake',a.intake_month],['How Heard',a.how_heard],['Applied',fmtTS(a.created_at)]];
-  var grid = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' + fields.map(function(kv){ return '<div style="padding:10px 12px;background:var(--gray-lt);border-radius:8px"><div style="font-size:.68rem;font-weight:700;color:var(--gray);margin-bottom:3px">'+kv[0]+'</div><div style="font-size:.83rem;color:var(--navy);font-weight:600">'+h(kv[1]||'—')+'</div></div>'; }).join('') + '</div>';
-  var stmt = a.personal_statement ? '<div style="margin-top:14px;padding:14px;background:var(--navy);color:rgba(255,255,255,.82);border-radius:10px;font-size:.83rem"><strong style="color:var(--gold)">Personal Statement:</strong><br>' + h(a.personal_statement) + '</div>' : '';
-  var docs = '<div style="margin-top:14px"><h4 style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:10px">Documents</h4><div style="display:flex;gap:10px;flex-wrap:wrap">'+(a.passport_photo_url?'<a href="'+h(a.passport_photo_url)+'" target="_blank"><img src="'+h(a.passport_photo_url)+'" style="width:90px;height:70px;object-fit:cover;border-radius:8px;border:2px solid var(--border)" onerror="imgFail(this)"></a>':'')+(a.national_id_front_url?'<a href="'+h(a.national_id_front_url)+'" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-id-card"></i> ID Front</a>':'')+(a.national_id_back_url?'<a href="'+h(a.national_id_back_url)+'" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-id-card"></i> ID Back</a>':'')+(a.certificate_url?'<a href="'+h(a.certificate_url)+'" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-file"></i> Certificate</a>':'')+'</div></div>';
-  var statusOpts = ['pending','contacted','approved','rejected'].map(function(s){ return '<option value="'+s+'"'+(a.status===s?' selected':'')+'>'+ s.charAt(0).toUpperCase()+s.slice(1)+'</option>'; }).join('');
-  var foot = '<select id="modalAppStatus" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:Outfit,sans-serif;font-size:.83rem">'+statusOpts+'</select><button class="btn btn-red" id="modalSaveStatus"><i class="fas fa-save"></i> Update Status</button><a class="btn btn-gold" href="https://wa.me/'+(a.phone||'').replace(/\D/g,'') + '" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a><button class="btn btn-ghost" onclick="closeModal()">Close</button>';
-  openModal('Application — ' + h(a.full_name), grid + stmt + docs, foot, '780px');
-  setTimeout(function(){ var btn=document.getElementById('modalSaveStatus'); if(btn) btn.addEventListener('click', function(){ var sel=document.getElementById('modalAppStatus'); if(sel) updateAppStatus(a.id, sel.value); closeModal(); }); }, 50);
-}
-
+// FIXED: Updated updateAppStatus function with proper error handling
 async function updateAppStatus(id, status) {
-  var res = await sb.from('applications').update({status:status}).eq('id',id);
-  if (res.error) { toast('Update failed: '+res.error.message,'err'); return; }
-  var a = DB.applications.find(function(x){ return x.id==id; });
-  if (a) a.status = status;
-  toast('Status updated: ' + status);
+  // Validate status is one of allowed values
+  const validStatuses = ['pending', 'contacted', 'approved', 'rejected'];
+  if (!validStatuses.includes(status)) {
+    toast('Invalid status value: ' + status, 'err');
+    return;
+  }
+  
+  console.log('Updating application:', id, 'to status:', status);
+  
+  try {
+    const { error } = await sb
+      .from('applications')
+      .update({ status: status })
+      .eq('id', id);
+    
+    if (error) {
+      console.error('Supabase error:', error);
+      toast('Update failed: ' + error.message, 'err');
+      return;
+    }
+    
+    // Update local data
+    const app = DB.applications.find(function(x) { return x.id == id; });
+    if (app) {
+      app.status = status;
+    }
+    
+    // Refresh the current view to show updated status
+    if (currentPage === 'applications') {
+      renderPage('applications');
+    } else {
+      updateCounts();
+    }
+    
+    toast('Status updated to: ' + status.charAt(0).toUpperCase() + status.slice(1));
+    
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    toast('Update failed: ' + err.message, 'err');
+  }
 }
 
 async function deleteApplication(id) {
@@ -434,6 +438,19 @@ function exportCSV() {
   link.download = 'scti_applications_' + new Date().toISOString().slice(0,10) + '.csv';
   link.click();
   toast('CSV exported');
+}
+
+function viewApplication(id) {
+  var a = DB.applications.find(function(x){ return x.id==id; });
+  if (!a) return;
+  var fields = [['Full Name',a.full_name],['Email',a.email],['Phone',a.phone],['Date of Birth',fmtD(a.date_of_birth)],['Gender',a.gender],['National ID',a.national_id],['County',a.county],['Town',a.town],['Guardian',a.guardian_name],['Guardian Phone',a.guardian_phone],['Relationship',a.guardian_relationship],['Education',a.highest_education],['School',a.school_name],['Grad Year',a.graduation_year],['Course',a.course_name],['Level',a.study_level],['Mode',a.study_mode],['Intake',a.intake_month],['How Heard',a.how_heard],['Applied',fmtTS(a.created_at)]];
+  var grid = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' + fields.map(function(kv){ return '<div style="padding:10px 12px;background:var(--gray-lt);border-radius:8px"><div style="font-size:.68rem;font-weight:700;color:var(--gray);margin-bottom:3px">'+kv[0]+'</div><div style="font-size:.83rem;color:var(--navy);font-weight:600">'+h(kv[1]||'—')+'</div></div>'; }).join('') + '</div>';
+  var stmt = a.personal_statement ? '<div style="margin-top:14px;padding:14px;background:var(--navy);color:rgba(255,255,255,.82);border-radius:10px;font-size:.83rem"><strong style="color:var(--gold)">Personal Statement:</strong><br>' + h(a.personal_statement) + '</div>' : '';
+  var docs = '<div style="margin-top:14px"><h4 style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:10px">Documents</h4><div style="display:flex;gap:10px;flex-wrap:wrap">'+(a.passport_photo_url?'<a href="'+h(a.passport_photo_url)+'" target="_blank"><img src="'+h(a.passport_photo_url)+'" style="width:90px;height:70px;object-fit:cover;border-radius:8px;border:2px solid var(--border)" onerror="imgFail(this)"></a>':'')+(a.national_id_front_url?'<a href="'+h(a.national_id_front_url)+'" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-id-card"></i> ID Front</a>':'')+(a.national_id_back_url?'<a href="'+h(a.national_id_back_url)+'" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-id-card"></i> ID Back</a>':'')+(a.certificate_url?'<a href="'+h(a.certificate_url)+'" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-file"></i> Certificate</a>':'')+'</div></div>';
+  var statusOpts = ['pending','contacted','approved','rejected'].map(function(s){ return '<option value="'+s+'"'+(a.status===s?' selected':'')+'>'+ s.charAt(0).toUpperCase()+s.slice(1)+'</option>'; }).join('');
+  var foot = '<select id="modalAppStatus" style="padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);font-family:Outfit,sans-serif;font-size:.83rem">'+statusOpts+'</select><button class="btn btn-red" id="modalSaveStatus"><i class="fas fa-save"></i> Update Status</button><a class="btn btn-gold" href="https://wa.me/'+(a.phone||'').replace(/\D/g,'') + '" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a><button class="btn btn-ghost" onclick="closeModal()">Close</button>';
+  openModal('Application — ' + h(a.full_name), grid + stmt + docs, foot, '780px');
+  setTimeout(function(){ var btn=document.getElementById('modalSaveStatus'); if(btn) btn.addEventListener('click', function(){ var sel=document.getElementById('modalAppStatus'); if(sel) updateAppStatus(a.id, sel.value); closeModal(); }); }, 50);
 }
 
 function pgEnquiries() {
@@ -655,6 +672,34 @@ function setSaving(btnId, saving) {
   if (saving) { btn._origHTML = btn.innerHTML; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving…'; }
   else { btn.innerHTML = btn._origHTML || btn.innerHTML; }
 }
+
+// Global event listeners for dynamic elements
+document.addEventListener('change', function(e){
+  if (e.target.classList && e.target.classList.contains('app-status-sel')) {
+    updateAppStatus(e.target.dataset.appid, e.target.value);
+  }
+  if (e.target.classList && e.target.classList.contains('event-live-chk')) {
+    toggleLive(e.target.dataset.eid, e.target.checked);
+  }
+});
+
+document.addEventListener('click', function(e){
+  if (e.target.classList && e.target.classList.contains('app-filter-btn')) {
+    document.querySelectorAll('.app-filter-btn').forEach(function(b){ b.classList.remove('btn-navy'); b.classList.add('btn-ghost'); });
+    e.target.classList.remove('btn-ghost'); e.target.classList.add('btn-navy');
+    var status = e.target.dataset.status;
+    var filtered = status==='all' ? DB.applications : DB.applications.filter(function(a){ return a.status===status; });
+    var tb = document.getElementById('appTbody');
+    if (tb) tb.innerHTML = buildAppRows(filtered);
+  }
+  if (e.target.closest && e.target.closest('.view-app-btn')) { 
+    viewApplication(e.target.closest('.view-app-btn').dataset.appid); 
+  }
+  if (e.target.closest && e.target.closest('.del-app-btn')) { 
+    deleteApplication(e.target.closest('.del-app-btn').dataset.appid); 
+  }
+  if (e.target.id === 'exportCsvBtn' || (e.target.closest && e.target.closest('#exportCsvBtn'))) exportCSV();
+});
 
 window.imgFail = function(el){ el.onerror=null; el.style.background='#e2e8f0'; el.removeAttribute('src'); };
 window.closeModal = closeModal;
