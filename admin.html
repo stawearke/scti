@@ -171,6 +171,7 @@ tr:hover td{background:#fafbfc}
     <div class="sb-sec">WEBSITE CONTENT</div>
     <div class="sb-item" data-page="hero"><i class="fas fa-image"></i> Hero Slides <span class="sb-count" id="cntHero">0</span></div>
     <div class="sb-item" data-page="courses"><i class="fas fa-book-open"></i> Courses <span class="sb-count" id="cntCourse">0</span></div>
+    <div class="sb-item" data-page="fees"><i class="fas fa-tags"></i> Fee Structure</div>
     <div class="sb-item" data-page="events"><i class="fas fa-calendar-alt"></i> Events <span class="sb-count" id="cntEvent">0</span></div>
     <div class="sb-item" data-page="gallery"><i class="fas fa-images"></i> Gallery <span class="sb-count" id="cntGal">0</span></div>
     <div class="sb-sec">SETTINGS</div>
@@ -301,7 +302,7 @@ function setupNav() {
 function renderPage(page) {
   currentPage = page;
   document.querySelectorAll('.sb-item').forEach(function(el){ el.classList.toggle('on', el.dataset.page === page); });
-  var map = { dashboard:pgDashboard, applications:pgApplications, enquiries:pgEnquiries, hero:pgHero, courses:pgCourses, events:pgEvents, gallery:pgGallery, settings:pgSettings, live:pgLive };
+  var map = { dashboard:pgDashboard, applications:pgApplications, enquiries:pgEnquiries, hero:pgHero, courses:pgCourses, fees:pgFees, events:pgEvents, gallery:pgGallery, settings:pgSettings, live:pgLive };
   var fn = map[page];
   document.getElementById('mainContent').innerHTML = fn ? fn() : '<p>Not found</p>';
 }
@@ -809,8 +810,249 @@ document.addEventListener('click', function(e){
 
 window.imgFail = function(el){ el.onerror=null; el.style.background='#e2e8f0'; el.removeAttribute('src'); };
 window.closeModal = closeModal;
+// ─── FEE STRUCTURE MODULE ─────────────────────────────────────────────────
+var FEE_SCHOOLS = [
+  {
+    key:'media', label:'School of Media & Creative Arts', icon:'fas fa-film',
+    programmes:[
+      {name:'Basic Video Editing',level:'Short',duration:'2 Months',monthly:15000,perTerm:null,total:30000},
+      {name:'Intermediate Video Editing',level:'Short',duration:'3 Months',monthly:15000,perTerm:null,total:45000},
+      {name:'Professional Videography & Photography',level:'Short',duration:'5 Months',monthly:15000,perTerm:null,total:75000},
+      {name:'Film & Media Skill Certificate',level:'Certificate',duration:'10 Months',monthly:15000,perTerm:null,total:150000},
+      {name:'Film Production',level:'Certificate',duration:'1 Year',monthly:12500,perTerm:37500,total:null},
+      {name:'Film Production',level:'Diploma',duration:'2 Years',monthly:12500,perTerm:37500,total:null},
+      {name:'Photography',level:'Short',duration:'3 Months',monthly:10000,perTerm:null,total:30000},
+      {name:'Advanced Photography',level:'Short',duration:'4 Months',monthly:12500,perTerm:null,total:50000},
+      {name:'Animation',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:60000},
+      {name:'Animation',level:'Certificate',duration:'1 Year',monthly:12500,perTerm:37500,total:null},
+      {name:'Animation',level:'Diploma',duration:'2 Years',monthly:12500,perTerm:37500,total:null},
+      {name:'Graphic Design',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:45000},
+      {name:'Graphic Design',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+      {name:'Graphic Design',level:'Certificate',duration:'1 Year',monthly:12500,perTerm:37500,total:null},
+      {name:'Graphic Design',level:'Diploma',duration:'2 Years',monthly:12500,perTerm:37500,total:null},
+      {name:'Fine Art',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:45000},
+      {name:'Fine Art',level:'Short',duration:'4 Months',monthly:null,perTerm:null,total:60000},
+      {name:'Fine Art',level:'Certificate',duration:'1 Year',monthly:12500,perTerm:37500,total:null},
+      {name:'Fine Art',level:'Diploma',duration:'2 Years',monthly:12500,perTerm:37500,total:null},
+    ]
+  },
+  {
+    key:'ict', label:'School of ICT & Digital Technology', icon:'fas fa-laptop-code',
+    programmes:[
+      {name:'Computer Packages',level:'Short',duration:'2 Months',monthly:7500,perTerm:null,total:15000},
+      {name:'Computer Packages & Digital Skills',level:'Short',duration:'2 Months',monthly:null,perTerm:null,total:30000},
+      {name:'Advanced Computer Applications',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:30000},
+      {name:'ICT',level:'Certificate',duration:'1 Year',monthly:8000,perTerm:24000,total:null},
+      {name:'ICT',level:'Diploma',duration:'2 Years',monthly:8000,perTerm:24000,total:null},
+      {name:'Cyber Security',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+      {name:'Cyber Security',level:'Certificate',duration:'1 Year',monthly:12500,perTerm:null,total:150000},
+      {name:'Cyber Security',level:'Diploma',duration:'2 Years',monthly:12500,perTerm:null,total:300000},
+      {name:'Web Design / Web Development',level:'Short',duration:'6 Months',monthly:10000,perTerm:null,total:60000},
+      {name:'Advanced Web Design/Development',level:'Certificate',duration:'1 Year',monthly:10000,perTerm:null,total:120000},
+    ]
+  },
+  {
+    key:'engineering', label:'School of Engineering', icon:'fas fa-tools',
+    programmes:[
+      {name:'Electrical Installation',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+      {name:'Solar Installation',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+      {name:'CCTV Installation',level:'Short',duration:'3 Months',monthly:12500,perTerm:null,total:37500},
+      {name:'Electrical + Solar + CCTV',level:'Short',duration:'6 Months',monthly:null,perTerm:null,total:120000},
+      {name:'ElectroTechnical Engineering',level:'Certificate',duration:'1 Year',monthly:null,perTerm:24000,total:null},
+      {name:'ElectroTechnical Engineering',level:'Diploma',duration:'2 Years',monthly:null,perTerm:24000,total:null},
+      {name:'Plumbing',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+    ]
+  },
+  {
+    key:'business', label:'School of Business, Media & Hospitality', icon:'fas fa-briefcase',
+    programmes:[
+      {name:'Digital Marketing',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+      {name:'Digital Marketing',level:'Certificate',duration:'1 Year',monthly:12500,perTerm:37500,total:null},
+      {name:'Digital Marketing',level:'Diploma',duration:'2 Years',monthly:12500,perTerm:37500,total:null},
+      {name:'Digital Journalism',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+      {name:'Digital Journalism Skill Cert',level:'Certificate',duration:'10 Months',monthly:15000,perTerm:null,total:150000},
+      {name:'Digital Journalism',level:'Certificate',duration:'1 Year',monthly:12000,perTerm:36000,total:null},
+      {name:'Digital Journalism',level:'Diploma',duration:'2 Years',monthly:12000,perTerm:36000,total:null},
+      {name:'Content Creation',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:45000},
+      {name:'Deejaying',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:30000},
+      {name:'Advanced Deejaying',level:'Short',duration:'5 Months',monthly:null,perTerm:null,total:50000},
+      {name:'Phone Repair',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:30000},
+      {name:'Phone & Laptop Repair',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:65000},
+      {name:'Food & Beverages',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:45000},
+      {name:'Food & Beverages',level:'Certificate',duration:'1 Year',monthly:13000,perTerm:39000,total:null},
+      {name:'Food & Beverages',level:'Diploma',duration:'2 Years',monthly:13000,perTerm:39000,total:null},
+    ]
+  }
+];
+
+// Load fee structure from Supabase or fall back to defaults
+var DB_FEES = null;
+async function loadFees() {
+  if(DB_FEES) return;
+  try {
+    var r = await _sb.from('fee_structure').select('*').order('school').order('sort_order');
+    if(!r.error && r.data && r.data.length) {
+      DB_FEES = r.data;
+    } else {
+      DB_FEES = null; // use defaults
+    }
+  } catch(e) { DB_FEES = null; }
+}
+
+function ksh(n){ return n ? 'Ksh ' + Number(n).toLocaleString() : '—'; }
+function levelBadge(l){
+  var map={Short:'background:#fff3cd;color:#856404',Certificate:'background:#d1e7dd;color:#0a5c36',Diploma:'background:#cfe2ff;color:#0a3878'};
+  return '<span style="font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;'+(map[l]||'background:#eee;color:#555')+'">'+h(l)+'</span>';
+}
+
+function buildFeeTable(programmes) {
+  return '<div class="tbl-wrap"><table><thead><tr><th>Programme</th><th>Level</th><th>Duration</th><th>Monthly</th><th>Per Term</th><th>Total</th><th style="width:80px">Actions</th></tr></thead><tbody>'+
+    programmes.map(function(p,i){
+      return '<tr data-pi="'+i+'">' +
+        '<td><strong>'+h(p.name)+'</strong></td>' +
+        '<td>'+levelBadge(p.level)+'</td>' +
+        '<td>'+h(p.duration)+'</td>' +
+        '<td style="font-weight:600;color:var(--navy)">'+ksh(p.monthly)+'</td>' +
+        '<td style="font-weight:600;color:var(--navy)">'+ksh(p.perTerm)+'</td>' +
+        '<td style="font-weight:700;color:var(--red)">'+ksh(p.total)+'</td>' +
+        '<td><button class="btn btn-sm btn-navy fee-edit-btn" data-school="'+p._school+'" data-idx="'+i+'"><i class="fas fa-pen"></i></button></td>' +
+      '</tr>';
+    }).join('')+
+  '</tbody></table></div>';
+}
+
+function pgFees() {
+  var schools = FEE_SCHOOLS;
+  var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">' +
+    '<h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-tags" style="color:var(--red);margin-right:8px"></i>Fee Structure — 2026</h1>' +
+    '<div style="display:flex;gap:8px">' +
+      '<button class="btn btn-outline" onclick="exportFeesCsv()"><i class="fas fa-download"></i> Export CSV</button>' +
+      '<button class="btn btn-red" onclick="openAddFeeRow()"><i class="fas fa-plus"></i> Add Programme</button>' +
+    '</div>' +
+  '</div>' +
+  '<div style="background:#fff9f0;border:1.5px solid #f0a500;border-radius:10px;padding:12px 16px;margin-bottom:24px;font-size:.82rem;color:#7a4f00">' +
+    '<i class="fas fa-info-circle" style="margin-right:6px"></i>' +
+    '<strong>Registration Fee:</strong> Ksh 2,000 — Non-refundable. Applies to all programmes. ' +
+    '<strong>Intakes:</strong> January, May, September. &nbsp;|&nbsp; ' +
+    '<strong>Payment:</strong> Full payment or approved monthly instalments.' +
+  '</div>';
+
+  schools.forEach(function(school) {
+    var progs = school.programmes.map(function(p){ return Object.assign({},p,{_school:school.key}); });
+    html += '<div class="card" style="margin-bottom:24px;padding:0">' +
+      '<div class="card-hdr" style="padding:16px 20px;border-bottom:1px solid var(--border)">' +
+        '<div class="ch-left"><div class="ch-icon"><i class="'+school.icon+'"></i></div>' +
+        '<h2>'+h(school.label)+'</h2></div>' +
+      '</div>' +
+      buildFeeTable(progs) +
+    '</div>';
+  });
+
+  return html;
+}
+
+function openFeeEditModal(schoolKey, idx) {
+  var school = FEE_SCHOOLS.find(function(s){ return s.key===schoolKey; });
+  if(!school) return;
+  var p = school.programmes[idx];
+  var body = '<div class="form-grid">' +
+    '<div class="fg s2"><label class="form-label">Programme Name *</label><input class="form-input" id="fe_name" value="'+h(p.name)+'"></div>' +
+    '<div class="fg"><label class="form-label">Level</label><select class="form-input" id="fe_level"><option'+(p.level==='Short'?' selected':'')+'>Short</option><option'+(p.level==='Certificate'?' selected':'')+'>Certificate</option><option'+(p.level==='Diploma'?' selected':'')+'>Diploma</option></select></div>' +
+    '<div class="fg"><label class="form-label">Duration</label><input class="form-input" id="fe_dur" value="'+h(p.duration)+'"></div>' +
+    '<div class="fg"><label class="form-label">Monthly (Ksh)</label><input class="form-input" id="fe_monthly" type="number" value="'+(p.monthly||'')+'"></div>' +
+    '<div class="fg"><label class="form-label">Per Term (Ksh)</label><input class="form-input" id="fe_term" type="number" value="'+(p.perTerm||'')+'"></div>' +
+    '<div class="fg"><label class="form-label">Total (Ksh)</label><input class="form-input" id="fe_total" type="number" value="'+(p.total||'')+'"></div>' +
+  '</div>';
+  openModal('Edit Fee — '+h(p.name), body,
+    '<button class="btn btn-outline" onclick="closeModal()">Cancel</button>' +
+    '<button class="btn btn-danger" onclick="deleteFeeRow(\''+schoolKey+'\','+idx+')"><i class="fas fa-trash"></i> Delete</button>' +
+    '<button class="btn btn-red" onclick="saveFeeRow(\''+schoolKey+'\','+idx+')"><i class="fas fa-save"></i> Save</button>'
+  );
+}
+
+function openAddFeeRow() {
+  var schoolOpts = FEE_SCHOOLS.map(function(s){ return '<option value="'+s.key+'">'+s.label+'</option>'; }).join('');
+  var body = '<div class="form-grid">' +
+    '<div class="fg s2"><label class="form-label">School *</label><select class="form-input" id="fe_school">'+schoolOpts+'</select></div>' +
+    '<div class="fg s2"><label class="form-label">Programme Name *</label><input class="form-input" id="fe_name" placeholder="e.g. Advanced Cinematography"></div>' +
+    '<div class="fg"><label class="form-label">Level</label><select class="form-input" id="fe_level"><option>Short</option><option>Certificate</option><option>Diploma</option></select></div>' +
+    '<div class="fg"><label class="form-label">Duration</label><input class="form-input" id="fe_dur" placeholder="e.g. 6 Months"></div>' +
+    '<div class="fg"><label class="form-label">Monthly (Ksh)</label><input class="form-input" id="fe_monthly" type="number"></div>' +
+    '<div class="fg"><label class="form-label">Per Term (Ksh)</label><input class="form-input" id="fe_term" type="number"></div>' +
+    '<div class="fg"><label class="form-label">Total (Ksh)</label><input class="form-input" id="fe_total" type="number"></div>' +
+  '</div>';
+  openModal('Add New Programme', body,
+    '<button class="btn btn-outline" onclick="closeModal()">Cancel</button>' +
+    '<button class="btn btn-red" onclick="saveFeeRow(null,-1)"><i class="fas fa-plus"></i> Add</button>'
+  );
+}
+
+async function saveFeeRow(schoolKey, idx) {
+  var name = (document.getElementById('fe_name')||{}).value||'';
+  if(!name.trim()){ toast('Programme name is required','err'); return; }
+  var sKey = idx===-1 ? ((document.getElementById('fe_school')||{}).value||schoolKey) : schoolKey;
+  var school = FEE_SCHOOLS.find(function(s){ return s.key===sKey; });
+  if(!school){ toast('School not found','err'); return; }
+  var entry = {
+    name: name.trim(),
+    level: (document.getElementById('fe_level')||{}).value||'Short',
+    duration: (document.getElementById('fe_dur')||{}).value||'',
+    monthly: parseInt((document.getElementById('fe_monthly')||{}).value)||null,
+    perTerm: parseInt((document.getElementById('fe_term')||{}).value)||null,
+    total: parseInt((document.getElementById('fe_total')||{}).value)||null,
+  };
+  if(idx===-1){ school.programmes.push(entry); }
+  else { school.programmes[idx]=entry; }
+
+  // Sync to Supabase fee_structure table if it exists
+  try {
+    await _sb.from('fee_structure').upsert({
+      school: sKey, programme_name: entry.name, level: entry.level,
+      duration: entry.duration, monthly: entry.monthly, per_term: entry.perTerm, total: entry.total,
+      sort_order: idx===-1 ? school.programmes.length : idx
+    }, {onConflict:'school,programme_name,level'});
+  } catch(e){ /* table may not exist yet, local update still applied */ }
+
+  closeModal(); renderPage('fees'); toast(idx===-1?'Programme added!':'Fee updated!');
+}
+
+async function deleteFeeRow(schoolKey, idx) {
+  var school = FEE_SCHOOLS.find(function(s){ return s.key===schoolKey; });
+  if(!school) return;
+  var p = school.programmes[idx];
+  if(!confirm('Delete "'+p.name+'" ('+p.level+')? This cannot be undone.')) return;
+  try {
+    await _sb.from('fee_structure').delete().match({school:schoolKey, programme_name:p.name, level:p.level});
+  } catch(e){}
+  school.programmes.splice(idx,1);
+  closeModal(); renderPage('fees'); toast('Programme removed');
+}
+
+function exportFeesCsv() {
+  var rows = ['School,Programme,Level,Duration,Monthly (Ksh),Per Term (Ksh),Total (Ksh)'];
+  FEE_SCHOOLS.forEach(function(school){
+    school.programmes.forEach(function(p){
+      rows.push([school.label,p.name,p.level,p.duration,p.monthly||'',p.perTerm||'',p.total||''].join(','));
+    });
+  });
+  var blob = new Blob([rows.join('\n')], {type:'text/csv'});
+  var a = document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='SCTI_Fee_Structure_2026.csv'; a.click();
+}
+
+// Wire up fee edit buttons via delegation
+document.addEventListener('click', function(e){
+  var btn = e.target.closest('.fee-edit-btn');
+  if(btn){ openFeeEditModal(btn.dataset.school, parseInt(btn.dataset.idx)); }
+});
+// ─────────────────────────────────────────────────────────────────────────────
+
 window.renderPage = renderPage;
 window.saveSettings = saveSettings;
+window.openAddFeeRow = openAddFeeRow;
+window.exportFeesCsv = exportFeesCsv;
+window.saveFeeRow = saveFeeRow;
+window.deleteFeeRow = deleteFeeRow;
 
 if (authed) initApp();
 
