@@ -509,9 +509,10 @@ function renderHome(){
     <h2 class="sec-title">Our <span>Courses</span></h2>
     <div class="filter-bar">
       <button class="fb on" onclick="filterCat('All',this)">All Courses</button>
-      <button class="fb" onclick="filterCat('ICT & Technology',this)">ICT & Technology</button>
-      <button class="fb" onclick="filterCat('Creative Media',this)">Creative Media</button>
-      <button class="fb" onclick="filterCat('Business',this)">Business</button>
+      <button class="fb" onclick="filterCat('ICT & Digital Technology',this)">ICT & Technology</button>
+      <button class="fb" onclick="filterCat('School of Media & Creative Arts',this)">Creative Media</button>
+      <button class="fb" onclick="filterCat('School of Business, Media & Hospitality',this)">Business & Media</button>
+      <button class="fb" onclick="filterCat('School of Engineering',this)">Engineering</button>
     </div>
     <div class="courses-grid" id="coursesGrid">${featCourses.map(c=>courseCard(c)).join('')}</div>
     <div style="text-align:center"><button class="btn btn-or" onclick="go('courses')"><i class="fas fa-th-large"></i> View All ${DB.courses.length} Courses</button></div>
@@ -559,9 +560,10 @@ function renderCourses(){
   <section style="padding:56px 0"><div class="container">
     <div class="filter-bar">
       <button class="fb on" onclick="filterCat('All',this)">All (${DB.courses.length})</button>
-      <button class="fb" onclick="filterCat('ICT & Technology',this)">ICT & Technology</button>
-      <button class="fb" onclick="filterCat('Creative Media',this)">Creative Media</button>
-      <button class="fb" onclick="filterCat('Business',this)">Business</button>
+      <button class="fb" onclick="filterCat('ICT & Digital Technology',this)">ICT & Technology</button>
+      <button class="fb" onclick="filterCat('School of Media & Creative Arts',this)">Creative Media</button>
+      <button class="fb" onclick="filterCat('School of Business, Media & Hospitality',this)">Business & Media</button>
+      <button class="fb" onclick="filterCat('School of Engineering',this)">Engineering</button>
     </div>
     <div class="courses-grid" id="coursesGrid">${DB.courses.map(c=>courseCard(c)).join('')}</div>
   </div></section>
@@ -985,7 +987,7 @@ function renderFooter(){
         <p>${S('footer_text')}</p>
         <div class="social-row" style="margin-top:16px"><a class="sbtn" href="${S('facebook')}" target="_blank"><i class="fab fa-facebook-f"></i></a><a class="sbtn" href="${S('instagram')}" target="_blank"><i class="fab fa-instagram"></i></a><a class="sbtn" href="${S('tiktok')}" target="_blank"><i class="fab fa-tiktok"></i></a><a class="sbtn" href="${S('youtube')}" target="_blank"><i class="fab fa-youtube"></i></a><a class="sbtn" href="${S('twitter')}" target="_blank"><i class="fab fa-x-twitter"></i></a></div>
       </div>
-      <div class="ft-col"><h4>QUICK LINKS</h4><div onclick="go('home')">Home</div><div onclick="go('courses')">All Courses</div><div onclick="go('events')">Events</div><div onclick="go('gallery')">Gallery</div><div onclick="go('about')">About Us</div><div onclick="go('contact')">Contact</div><div onclick="window.location.href='status.html'">📋 Check Application Status</div><div onclick="go('apply')">Apply Now</div><div onclick="window.location.href='admin.html'" style="opacity:.5;font-size:.78rem;margin-top:8px;border-top:1px solid rgba(255,255,255,.08);padding-top:8px">⚙️ Staff Login</div></div>
+      <div class="ft-col"><h4>QUICK LINKS</h4><div onclick="go('home')">Home</div><div onclick="go('courses')">All Courses</div><div onclick="go('events')">Events</div><div onclick="go('gallery')">Gallery</div><div onclick="go('about')">About Us</div><div onclick="go('contact')">Contact</div><div onclick="window.location.href='status.html'">📋 Check Application Status</div><div onclick="go('apply')">Apply Now</div></div>
       <div class="ft-col"><h4>OUR COURSES</h4>${DB.courses.slice(0,6).map(c=>`<div onclick="goDetail('${c.id}')">${c.name}</div>`).join('')}</div>
       <div class="ft-col"><h4>CONTACT US</h4><div><i class="fas fa-phone" style="color:var(--gold);margin-right:6px"></i>${S('phone1')}</div><div><i class="fas fa-phone" style="color:var(--gold);margin-right:6px"></i>${S('phone2')}</div><div><i class="fas fa-envelope" style="color:var(--gold);margin-right:6px"></i>${S('email')}</div><div><i class="fas fa-map-marker-alt" style="color:var(--gold);margin-right:6px"></i>${S('address')}</div><a class="btn btn-red btn-sm" style="margin-top:14px;display:inline-flex" href="https://wa.me/${(S('whatsapp')||'').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Us</a></div>
     </div>
@@ -1025,7 +1027,7 @@ function sendMsg(){
 }
 
 function getSimpleReply(msg){
-  if(msg.includes('course')||msg.includes('study')||msg.includes('learn'))return`We offer courses in <strong>ICT & Technology, Creative Media, and Business</strong>. Popular ones: Cyber Security, Film Production, Digital Marketing, Web Design, Photography, and Deejaying. <a onclick="go('courses')" style="color:var(--red);cursor:pointer">View all courses →</a>`;
+  if(msg.includes('course')||msg.includes('study')||msg.includes('learn'))return`We offer <strong>23 courses</strong> across 4 schools: <strong>ICT & Technology</strong> (Cyber Security, Web Dev, ICT), <strong>Creative Media</strong> (Film, Photography, Graphic Design, Animation), <strong>Business & Media</strong> (Digital Marketing, Journalism, Deejaying, Food & Beverages), and <strong>Engineering</strong> (Electrical, Solar, CCTV, Plumbing). <a onclick="go('courses')" style="color:var(--red);cursor:pointer">View all courses →</a>`;
   if(msg.includes('fee')||msg.includes('cost')||msg.includes('price'))return`Course fees range from <strong>Ksh 15,000 to Ksh 300,000</strong> depending on the course and level (Short / Certificate / Diploma). There is also a <strong>Ksh 2,000 non-refundable registration fee</strong> for all programmes. Payment plans available — call ${S('phone1')} for details.`;
   if(msg.includes('apply')||msg.includes('admission'))return`Apply online via our <a onclick="go('apply')" style="color:var(--red);cursor:pointer">Application Form</a>. You'll need: Passport photo, National ID (front & back), and academic certificate. We'll call you within 24 hours!`;
   if(msg.includes('location')||msg.includes('address')||msg.includes('where'))return`We're located at <strong>${S('address')}</strong>. Open ${S('working_hours')}.`;
