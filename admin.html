@@ -262,7 +262,7 @@ async function loadAll() {
       sb.from('gallery').select('*').order('sort_order', {ascending:true}),
       sb.from('hero_slides').select('*').order('sort_order', {ascending:true}),
       sb.from('settings').select('*'),
-      sb.from('applications').select('*').order('created_at', {ascending:false}),
+      sb.from('applications').select('*', {count: 'exact'}).order('created_at', {ascending:false}).range(0, 49),
       sb.from('contact_enquiries').select('*').order('created_at', {ascending:false})
     ]);
     if (!results[0].error) DB.events = results[0].data || [];
