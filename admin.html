@@ -494,8 +494,9 @@ async function deleteApplication(id) {
 }
 
 function exportCSV() {
-  var cols = ['full_name','email','phone','course_name','study_level','study_mode','intake_month','county','town','highest_education','how_heard','status','created_at'];
-  var rows = [cols.join(',')].concat(DB.applications.map(function(a){ return cols.map(function(c){ return '"'+(a[c]||'').toString().replace(/"/g,'""')+'"'; }).join(','); }));
+  var cols = ['full_name','email','phone','course_name','study_level','study_mode','intake_month','county','town','highest_education','how_heard','status','reg_fee_proof_url','created_at'];
+  var headers = ['Full Name','Email','Phone','Course','Level','Mode','Intake','County','Town','Education','How Heard','Status','Reg Fee Proof URL','Applied At'];
+  var rows = [headers.join(',')].concat(DB.applications.map(function(a){ return cols.map(function(c){ return '"'+(a[c]||'').toString().replace(/"/g,'""')+'"'; }).join(','); }));
   var blob = new Blob([rows.join('\n')], {type:'text/csv'});
   var link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
@@ -510,7 +511,17 @@ function viewApplication(id) {
   var fields = [['Full Name',a.full_name],['Email',a.email],['Phone',a.phone],['Date of Birth',fmtD(a.date_of_birth)],['Gender',a.gender],['National ID',a.national_id],['County',a.county],['Town',a.town],['Guardian',a.guardian_name],['Guardian Phone',a.guardian_phone],['Relationship',a.guardian_relationship],['Education',a.highest_education],['School',a.school_name],['Grad Year',a.graduation_year],['Course',a.course_name],['Level',a.study_level],['Mode',a.study_mode],['Intake',a.intake_month],['How Heard',a.how_heard],['Applied',fmtTS(a.created_at)]];
   var grid = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">' + fields.map(function(kv){ return '<div style="padding:10px 12px;background:var(--gray-lt);border-radius:8px"><div style="font-size:.68rem;font-weight:700;color:var(--gray);margin-bottom:3px">'+kv[0]+'</div><div style="font-size:.83rem;color:var(--navy);font-weight:600">'+h(kv[1]||'—')+'</div></div>'; }).join('') + '</div>';
   var stmt = a.personal_statement ? '<div style="margin-top:14px;padding:14px;background:var(--navy);color:rgba(255,255,255,.82);border-radius:10px;font-size:.83rem"><strong style="color:var(--gold)">Personal Statement:</strong><br>' + h(a.personal_statement) + '</div>' : '';
-  var docs = '<div style="margin-top:14px"><h4 style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:10px">Documents</h4><div style="display:flex;gap:10px;flex-wrap:wrap">'+(a.passport_photo_url?'<a href="'+h(a.passport_photo_url)+'" target="_blank"><img src="'+h(a.passport_photo_url)+'" style="width:90px;height:70px;object-fit:cover;border-radius:8px;border:2px solid var(--border)" onerror="imgFail(this)"></a>':'')+(a.national_id_front_url?'<a href="'+h(a.national_id_front_url)+'" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-id-card"></i> ID Front</a>':'')+(a.national_id_back_url?'<a href="'+h(a.national_id_back_url)+'" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-id-card"></i> ID Back</a>':'')+(a.certificate_url?'<a href="'+h(a.certificate_url)+'" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-file"></i> Certificate</a>':'')+'</div></div>';
+  var regFeeBadge = a.reg_fee_proof_url
+    ? '<div style="margin-top:10px;padding:8px 12px;background:#d1e7dd;border-radius:8px;display:flex;align-items:center;gap:8px"><i class="fas fa-check-circle" style="color:#0a5c36"></i><span style="font-size:.8rem;font-weight:700;color:#0a5c36">Reg Fee Proof Attached</span><a href="'+h(a.reg_fee_proof_url)+'" target="_blank" class="btn btn-sm btn-ghost" style="margin-left:auto"><i class="fas fa-eye"></i> View</a></div>'
+    : '<div style="margin-top:10px;padding:8px 12px;background:#fee2e2;border-radius:8px;display:flex;align-items:center;gap:8px"><i class="fas fa-exclamation-circle" style="color:#991b1b"></i><span style="font-size:.8rem;font-weight:700;color:#991b1b">No Reg Fee Proof Uploaded</span></div>';
+  var docs = '<div style="margin-top:14px"><h4 style="font-size:.82rem;font-weight:700;color:var(--navy);margin-bottom:10px">Documents</h4>'
+    + regFeeBadge
+    + '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px">'
+    + (a.passport_photo_url?'<a href="'+h(a.passport_photo_url)+'" target="_blank"><img src="'+h(a.passport_photo_url)+'" style="width:90px;height:70px;object-fit:cover;border-radius:8px;border:2px solid var(--border)" onerror="imgFail(this)"></a>':'')
+    + (a.national_id_front_url?'<a href="'+h(a.national_id_front_url)+'" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-id-card"></i> ID Front</a>':'')
+    + (a.national_id_back_url?'<a href="'+h(a.national_id_back_url)+'" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-id-card"></i> ID Back</a>':'')
+    + (a.certificate_url?'<a href="'+h(a.certificate_url)+'" target="_blank" class="btn btn-sm btn-ghost"><i class="fas fa-file"></i> Certificate</a>':'')
+    + '</div></div>';
   var statusOpts = [
     '<option value="pending"'+(a.status==='pending'?' selected':'')+'>Pending</option>',
     '<option value="processing"'+(a.status==='processing'?' selected':'')+'>Processing</option>',
@@ -890,7 +901,7 @@ var DB_FEES = null;
 async function loadFees() {
   if(DB_FEES) return;
   try {
-    var r = await _sb.from('fee_structure').select('*').order('school').order('sort_order');
+    var r = await sb.from('fee_structure').select('*').order('school').order('sort_order');
     if(!r.error && r.data && r.data.length) {
       DB_FEES = r.data;
     } else {
@@ -1006,7 +1017,7 @@ async function saveFeeRow(schoolKey, idx) {
 
   // Sync to Supabase fee_structure table if it exists
   try {
-    await _sb.from('fee_structure').upsert({
+    await sb.from('fee_structure').upsert({
       school: sKey, programme_name: entry.name, level: entry.level,
       duration: entry.duration, monthly: entry.monthly, per_term: entry.perTerm, total: entry.total,
       sort_order: idx===-1 ? school.programmes.length : idx
@@ -1022,7 +1033,7 @@ async function deleteFeeRow(schoolKey, idx) {
   var p = school.programmes[idx];
   if(!confirm('Delete "'+p.name+'" ('+p.level+')? This cannot be undone.')) return;
   try {
-    await _sb.from('fee_structure').delete().match({school:schoolKey, programme_name:p.name, level:p.level});
+    await sb.from('fee_structure').delete().match({school:schoolKey, programme_name:p.name, level:p.level});
   } catch(e){}
   school.programmes.splice(idx,1);
   closeModal(); renderPage('fees'); toast('Programme removed');
