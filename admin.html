@@ -158,6 +158,7 @@ tr:hover td{background:#fafbfc}
       <div><span>SCTI Admin</span><small>CONTENT MANAGEMENT</small></div>
     </div>
     <div class="hdr-right">
+      <a href="index.html" target="_blank" class="hdr-badge" style="color:rgba(255,255,255,.8);text-decoration:none"><i class="fas fa-external-link-alt" style="font-size:.5rem;margin-right:4px"></i> View Site</a>
       <span class="hdr-badge" id="liveBadge"><i class="fas fa-circle" style="font-size:.5rem"></i> No Live Stream</span>
       <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
     </div>
@@ -251,7 +252,7 @@ var DB = { events:[], courses:[], gallery:[], slides:[], settings:{}, applicatio
 var currentPage = 'dashboard';
 var editingId = null;
 
-async function initApp() { await loadAll(); setupNav(); renderPage('dashboard'); }
+async function initApp() { await loadAll(); await loadFees(); setupNav(); renderPage('dashboard'); }
 
 async function loadAll() {
   try {
@@ -933,7 +934,23 @@ function buildFeeTable(programmes) {
 }
 
 function pgFees() {
-  var schools = FEE_SCHOOLS;
+  // Use live Supabase data if loaded, otherwise fall back to static defaults
+  var schools;
+  if (DB_FEES && DB_FEES.length) {
+    // Group DB rows by school key
+    var schoolMap = {};
+    DB_FEES.forEach(function(row) {
+      var sk = row.school;
+      if (!schoolMap[sk]) {
+        var meta = FEE_SCHOOLS.find(function(s){ return s.key===sk; });
+        schoolMap[sk] = { key:sk, label:meta?meta.label:sk, icon:meta?meta.icon:'fas fa-school', programmes:[] };
+      }
+      schoolMap[sk].programmes.push({ name:row.programme_name, level:row.level, duration:row.duration, monthly:row.monthly, perTerm:row.per_term, total:row.total, _school:sk });
+    });
+    schools = FEE_SCHOOLS.map(function(s){ return schoolMap[s.key] || s; });
+  } else {
+    schools = FEE_SCHOOLS;
+  }
   var html = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">' +
     '<h1 style="font-size:1.3rem;color:var(--navy)"><i class="fas fa-tags" style="color:var(--red);margin-right:8px"></i>Fee Structure — 2026</h1>' +
     '<div style="display:flex;gap:8px">' +
