@@ -1,21 +1,1255 @@
-# Security Policy
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Favicon -->
+<link rel="icon" type="image/png" href="images/logo.png">
 
-## Supported Versions
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="SKYMO Creative Training Institute">
+<meta property="og:description" content="TVET-accredited institution offering ICT, Film, Cyber Security, Design and more.">
+<meta property="og:image" content="https://i.postimg.cc/z3mbmC1q/Whats-App-Image-2026-06-13-at-12-18-41-PM.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://skymocreativetraininginstitute.ac.ke/">
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+<!-- WhatsApp / Facebook card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SCTI | Skymo Creative Training Institute — Empowering Skills. Creating Leaders.</title>
+<meta name="description" content="Skymo Creative Training Institute offers hands-on courses in ICT, Creative Media & Business. Located in Ruiru, opposite Tatu City, Nairobi.">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --red:#C41E3A;--red-dk:#9e1830;--red-lt:#fff0f2;
+  --gold:#D4AF37;--gold-lt:rgba(212,175,55,.15);
+  --navy:#0a2540;--navy2:#0d3b5e;
+  --gray:#5a6680;--gray-lt:#f4f7fb;--border:#e2e8f0;
+  --white:#fff;--r:14px;--rlg:22px;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--white);color:#1a1a2e;line-height:1.55;overflow-x:hidden}
+h1,h2,h3,h4,.syne{font-family:'Syne',sans-serif}
+.container{max-width:1240px;margin:0 auto;padding:0 28px}
+a{text-decoration:none}
+#annBar{background:var(--red);color:white;font-size:.78rem;font-weight:600;padding:8px 0;overflow:hidden;position:relative;z-index:1010;display:flex;align-items:center;}
+.ann-label{background:var(--gold);color:var(--navy);padding:3px 14px;border-radius:0 50px 50px 0;font-weight:700;font-size:.72rem;letter-spacing:.5px;white-space:nowrap;flex-shrink:0;margin-right:16px;}
+.ann-track-wrap{flex:1;overflow:hidden}
+.ann-track{display:flex;gap:60px;white-space:nowrap;animation:ticker 32s linear infinite;}
+.ann-track:hover{animation-play-state:paused}
+.ann-item{cursor:pointer;display:inline-flex;align-items:center;gap:10px;transition:color .2s}
+.ann-item:hover{color:var(--gold)}
+.ann-item i{opacity:.8;font-size:.75rem}
+.ann-close{flex-shrink:0;background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:1rem;padding:0 14px;line-height:1;}
+.ann-close:hover{color:white}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+header{background:var(--navy);position:sticky;top:0;z-index:1000;box-shadow:0 2px 24px rgba(0,0,0,.2)}
+.navbar{display:flex;align-items:center;justify-content:space-between;padding:14px 0;gap:12px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:14px;cursor:pointer;text-decoration:none}
+.logo-mark{width:46px;height:46px;border-radius:11px;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+.logo-words h1{font-size:1.05rem;font-weight:700;color:white;letter-spacing:-.2px}
+.logo-words p{font-size:.52rem;color:var(--gold);letter-spacing:2px;font-weight:600;font-family:'Outfit',sans-serif}
+.nav-list{display:flex;align-items:center;gap:4px;list-style:none}
+.nav-item{position:relative}
+.nav-a{color:rgba(255,255,255,.85);text-decoration:none;font-weight:500;font-size:.87rem;cursor:pointer;padding:8px 12px;border-radius:8px;display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap;background:none;border:none;font-family:'Outfit',sans-serif;}
+.nav-a:hover,.nav-a.active{color:var(--gold);background:rgba(255,255,255,.06)}
+.nav-a.active{border-bottom:2px solid var(--gold)}
+.nav-item.events-nav>.nav-a{color:var(--gold)}
+.events-dot{width:8px;height:8px;border-radius:50%;background:var(--red);animation:blink 1.4s ease-in-out infinite;display:inline-block;}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.events-dropdown{position:absolute;top:calc(100% + 6px);left:50%;transform:translateX(-50%);background:white;border-radius:var(--rlg);box-shadow:0 24px 60px rgba(0,0,0,.18);border:1px solid var(--border);width:340px;padding:16px;z-index:2000;display:none;opacity:0;transition:opacity .25s;pointer-events:none;}
+.nav-item.events-nav:hover .events-dropdown,.nav-item.events-nav.dd-open .events-dropdown{display:block;opacity:1;pointer-events:all;}
+.dd-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:12px;}
+.dd-head h4{font-size:.82rem;color:var(--navy);font-family:'Syne',sans-serif}
+.dd-head a{font-size:.72rem;color:var(--red);cursor:pointer;text-decoration:none}
+.event-card{display:flex;gap:12px;padding:10px;border-radius:10px;cursor:pointer;transition:background .2s;align-items:flex-start;margin-bottom:6px;}
+.event-card:hover{background:var(--gray-lt)}
+.event-card:last-child{margin-bottom:0}
+.ev-date-badge{background:var(--navy);color:white;border-radius:8px;padding:6px 10px;text-align:center;flex-shrink:0;min-width:46px;}
+.ev-date-badge .day{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;line-height:1}
+.ev-date-badge .mon{font-size:.6rem;opacity:.75;font-weight:600;letter-spacing:.5px}
+.ev-info h5{font-size:.83rem;color:var(--navy);margin-bottom:3px;font-weight:600}
+.ev-info p{font-size:.74rem;color:var(--gray)}
+.ev-live-badge{display:inline-flex;align-items:center;gap:5px;background:var(--red);color:white;border-radius:50px;font-size:.62rem;font-weight:700;padding:2px 8px;margin-top:4px;}
+.ev-upcoming-badge{display:inline-flex;align-items:center;gap:5px;background:var(--gold-lt);color:var(--gold);border-radius:50px;font-size:.62rem;font-weight:700;padding:2px 8px;margin-top:4px;border:1px solid rgba(212,175,55,.3);}
+.hamburger{display:none;background:none;border:none;color:white;font-size:1.4rem;cursor:pointer;padding:4px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:none;border-radius:50px;font-weight:600;cursor:pointer;transition:all .22s;font-family:'Outfit',sans-serif;text-decoration:none;font-size:.9rem;padding:12px 26px;}
+.btn-red{background:var(--red);color:white}
+.btn-red:hover{background:var(--red-dk);transform:translateY(-2px);box-shadow:0 8px 24px rgba(196,30,58,.35)}
+.btn-wh{background:transparent;border:2px solid rgba(255,255,255,.65);color:white}
+.btn-wh:hover{background:rgba(255,255,255,.12);border-color:white}
+.btn-or{background:transparent;border:2px solid var(--red);color:var(--red)}
+.btn-or:hover{background:var(--red);color:white}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-gold:hover{background:#b8942a;transform:translateY(-2px)}
+.btn-sm{padding:9px 18px;font-size:.8rem}
+.hero{position:relative;height:88vh;min-height:520px;overflow:hidden}
+.slide{position:absolute;inset:0;background-size:cover;background-position:center;opacity:0;transition:opacity 1.1s ease;}
+.slide.on{opacity:1}
+.slide-ov{position:absolute;inset:0;background:linear-gradient(135deg,rgba(10,37,64,.88) 0%,rgba(0,0,0,.45) 100%);display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;color:white;padding:24px;}
+.slide-badge{background:var(--gold-lt);border:1px solid rgba(212,175,55,.4);color:var(--gold);font-size:.7rem;font-weight:700;letter-spacing:2px;padding:5px 16px;border-radius:50px;margin-bottom:18px;font-family:'Outfit',sans-serif;}
+.slide-ov h2{font-size:clamp(2rem,5vw,3.5rem);line-height:1.15;margin-bottom:14px;max-width:720px}
+.slide-ov h2 .g{color:var(--gold)}
+.slide-ov p{font-size:clamp(.9rem,2vw,1.05rem);max-width:560px;margin-bottom:34px;opacity:.9;line-height:1.65}
+.slide-acts{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.dots{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:10}
+.dot{width:9px;height:9px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:all .3s}
+.dot.on{background:var(--red);width:26px;border-radius:10px}
+.stats-bar{background:var(--red);color:white;padding:18px 0}
+.stats-inner{display:flex;flex-wrap:wrap}
+.si{flex:1;min-width:130px;text-align:center;padding:10px 16px;border-right:1px solid rgba(255,255,255,.18)}
+.si:last-child{border-right:none}
+.si-num{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800}
+.si-lbl{font-size:.72rem;opacity:.85;font-weight:500;letter-spacing:.4px}
+.sec-title{font-size:clamp(1.5rem,3vw,2rem);font-weight:700;text-align:center;margin-bottom:44px;color:var(--navy)}
+.sec-title span{color:var(--red)}
+.sec-title::after{content:'';width:52px;height:4px;background:var(--red);display:block;margin:12px auto 0;border-radius:4px}
+.ev-section{padding:72px 0}
+.events-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;margin-top:16px}
+.ev-full-card{background:white;border-radius:var(--rlg);overflow:hidden;border:1px solid var(--border);box-shadow:0 6px 20px rgba(0,0,0,.07);cursor:pointer;transition:all .3s;}
+.ev-full-card:hover{transform:translateY(-5px);border-color:var(--red);box-shadow:0 18px 40px rgba(196,30,58,.14)}
+.ev-thumb{height:190px;background-size:cover;background-position:center;position:relative;display:flex;align-items:flex-end;}
+.ev-thumb-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,37,64,.75) 0%,transparent 55%);}
+.ev-thumb-badges{position:absolute;top:14px;left:14px;display:flex;gap:8px;z-index:2}
+.badge-live{background:var(--red);color:white;padding:4px 10px;border-radius:50px;font-size:.65rem;font-weight:700;display:flex;align-items:center;gap:5px}
+.badge-date{background:white;color:var(--navy);padding:4px 10px;border-radius:50px;font-size:.65rem;font-weight:700}
+.play-btn{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:52px;height:52px;background:rgba(255,255,255,.92);border-radius:50%;display:flex;align-items:center;justify-content:center;z-index:2;color:var(--red);font-size:1.2rem;transition:all .2s;}
+.ev-full-card:hover .play-btn{transform:translate(-50%,-50%) scale(1.1);background:white}
+.ev-body{padding:20px}
+.ev-body h3{font-size:1rem;color:var(--navy);margin-bottom:6px;font-weight:700}
+.ev-body p{font-size:.82rem;color:var(--gray);line-height:1.55;margin-bottom:12px}
+.ev-meta{display:flex;gap:14px;flex-wrap:wrap}
+.ev-meta span{font-size:.74rem;color:var(--gray);display:flex;align-items:center;gap:5px}
+.ev-meta i{color:var(--red)}
+.vid-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:3000;align-items:center;justify-content:center;padding:20px;}
+.vid-modal.on{display:flex}
+.vid-box{background:var(--navy);border-radius:var(--rlg);overflow:hidden;max-width:860px;width:100%;position:relative;}
+.vid-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.1);}
+.vid-header h3{color:white;font-size:1rem}
+.vid-close{background:rgba(255,255,255,.1);border:none;color:white;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:.2s;}
+.vid-close:hover{background:var(--red)}
+.vid-frame{position:relative;padding-top:56.25%;background:#000}
+.vid-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.vid-footer{padding:14px 20px;background:rgba(0,0,0,.3)}
+.vid-footer p{color:rgba(255,255,255,.7);font-size:.82rem}
+.courses-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:26px;margin-bottom:44px}
+.course-card{background:white;border-radius:var(--rlg);overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.07);border:1px solid var(--border);cursor:pointer;transition:all .3s;}
+.course-card:hover{transform:translateY(-6px);border-color:var(--red);box-shadow:0 20px 40px rgba(196,30,58,.14)}
+.cc-thumb{height:185px;background-size:cover;background-position:center;position:relative}
+.cc-cat{position:absolute;top:13px;right:13px;background:var(--red);color:white;padding:3px 11px;border-radius:50px;font-size:.67rem;font-weight:700;}
+.cc-body{padding:20px}
+.cc-body h3{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:7px}
+.cc-body p{font-size:.81rem;color:var(--gray);line-height:1.55;margin-bottom:12px}
+.badge-row{display:flex;gap:6px;flex-wrap:wrap}
+.cbadge{background:var(--red-lt);color:var(--red);padding:3px 9px;border-radius:50px;font-size:.67rem;font-weight:700}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:36px}
+.fb{padding:7px 18px;border-radius:50px;border:1.5px solid var(--border);font-family:'Outfit',sans-serif;font-size:.8rem;font-weight:600;cursor:pointer;background:white;color:var(--gray);transition:all .2s;}
+.fb.on,.fb:hover{background:var(--red);border-color:var(--red);color:white}
+.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:52px;align-items:center}
+.why-text h2{font-size:clamp(1.4rem,3vw,1.9rem);color:var(--navy);margin-bottom:16px}
+.why-text p{color:var(--gray);margin-bottom:22px;line-height:1.75}
+.check-list{list-style:none;margin-bottom:28px}
+.check-list li{display:flex;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--border);font-size:.88rem;color:var(--navy);font-weight:500}
+.check-list i{color:var(--red)}
+.why-card{background:white;border-radius:var(--rlg);padding:32px;border:1px solid var(--border);box-shadow:0 8px 28px rgba(0,0,0,.06)}
+.sbox{text-align:center;padding:18px 0;border-bottom:1px solid var(--border)}
+.sbox:last-child{border-bottom:none}
+.sbox .num{font-family:'Syne',sans-serif;font-size:2.5rem;font-weight:800;color:var(--red);line-height:1}
+.sbox .lbl{font-weight:700;color:var(--navy);margin:4px 0;font-size:.9rem}
+.sbox .sub{font-size:.76rem;color:var(--gray)}
+.cta-band{background:var(--navy);color:white;padding:60px 0;text-align:center}
+.cta-band h2{font-size:clamp(1.4rem,3vw,1.9rem);margin-bottom:10px}
+.cta-band p{margin-bottom:30px;opacity:.82}
+.cta-acts{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;margin-bottom:60px}
+.about-img{width:100%;height:370px;object-fit:cover;border-radius:var(--rlg);box-shadow:0 16px 40px rgba(0,0,0,.14)}
+.about-text h3{font-size:1.4rem;color:var(--navy);margin-bottom:14px}
+.about-text p{color:var(--gray);line-height:1.75;margin-bottom:14px}
+.vals-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:22px}
+.val-card{background:white;border-radius:var(--r);padding:26px 22px;border:1px solid var(--border);text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.05);transition:all .3s}
+.val-card:hover{transform:translateY(-4px);border-color:var(--red)}
+.val-ico{width:50px;height:50px;background:var(--red-lt);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--red);font-size:1.2rem;margin:0 auto 14px}
+.val-card h4{color:var(--navy);margin-bottom:7px;font-size:.95rem}
+.val-card p{color:var(--gray);font-size:.8rem;line-height:1.55}
+.detail-hero{background:linear-gradient(135deg,var(--navy) 0%,#0d3b5e 100%);color:white;padding:0;position:relative;overflow:hidden}
+.detail-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.18;filter:blur(2px)}
+.detail-hero-inner{position:relative;z-index:2;padding:52px 0 40px}
+.back-btn{display:inline-flex;align-items:center;gap:7px;color:rgba(255,255,255,.65);font-size:.83rem;cursor:pointer;background:none;border:none;font-family:'Outfit',sans-serif;padding:0;margin-bottom:18px;transition:.2s;}
+.back-btn:hover{color:white}
+.detail-hero h1{font-size:clamp(1.5rem,3vw,2.2rem);margin-bottom:8px;font-weight:800}
+.detail-meta{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}
+.detail-meta span{display:inline-flex;align-items:center;gap:7px;font-size:.8rem;background:rgba(255,255,255,.12);padding:5px 12px;border-radius:50px;border:1px solid rgba(255,255,255,.15)}
+.detail-meta i{color:var(--gold)}
+.detail-layout{display:grid;grid-template-columns:1fr 340px;gap:40px;padding:48px 0 60px;align-items:start}
+.cd-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:28px}
+.cd-tab{padding:12px 20px;font-weight:600;font-size:.87rem;cursor:pointer;border:none;background:none;color:var(--gray);border-bottom:2px solid transparent;margin-bottom:-2px;font-family:'Outfit',sans-serif;transition:.2s}
+.cd-tab.on{color:var(--red);border-bottom-color:var(--red)}
+.cd-panel{display:none}
+.cd-panel.on{display:block}
+.info-block{background:var(--gray-lt);border-radius:var(--r);padding:26px;margin-bottom:22px;border:1px solid var(--border)}
+.info-block h3{font-size:1rem;color:var(--red);margin-bottom:16px;font-family:'Syne',sans-serif;font-weight:700}
+.info-list{list-style:none}
+.info-list li{display:flex;align-items:flex-start;gap:11px;padding:10px 0;border-bottom:1px solid var(--border);font-size:.86rem;color:var(--navy);line-height:1.5}
+.info-list li:last-child{border-bottom:none}
+.info-list i{color:var(--red);width:17px;flex-shrink:0;margin-top:2px}
+.mini-gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:8px}
+.mini-gal img{width:100%;height:100px;object-fit:cover;border-radius:10px;cursor:pointer;transition:.3s}
+.learn-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.learn-item{display:flex;align-items:flex-start;gap:10px;background:white;border:1px solid var(--border);border-radius:10px;padding:12px 14px;font-size:.84rem;color:var(--navy);line-height:1.4}
+.learn-item i{color:var(--gold);width:16px;flex-shrink:0;margin-top:2px}
+.curr-module{border:1px solid var(--border);border-radius:var(--r);margin-bottom:12px;overflow:hidden}
+.curr-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:white;cursor:pointer;font-weight:700;font-size:.9rem;color:var(--navy);transition:.2s}
+.curr-head:hover{background:var(--red-lt);color:var(--red)}
+.curr-head .mod-num{background:var(--red);color:white;width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:800;flex-shrink:0}
+.curr-head .mod-title{flex:1;margin:0 12px}
+.curr-body{display:none;padding:0 18px 14px;background:var(--gray-lt)}
+.curr-body ul{list-style:none;padding-top:10px}
+.curr-body li{font-size:.83rem;color:var(--gray);padding:6px 0;border-bottom:1px dashed var(--border);display:flex;align-items:center;gap:8px}
+.curr-module.open .curr-body{display:block}
+.curr-module.open .curr-head{background:var(--red-lt);color:var(--red)}
+.curr-chevron{transition:transform .25s}
+.curr-module.open .curr-chevron{transform:rotate(180deg)}
+.faq-item{border:1px solid var(--border);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;font-weight:600;font-size:.88rem;color:var(--navy);background:white;transition:.2s}
+.faq-q:hover{background:var(--red-lt);color:var(--red)}
+.faq-a{display:none;padding:14px 18px;background:var(--gray-lt);font-size:.85rem;color:var(--gray);line-height:1.65;border-top:1px solid var(--border)}
+.faq-item.open .faq-a{display:block}
+.faq-item.open .faq-q{background:var(--red-lt);color:var(--red)}
+.faq-chevron{transition:transform .25s}
+.faq-item.open .faq-chevron{transform:rotate(180deg)}
+.enroll-card{background:white;border:2px solid var(--border);border-radius:var(--rlg);padding:28px;box-shadow:0 12px 36px rgba(0,0,0,.1);position:sticky;top:90px;margin-bottom:20px}
+.enroll-card .ec-price{font-family:'Syne',sans-serif;font-size:1.7rem;font-weight:800;color:var(--navy);margin-bottom:4px}
+.enroll-divider{border:none;border-top:1px solid var(--border);margin:16px 0}
+.ec-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;font-size:.83rem;border-bottom:1px solid var(--border)}
+.ec-row:last-of-type{border:none}
+.ec-row .label{color:var(--gray);display:flex;align-items:center;gap:7px}
+.ec-row .val{font-weight:700;color:var(--navy)}
+.ec-row i{color:var(--red);width:14px}
+.detail-contact-box{background:var(--navy);border-radius:var(--r);padding:20px;color:white;margin-top:16px}
+.detail-contact-box h4{color:var(--gold);font-size:.88rem;margin-bottom:12px}
+.detail-contact-box p{font-size:.8rem;opacity:.75;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.detail-contact-box i{color:var(--gold);width:14px}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;margin-top:8px}
+.career-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.career-tag{background:white;border:1.5px solid var(--border);color:var(--navy);padding:6px 14px;border-radius:50px;font-size:.78rem;font-weight:600;transition:.2s}
+.career-tag:hover{background:var(--red);border-color:var(--red);color:white}
+.intake-badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.intake-badge{background:var(--gold-lt);color:#7a5800;border:1px solid rgba(212,175,55,.3);padding:5px 13px;border-radius:50px;font-size:.76rem;font-weight:700}
+.rating-row{display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.stars{color:var(--gold);font-size:1rem;letter-spacing:2px}
+.rating-count{font-size:.78rem;color:var(--gray)}
+.gal-masonry{columns:3;column-gap:18px;margin-top:36px}
+.gi{break-inside:avoid;position:relative;margin-bottom:18px;border-radius:var(--r);overflow:hidden;cursor:pointer}
+.gi img{width:100%;display:block;transition:.35s}
+.gi:hover img{transform:scale(1.04)}
+.gi-ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,37,64,.75),transparent);opacity:0;transition:.3s;display:flex;align-items:flex-end;padding:14px;color:white;font-size:.78rem;}
+.gi:hover .gi-ov{opacity:1}
+.apply-wrap{display:grid;grid-template-columns:1fr 2fr;gap:44px}
+.sidebar-box{background:var(--navy);color:white;border-radius:var(--rlg);padding:32px;margin-bottom:18px}
+.sidebar-box h3{font-size:1rem;margin-bottom:16px;color:var(--gold)}
+.sidebar-box p{font-size:.83rem;opacity:.83;margin-bottom:10px;line-height:1.6}
+.docs-list{list-style:none;margin-top:10px}
+.docs-list li{display:flex;align-items:center;gap:10px;font-size:.8rem;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.docs-list li:last-child{border-bottom:none}
+.docs-list i{color:var(--gold)}
+.form-card{background:white;border-radius:var(--rlg);padding:36px;box-shadow:0 8px 28px rgba(0,0,0,.07);border:1px solid var(--border)}
+.form-card h3{font-size:1.2rem;color:var(--navy);margin-bottom:28px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fg{margin-bottom:16px}
+.fg.s2{grid-column:span 2}
+label{font-weight:600;display:block;margin-bottom:6px;color:var(--navy);font-size:.8rem}
+label .r{color:var(--red)}
+input,select,textarea{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:9px;font-family:'Outfit',sans-serif;font-size:.87rem;color:#1a1a2e;transition:.2s;background:white;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--red);box-shadow:0 0 0 3px rgba(196,30,58,.1)}
+input[type="file"]{background:var(--gray-lt);cursor:pointer;padding:8px}
+.file-upload-area{border:2px dashed var(--border);border-radius:9px;padding:18px;text-align:center;cursor:pointer;transition:.2s;position:relative;background:var(--gray-lt);}
+.file-upload-area:hover{border-color:var(--red);background:var(--red-lt)}
+.file-upload-area input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;border:none;background:none;padding:0;}
+.file-upload-area .fu-icon{font-size:1.8rem;color:var(--red);margin-bottom:8px}
+.file-upload-area p{font-size:.78rem;color:var(--gray)}
+.file-upload-area .fu-name{font-size:.75rem;color:var(--red);font-weight:600;margin-top:6px;display:none}
+.img-preview{width:80px;height:80px;object-fit:cover;border-radius:8px;border:2px solid var(--border);display:none;margin-top:8px;}
+.consent-row{display:flex;align-items:flex-start;gap:11px;padding:14px;background:var(--red-lt);border-radius:9px;margin:20px 0}
+.consent-row input[type="checkbox"]{width:17px;height:17px;flex-shrink:0;margin-top:2px;accent-color:var(--red)}
+.consent-row label{font-size:.8rem;font-weight:500;margin-bottom:0}
+.form-section-title{font-size:.95rem;font-weight:700;color:var(--navy);border-bottom:2px solid var(--red-lt);padding-bottom:8px;margin:24px 0 16px;font-family:'Syne',sans-serif;}
+.form-section-title i{color:var(--red);margin-right:8px}
+.success-card{background:white;border-radius:var(--rlg);padding:52px 36px;text-align:center;max-width:560px;margin:60px auto;box-shadow:0 16px 40px rgba(0,0,0,.08);border:1px solid var(--border);}
+.success-card .s-ico{width:72px;height:72px;background:#d1fae5;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;color:#059669;margin:0 auto 20px;}
+.success-card h3{color:var(--navy);font-size:1.4rem;margin-bottom:10px}
+.success-card p{color:var(--gray);font-size:.9rem;line-height:1.65;margin-bottom:24px}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;margin-bottom:44px}
+.contact-info h3{font-size:1.2rem;color:var(--navy);margin-bottom:24px}
+.ci{display:flex;gap:14px;margin-bottom:20px;align-items:flex-start}
+.ci-ico{width:44px;height:44px;background:var(--red-lt);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--red);font-size:1rem;flex-shrink:0}
+.ci-text strong{display:block;color:var(--navy);margin-bottom:3px;font-size:.87rem}
+.ci-text span,.ci-text a{font-size:.83rem;color:var(--gray);text-decoration:none}
+.ci-text a:hover{color:var(--red)}
+.social-row{display:flex;gap:12px;margin-top:22px}
+.sbtn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--gray);cursor:pointer;transition:.2s;text-decoration:none;font-size:.95rem;}
+.sbtn:hover{background:var(--red);border-color:var(--red);color:white}
+.cf-box{background:var(--gray-lt);border-radius:var(--rlg);padding:32px}
+footer{background:var(--navy);color:#8fa3b5;padding:52px 0 24px;margin-top:60px}
+.ft-grid{display:grid;grid-template-columns:1.3fr 1fr 1.3fr 1fr;gap:32px;margin-bottom:36px}
+.ft-brand p{font-size:.8rem;margin-top:10px;line-height:1.65}
+.ft-col h4{color:var(--gold);font-family:'Syne',sans-serif;font-size:.8rem;letter-spacing:.5px;margin-bottom:14px}
+.ft-col a,.ft-col div{display:block;font-size:.8rem;margin-bottom:7px;cursor:pointer;color:#8fa3b5;text-decoration:none;transition:.2s}
+.ft-col a:hover,.ft-col div:hover{color:white}
+.ft-bottom{border-top:1px solid rgba(255,255,255,.08);padding-top:20px;text-align:center;font-size:.71rem}
+.chat-tog{position:fixed;bottom:92px;right:22px;background:var(--navy);width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:21px;color:white;cursor:pointer;z-index:980;box-shadow:0 6px 18px rgba(0,0,0,.25);transition:.2s;border:none;}
+.chat-tog:hover{background:var(--red);transform:scale(1.06)}
+.chat-win{position:fixed;bottom:158px;right:22px;width:335px;height:520px;background:white;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,.22);z-index:981;display:none;flex-direction:column;overflow:hidden;border:1px solid var(--border);}
+.chat-win.on{display:flex}
+.chat-hd{background:var(--navy);color:white;padding:14px 16px;display:flex;align-items:center;gap:10px}
+.chat-av{width:30px;height:30px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px}
+.chat-hd-text strong{display:block;font-size:.87rem}
+.chat-hd-text span{font-size:.68rem;color:#10b981}
+.chat-hd button{background:none;border:none;color:rgba(255,255,255,.6);font-size:1.1rem;cursor:pointer;margin-left:auto}
+.chat-msgs{flex:1;padding:12px;overflow-y:auto;background:var(--gray-lt);display:flex;flex-direction:column;gap:8px}
+.mb{max-width:86%}
+.mb-bot{background:white;border:1px solid var(--border);border-radius:0 12px 12px 12px;padding:9px 12px;font-size:.8rem;color:var(--navy);line-height:1.5}
+.mb-user{background:var(--red);border-radius:12px 0 12px 12px;padding:9px 12px;font-size:.8rem;color:white;margin-left:auto}
+.chat-inp{display:flex;padding:9px;border-top:1px solid var(--border);gap:7px}
+.chat-inp input{flex:1;padding:8px 11px;border:1.5px solid var(--border);border-radius:50px;font-size:.8rem;font-family:'Outfit',sans-serif}
+.chat-inp button{background:var(--red);border:none;color:white;border-radius:50%;width:34px;height:34px;cursor:pointer;font-size:13px;flex-shrink:0}
+.wa{position:fixed;bottom:22px;right:22px;width:52px;height:52px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:25px;color:white;z-index:979;text-decoration:none;box-shadow:0 6px 18px rgba(37,211,102,.45);transition:.2s;}
+.wa:hover{transform:scale(1.06)}
+.status-float-btn{position:fixed;bottom:160px;right:22px;background:var(--red);color:white;padding:12px 18px;border-radius:50px;font-size:.85rem;font-weight:700;text-decoration:none;z-index:979;box-shadow:0 4px 12px rgba(0,0,0,.2);transition:all .3s;display:flex;align-items:center;gap:8px}
+.status-float-btn:hover{background:var(--red-dk);transform:scale(1.05)}
+.img-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:2500;align-items:center;justify-content:center;cursor:pointer}
+.img-modal.on{display:flex}
+.img-modal img{max-width:92%;max-height:88vh;border-radius:var(--r)}
+.page-hero{background:linear-gradient(135deg,var(--navy),var(--navy2));color:white;padding:56px 0 44px}
+.fee-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:28px}
+.fee-note{background:#fff9f0;border:1.5px solid #f0a500;border-radius:12px;padding:14px 18px;margin-bottom:28px;font-size:.85rem;color:#7a4f00;line-height:1.6}
+.fee-school{background:white;border:1px solid var(--border);border-radius:var(--rlg);margin-bottom:24px;overflow:hidden;box-shadow:0 4px 18px rgba(0,0,0,.04)}
+.fee-school-hdr{display:flex;align-items:center;gap:12px;padding:18px 22px;background:var(--gray-lt);border-bottom:1px solid var(--border)}
+.fee-school-hdr i{width:38px;height:38px;border-radius:10px;background:var(--navy);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.fee-school-hdr h3{font-size:1.02rem;color:var(--navy)}
+.fee-tbl-wrap{overflow-x:auto}
+.fee-tbl{width:100%;border-collapse:collapse;font-size:.83rem}
+.fee-tbl th{text-align:left;padding:12px 16px;background:var(--navy);color:white;font-weight:600;font-size:.75rem;letter-spacing:.3px;white-space:nowrap}
+.fee-tbl td{padding:11px 16px;border-bottom:1px solid var(--border);white-space:nowrap}
+.fee-tbl tr:last-child td{border-bottom:none}
+.fee-tbl tr:hover td{background:var(--gray-lt)}
+.fee-level-tag{font-size:.62rem;font-weight:700;padding:2px 9px;border-radius:20px}
+.fee-level-Short{background:#fff3cd;color:#856404}
+.fee-level-Certificate{background:#d1e7dd;color:#0a5c36}
+.fee-level-Diploma{background:#cfe2ff;color:#0a3878}
+.fee-amt{font-weight:600;color:var(--navy)}
+.fee-amt-total{font-weight:700;color:var(--red)}
+.page-tag{font-size:.7rem;font-weight:700;letter-spacing:2px;color:var(--gold);display:block;margin-bottom:10px}
+.page-hero h1{font-size:clamp(1.7rem,3vw,2.3rem);margin-bottom:8px}
+.page-hero p{opacity:.8;font-size:.93rem;max-width:560px}
+.breadcrumb{display:flex;gap:8px;align-items:center;margin-bottom:16px;font-size:.78rem;color:rgba(255,255,255,.55)}
+.breadcrumb span{color:var(--gold)}
+@media(max-width:1024px){.ft-grid{grid-template-columns:1fr 1fr}.apply-wrap{grid-template-columns:1fr}.detail-layout{grid-template-columns:1fr}}
+@media(max-width:768px){
+  .hamburger{display:flex}
+  .nav-list{display:none;position:absolute;top:100%;left:0;right:0;background:var(--navy);flex-direction:column;padding:12px;border-top:1px solid rgba(255,255,255,.1);gap:2px}
+  .nav-list.on{display:flex}
+  .events-dropdown{left:0;transform:none;width:calc(100vw - 48px)}
+  .why-grid,.about-grid,.contact-grid,.fgrid,.learn-grid{grid-template-columns:1fr}
+  .gal-masonry{columns:2}
+  .hero{height:70vh}
+  .ft-grid{grid-template-columns:1fr 1fr}
+  .chat-win{width:calc(100vw - 30px);right:15px}
+  .detail-layout{grid-template-columns:1fr}
+  .enroll-card{position:static}
+  .cd-tabs{overflow-x:auto}
+  .cd-tab{white-space:nowrap;font-size:.8rem;padding:10px 14px}
+}
+@media(max-width:480px){.gal-masonry{columns:1}.ft-grid{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}.fg.s2{grid-column:span 1}}
+</style>
+</head>
+<body>
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+<div id="annBar">
+  <span class="ann-label">📢 LIVE</span>
+  <div class="ann-track-wrap"><div class="ann-track" id="annTrack"><span class="ann-item"><i class="fas fa-circle" style="color:var(--gold)"></i> Loading upcoming events…</span></div></div>
+  <button class="ann-close" onclick="document.getElementById('annBar').style.display='none'">×</button>
+</div>
 
-## Reporting a Vulnerability
+<header>
+  <div class="container">
+    <nav class="navbar">
+      <a class="logo" onclick="go('home')">
+        <div class="logo-mark"><img src="https://i.ibb.co/XHH8Qff/image-removebg-preview-1.png" alt="SCTI Logo" style="width:46px;height:46px;object-fit:cover;border-radius:11px"></div>
+        <div class="logo-words"><h1>Skymo Creative</h1><p>TRAINING INSTITUTE · RUIRU</p></div>
+      </a>
+      <button class="hamburger" onclick="toggleNav()"><i class="fas fa-bars"></i></button>
+      <ul class="nav-list" id="navList">
+        <li class="nav-item"><button class="nav-a active" id="nav-home" onclick="go('home')">Home</button></li>
+        <li class="nav-item"><button class="nav-a" id="nav-courses" onclick="go('courses')">Courses</button></li>
+        <li class="nav-item events-nav">
+          <button class="nav-a" id="nav-events" onclick="go('events')"><span class="events-dot"></span> Events</button>
+          <div class="events-dropdown" id="evDD">
+            <div class="dd-head"><h4>Upcoming Events</h4><a onclick="go('events')">View all →</a></div>
+            <div id="ddEvList"><p style="font-size:.8rem;color:var(--gray)">Loading…</p></div>
+          </div>
+        </li>
+        <li class="nav-item"><button class="nav-a" id="nav-gallery" onclick="go('gallery')">Gallery</button></li>
+        <li class="nav-item"><button class="nav-a" id="nav-fees" onclick="go('fees')"><i class="fas fa-tags"></i> Fees</button></li>
+        <li class="nav-item"><button class="nav-a" id="nav-about" onclick="go('about')">About</button></li>
+        <li class="nav-item"><button class="nav-a" id="nav-contact" onclick="go('contact')">Contact</button></li>
+        <li class="nav-item"><button class="nav-a" id="nav-status" onclick="window.location.href='status.html'"><i class="fas fa-search"></i> Check Status</button></li>
+        <li class="nav-item"><button class="btn btn-red btn-sm" onclick="go('apply')"><i class="fas fa-pen"></i> Apply Now</button></li>
+      </ul>
+    </nav>
+  </div>
+</header>
 
-Use this section to tell people how to report a vulnerability.
+<main id="main">
+  <div style="padding:80px 0;text-align:center">
+    <div style="width:50px;height:50px;border:3px solid var(--red-lt);border-top-color:var(--red);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 16px"></div>
+    <p style="color:var(--gray)">Loading SCTI…</p>
+  </div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</main>
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+<button class="chat-tog" onclick="toggleChat()" title="AI Assistant"><i class="fas fa-robot"></i></button>
+<a class="wa" href="https://wa.me/254113504043" target="_blank" title="WhatsApp Us"><i class="fab fa-whatsapp"></i></a>
+<a href="status.html" class="status-float-btn"><i class="fas fa-search"></i> Check Status</a>
+
+<div class="chat-win" id="chatWin">
+  <div class="chat-hd">
+    <div class="chat-av"><i class="fas fa-robot"></i></div>
+    <div class="chat-hd-text"><strong>SCTI AI Guide</strong><span>● Online — Ask anything</span></div>
+    <button onclick="toggleChat()">×</button>
+  </div>
+  <div class="chat-msgs" id="chatMsgs">
+    <div class="mb"><div class="mb-bot">👋 Hi! I'm SCTI's AI Guide. Ask me about courses, fees, events, how to apply, or our location!</div></div>
+  </div>
+  <div class="chat-inp">
+    <input type="text" id="chatIn" placeholder="Ask me anything…" onkeypress="if(event.key==='Enter')sendMsg()">
+    <button onclick="sendMsg()"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<div class="vid-modal" id="vidModal" onclick="closeVid(event)">
+  <div class="vid-box" onclick="event.stopPropagation()">
+    <div class="vid-header"><h3 id="vidTitle">Event Stream</h3><button class="vid-close" onclick="closeVidBtn()">×</button></div>
+    <div class="vid-frame"><iframe id="vidFrame" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe></div>
+    <div class="vid-footer"><p id="vidDesc">Watch live or on demand.</p></div>
+  </div>
+</div>
+
+<div class="img-modal" id="imgModal" onclick="closeImgModal()">
+  <img id="imgModalSrc" src="" alt="">
+</div>
+
+<script>
+const SUPABASE_URL  = 'https://iuskmfphmraighipmsmh.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1c2ttZnBobXJhaWdoaXBtc21oIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1ODEyOTYsImV4cCI6MjA5NDE1NzI5Nn0.Yfbj26m0cxGfCBTvEmuPAXpemLPhxBws8N3JvHF1HFI';
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+let DB = { events:[], courses:[], gallery:[], hero_slides:[], settings:{}, fee_schools:[] };
+let PAGE='home', SEL_COURSE=null, ACT_CAT='All';
+let slideIdx=0, slideTimer=null;
+let chatLoading=false;
+
+const DEF_SETTINGS={site_name:'Skymo Creative Training Institute',phone1:'0113 50 40 43',phone2:'0724 33 33 13',whatsapp:'+254113504043',email:'skymocreativetraininginstitute@gmail.com',address:'Ruiru Bypass, Opposite Tatu City, Nairobi',facebook:'https://facebook.com/skymocreative',instagram:'https://instagram.com/skymocreative',tiktok:'https://tiktok.com/@skymocreative',youtube:'https://youtube.com/@skymocreative',twitter:'https://x.com/skymocreative',about_text:'Located in Ruiru, opposite Tatu City, SCTI delivers industry-driven courses blending creativity with technology — designed around what employers actually need.',footer_text:'Empowering Skills. Creating Leaders.',cta_title:'Ready to Start Your Journey?',cta_subtitle:'Intakes open all year. Call or WhatsApp us today.',students_count:'2,000+',courses_count:'20+',years_count:'8+',placement_rate:'92%',working_hours:'Mon–Fri 8am–5pm, Sat 9am–1pm'};
+const DEF_SLIDES=[{id:1,background_url:'https://images.pexels.com/photos/5428836/pexels-photo-5428836.jpeg?auto=compress&cs=tinysrgb&w=1400',badge:'SKILLS THAT PAY',title:"Transform Your Future<br>with <span class='g'>SCTI</span>",subtitle:'Industry-driven, hands-on training in Technology, Creative Media & Business.',sort_order:1},{id:2,background_url:'https://images.pexels.com/photos/5380642/pexels-photo-5380642.jpeg?auto=compress&cs=tinysrgb&w=1400',badge:'ICT & TECHNOLOGY',title:"Cyber Security,<br>Web Dev & <span class='g'>More</span>",subtitle:'Prepare for high-demand tech careers taught by industry professionals.',sort_order:2},{id:3,background_url:'https://images.pexels.com/photos/2751868/pexels-photo-2751868.jpeg?auto=compress&cs=tinysrgb&w=1400',badge:'CREATIVE MEDIA',title:"Film, Design,<br>Photography & <span class='g'>DJ</span>",subtitle:'Unleash your creativity. Build a career doing what you love.',sort_order:3}];
+const DEF_EVENTS=[{id:1,title:'Open Day & Campus Tour',date:'2026-05-24',date_label:'24 May 2026',time:'10:00 AM – 2:00 PM',location:'SCTI Campus, Ruiru',description:'Tour the campus, meet trainers, and discover which course is right for you.',thumbnail:'https://images.pexels.com/photos/5428836/pexels-photo-5428836.jpeg?auto=compress&cs=tinysrgb&w=700',video_url:'https://www.youtube.com/embed/dQw4w9WgXcQ',is_live:false,tag:'Open Day'},{id:2,title:'Film Production Workshop',date:'2026-05-30',date_label:'30 May 2026',time:'2:00 PM – 4:00 PM',location:'SCTI Film Studio',description:'A live masterclass in cinematography and storytelling.',thumbnail:'https://images.pexels.com/photos/2751868/pexels-photo-2751868.jpeg?auto=compress&cs=tinysrgb&w=700',video_url:'https://www.youtube.com/embed/dQw4w9WgXcQ',is_live:false,tag:'Workshop'},{id:3,title:'Graduation Ceremony 2026',date:'2026-06-14',date_label:'14 Jun 2026',time:'9:00 AM – 1:00 PM',location:'SCTI Main Hall',description:'Celebrating our latest cohort of graduates across all departments.',thumbnail:'https://images.pexels.com/photos/5212345/pexels-photo-5212345.jpeg?auto=compress&cs=tinysrgb&w=700',video_url:'https://www.youtube.com/embed/dQw4w9WgXcQ',is_live:false,tag:'Graduation'}];
+const DEF_COURSES=[{id:1,name:'Computer Packages',category:'ICT & Digital Technology',duration:'2 Months',fee:'Ksh 15,000',levels:'Short Course',mode:'Full-time / Online',description:'Comprehensive computer training including Microsoft Office, digital skills, internet applications, and IT fundamentals.',requirements:'Passion and interest, Minimum age 16',careers:'IT Support Specialist, Computer Operator, Data Entry Clerk, Office Administrator',image_url:'https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:1},{id:2,name:'ICT',category:'ICT & Digital Technology',duration:'1 Year / 2 Years',fee:'Ksh 8,000/mo (Cert) | Ksh 8,000/mo (Dip)',levels:'Certificate,Diploma',mode:'Full-time / Online',description:'Full ICT training covering hardware, software, networking, and digital systems.',requirements:'KCSE Grade D minimum, Basic computer knowledge',careers:'IT Technician, Systems Administrator, Network Engineer, ICT Officer',image_url:'https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:2},{id:3,name:'Cyber Security',category:'ICT & Digital Technology',duration:'6 Months / 1 Year / 2 Years',fee:'Ksh 75,000 (Short) | Ksh 150,000 (Cert) | Ksh 300,000 (Dip)',levels:'Short Course,Certificate,Diploma',mode:'Full-time / Part-time',description:'Network security, penetration testing, cyber forensics, ethical hacking, and digital defence strategies.',requirements:'ICT background preferred, Basic networking knowledge, KCSE certificate',careers:'Security Analyst, Penetration Tester, Security Consultant, IT Auditor',image_url:'https://images.pexels.com/photos/5380642/pexels-photo-5380642.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:3},{id:4,name:'Web Design & Development',category:'ICT & Digital Technology',duration:'6 Months / 1 Year',fee:'Ksh 60,000 (Short) | Ksh 120,000 (Cert)',levels:'Short Course,Certificate',mode:'Full-time / Online',description:'Build responsive websites using HTML/CSS, JavaScript, React, and WordPress. Advanced certificate covers full-stack development.',requirements:'Basic computer skills, Logical thinking',careers:'Web Developer, Frontend Developer, WordPress Developer, Freelancer',image_url:'https://images.pexels.com/photos/270404/pexels-photo-270404.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:4},{id:5,name:'Film Production',category:'School of Media & Creative Arts',duration:'1 Year / 2 Years',fee:'Ksh 12,500/mo — Ksh 37,500/term',levels:'Certificate,Diploma',mode:'Full-time / Part-time',description:'Complete filmmaking — scriptwriting, directing, cinematography, editing, and post-production.',requirements:'Passion for storytelling, Basic English, Minimum age 17, Grade C- (Diploma) / Grade D (Cert)',careers:'Film Director, Editor, Cinematographer, Production Manager, Screenwriter',image_url:'https://images.pexels.com/photos/2751868/pexels-photo-2751868.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:5},{id:6,name:'Basic Video Editing',category:'School of Media & Creative Arts',duration:'2 Months',fee:'Ksh 30,000',levels:'Short Course',mode:'Full-time / Part-time',description:'Hands-on video editing training using industry-standard tools. Perfect for beginners entering content creation.',requirements:'Passion and interest',careers:'Video Editor, Content Creator, Social Media Producer',image_url:'https://images.pexels.com/photos/2751868/pexels-photo-2751868.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:6},{id:7,name:'Professional Videography & Photography',category:'School of Media & Creative Arts',duration:'5 Months',fee:'Ksh 75,000',levels:'Short Course',mode:'Full-time / Weekend',description:'Advanced videography and photography combining camera work, lighting, editing, and visual storytelling.',requirements:'Passion and interest',careers:'Videographer, Commercial Photographer, Content Producer',image_url:'https://images.pexels.com/photos/159823/kid-girl-paint-drawing-159823.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:7},{id:8,name:'Photography',category:'School of Media & Creative Arts',duration:'3 Months / 4 Months',fee:'Ksh 30,000 (Basic) | Ksh 50,000 (Advanced)',levels:'Short Course',mode:'Full-time / Weekend',description:'Studio photography, outdoor shoots, portrait, event photography, and post-processing editing.',requirements:'Passion and interest, Own camera recommended',careers:'Photographer, Photo Editor, Studio Manager, Freelance Photographer',image_url:'https://images.pexels.com/photos/159823/kid-girl-paint-drawing-159823.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:8},{id:9,name:'Animation',category:'School of Media & Creative Arts',duration:'3 Months / 1 Year / 2 Years',fee:'Ksh 60,000 (Short) | Ksh 12,500/mo — 37,500/term (Cert/Dip)',levels:'Short Course,Certificate,Diploma',mode:'Full-time / Online',description:'2D/3D animation, motion graphics, character design, and digital storytelling using industry tools.',requirements:'Creative aptitude, Basic computer skills, Grade D minimum (Cert/Dip)',careers:'Animator, Motion Designer, VFX Artist, Game Designer',image_url:'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:9},{id:10,name:'Graphic Design',category:'School of Media & Creative Arts',duration:'3 Months / 6 Months / 1 Year / 2 Years',fee:'Ksh 45,000 (3mo) | Ksh 75,000 (6mo) | Ksh 12,500/mo — 37,500/term (Cert/Dip)',levels:'Short Course,Certificate,Diploma',mode:'Full-time / Online',description:'Adobe Creative Suite — Photoshop, Illustrator, InDesign, branding, and logo design across all levels.',requirements:'Creative aptitude, Basic computer skills, Grade D minimum (Cert/Dip)',careers:'Graphic Designer, UI/UX Designer, Brand Identity Designer, Art Director',image_url:'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:10},{id:11,name:'Fine Art',category:'School of Media & Creative Arts',duration:'3 Months / 4 Months / 1 Year / 2 Years',fee:'Ksh 45,000 (3mo) | Ksh 60,000 (4mo) | Ksh 12,500/mo — 37,500/term (Cert/Dip)',levels:'Short Course,Certificate,Diploma',mode:'Full-time',description:'Painting, drawing, sculpture, mixed media, and fine art theory for aspiring visual artists.',requirements:'Passion and interest, Grade D minimum (Cert/Dip)',careers:'Fine Artist, Art Teacher, Gallery Curator, Illustrator',image_url:'https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:11},{id:12,name:'Digital Marketing',category:'School of Business, Media & Hospitality',duration:'6 Months / 1 Year / 2 Years',fee:'Ksh 75,000 (Short) | Ksh 12,500/mo — 37,500/term (Cert/Dip)',levels:'Short Course,Certificate,Diploma',mode:'Online / Part-time / Full-time',description:'SEO, Google Ads, Social Media Marketing, Email Marketing, Content Strategy, and Analytics.',requirements:'Basic internet knowledge, Interest in marketing, Grade D minimum (Cert/Dip)',careers:'Digital Marketer, SEO Specialist, Social Media Manager, Content Strategist',image_url:'https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:12},{id:13,name:'Digital Journalism',category:'School of Business, Media & Hospitality',duration:'6 Months / 10 Months / 1 Year / 2 Years',fee:'Ksh 75,000 (Short) | Ksh 150,000 (Skill Cert) | Ksh 12,000/mo — 36,000/term (Cert/Dip)',levels:'Short Course,Certificate,Diploma',mode:'Full-time / Part-time',description:'News writing, broadcast journalism, online media, investigative reporting, and multimedia storytelling.',requirements:'Passion and interest, Grade D minimum (Cert/Dip)',careers:'Journalist, News Anchor, Reporter, Content Editor, Media Producer',image_url:'https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:13},{id:14,name:'Deejaying',category:'School of Business, Media & Hospitality',duration:'3 Months / 5 Months',fee:'Ksh 30,000 (Basic) | Ksh 50,000 (Advanced)',levels:'Short Course',mode:'Studio Access',description:'DJ mixing, rekordbox, sound engineering, music production, and live performance techniques.',requirements:'Passion for music, Good ear for rhythm',careers:'Professional DJ, Club DJ, Event DJ, Music Producer, Radio Personality',image_url:'https://images.pexels.com/photos/167636/pexels-photo-167636.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:14},{id:15,name:'Phone & Laptop Repair',category:'School of Business, Media & Hospitality',duration:'3 Months',fee:'Ksh 65,000',levels:'Short Course',mode:'Practical',description:'Hardware diagnostics, PCB-level repair, phone & laptop component replacement, and firmware flashing.',requirements:'Passion and interest, Attention to detail',careers:'Phone Technician, Laptop Repair Tech, Tech Repair Business Owner',image_url:'https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:15},{id:16,name:'Food & Beverages',category:'School of Business, Media & Hospitality',duration:'3 Months / 1 Year / 2 Years',fee:'Ksh 45,000 (Short) | Ksh 13,000/mo — 39,000/term (Cert/Dip)',levels:'Short Course,Certificate,Diploma',mode:'Full-time',description:'Culinary arts, food preparation, beverage service, hospitality management, and catering operations.',requirements:'Passion and interest, Grade D minimum (Cert/Dip)',careers:'Chef, Catering Manager, Hotel Staff, Restaurant Owner, Food Entrepreneur',image_url:'https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:16},{id:17,name:'Electrical Installation',category:'School of Engineering',duration:'6 Months',fee:'Ksh 75,000',levels:'Short Course',mode:'Practical',description:'Electrical wiring, circuit design, installation standards, and safety practices for residential and commercial buildings.',requirements:'Passion and interest',careers:'Electrician, Electrical Technician, Site Supervisor, Electrical Contractor',image_url:'https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:17},{id:18,name:'Solar Installation',category:'School of Engineering',duration:'6 Months',fee:'Ksh 75,000',levels:'Short Course',mode:'Practical',description:'Solar panel installation, system design, inverter setup, battery storage, and renewable energy fundamentals.',requirements:'Passion and interest',careers:'Solar Technician, Renewable Energy Installer, Solar Contractor',image_url:'https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:18},{id:19,name:'CCTV Installation',category:'School of Engineering',duration:'3 Months',fee:'Ksh 37,500',levels:'Short Course',mode:'Practical',description:'CCTV system design, IP camera configuration, DVR/NVR setup, and security system maintenance.',requirements:'Passion and interest, Basic computer knowledge',careers:'CCTV Technician, Security Systems Installer, Network Surveillance Tech',image_url:'https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:19},{id:20,name:'Electrical + Solar + CCTV (Combined)',category:'School of Engineering',duration:'6 Months',fee:'Ksh 120,000',levels:'Short Course',mode:'Practical',description:'Comprehensive engineering package covering electrical installation, solar systems, and CCTV — all in one programme.',requirements:'Passion and interest',careers:'Multi-skilled Technician, Engineering Contractor, Field Engineer',image_url:'https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:20},{id:21,name:'ElectroTechnical Engineering',category:'School of Engineering',duration:'1 Year / 2 Years',fee:'Ksh 24,000/term',levels:'Certificate,Diploma',mode:'Full-time',description:'Advanced electrical and electronics engineering covering industrial systems, PLCs, and electrotechnical theory.',requirements:'KCSE Grade D minimum (Cert) / Grade C- (Dip)',careers:'Electrotechnical Engineer, Electrical Inspector, Industrial Electrician',image_url:'https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:21},{id:22,name:'Plumbing',category:'School of Engineering',duration:'6 Months',fee:'Ksh 75,000',levels:'Short Course',mode:'Practical',description:'Pipe fitting, water systems, sanitation, drainage installation, and plumbing maintenance.',requirements:'Passion and interest',careers:'Plumber, Plumbing Contractor, Facilities Technician',image_url:'https://images.pexels.com/photos/442150/pexels-photo-442150.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:22},{id:23,name:'Content Creation',category:'School of Business, Media & Hospitality',duration:'3 Months',fee:'Ksh 45,000',levels:'Short Course',mode:'Full-time / Part-time',description:'Social media content creation, video production for platforms, copywriting, and brand storytelling.',requirements:'Passion and interest',careers:'Content Creator, Social Media Manager, Brand Influencer, Digital Producer',image_url:'https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=700',gallery_urls:'[]',sort_order:23}];
+const DEF_GALLERY=['https://images.pexels.com/photos/1181263/pexels-photo-1181263.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/2751868/pexels-photo-2751868.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/196644/pexels-photo-196644.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/5380642/pexels-photo-5380642.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/267350/pexels-photo-267350.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/167636/pexels-photo-167636.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=600','https://images.pexels.com/photos/270404/pexels-photo-270404.jpeg?auto=compress&cs=tinysrgb&w=600'].map((url,i)=>({id:i+1,url,sort_order:i,caption:'SCTI Campus'}));
+
+// Fee structure — mirrors admin.html FEE_SCHOOLS so the public page always matches what's managed in admin
+const FEE_SCHOOLS=[
+  {key:'media',label:'School of Media & Creative Arts',icon:'fas fa-film',programmes:[
+    {name:'Basic Video Editing',level:'Short',duration:'2 Months',monthly:15000,perTerm:null,total:30000},
+    {name:'Intermediate Video Editing',level:'Short',duration:'3 Months',monthly:15000,perTerm:null,total:45000},
+    {name:'Professional Videography & Photography',level:'Short',duration:'5 Months',monthly:15000,perTerm:null,total:75000},
+    {name:'Film & Media Skill Certificate',level:'Certificate',duration:'10 Months',monthly:15000,perTerm:null,total:150000},
+    {name:'Film Production',level:'Certificate',duration:'1 Year',monthly:12500,perTerm:37500,total:null},
+    {name:'Film Production',level:'Diploma',duration:'2 Years',monthly:12500,perTerm:37500,total:null},
+    {name:'Photography',level:'Short',duration:'3 Months',monthly:10000,perTerm:null,total:30000},
+    {name:'Advanced Photography',level:'Short',duration:'4 Months',monthly:12500,perTerm:null,total:50000},
+    {name:'Animation',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:60000},
+    {name:'Animation',level:'Certificate',duration:'1 Year',monthly:12500,perTerm:37500,total:null},
+    {name:'Animation',level:'Diploma',duration:'2 Years',monthly:12500,perTerm:37500,total:null},
+    {name:'Graphic Design',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:45000},
+    {name:'Graphic Design',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+    {name:'Graphic Design',level:'Certificate',duration:'1 Year',monthly:12500,perTerm:37500,total:null},
+    {name:'Graphic Design',level:'Diploma',duration:'2 Years',monthly:12500,perTerm:37500,total:null},
+    {name:'Fine Art',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:45000},
+    {name:'Fine Art',level:'Short',duration:'4 Months',monthly:null,perTerm:null,total:60000},
+    {name:'Fine Art',level:'Certificate',duration:'1 Year',monthly:12500,perTerm:37500,total:null},
+    {name:'Fine Art',level:'Diploma',duration:'2 Years',monthly:12500,perTerm:37500,total:null},
+  ]},
+  {key:'ict',label:'School of ICT & Digital Technology',icon:'fas fa-laptop-code',programmes:[
+    {name:'Computer Packages',level:'Short',duration:'2 Months',monthly:7500,perTerm:null,total:15000},
+    {name:'Computer Packages & Digital Skills',level:'Short',duration:'2 Months',monthly:null,perTerm:null,total:30000},
+    {name:'Advanced Computer Applications',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:30000},
+    {name:'ICT',level:'Certificate',duration:'1 Year',monthly:8000,perTerm:24000,total:null},
+    {name:'ICT',level:'Diploma',duration:'2 Years',monthly:8000,perTerm:24000,total:null},
+    {name:'Cyber Security',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+    {name:'Cyber Security',level:'Certificate',duration:'1 Year',monthly:12500,perTerm:null,total:150000},
+    {name:'Cyber Security',level:'Diploma',duration:'2 Years',monthly:12500,perTerm:null,total:300000},
+    {name:'Web Design / Web Development',level:'Short',duration:'6 Months',monthly:10000,perTerm:null,total:60000},
+    {name:'Advanced Web Design/Development',level:'Certificate',duration:'1 Year',monthly:10000,perTerm:null,total:120000},
+  ]},
+  {key:'engineering',label:'School of Engineering',icon:'fas fa-tools',programmes:[
+    {name:'Electrical Installation',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+    {name:'Solar Installation',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+    {name:'CCTV Installation',level:'Short',duration:'3 Months',monthly:12500,perTerm:null,total:37500},
+    {name:'Electrical + Solar + CCTV',level:'Short',duration:'6 Months',monthly:null,perTerm:null,total:120000},
+    {name:'ElectroTechnical Engineering',level:'Certificate',duration:'1 Year',monthly:null,perTerm:24000,total:null},
+    {name:'ElectroTechnical Engineering',level:'Diploma',duration:'2 Years',monthly:null,perTerm:24000,total:null},
+    {name:'Plumbing',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+  ]},
+  {key:'business',label:'School of Business, Media & Hospitality',icon:'fas fa-briefcase',programmes:[
+    {name:'Digital Marketing',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+    {name:'Digital Marketing',level:'Certificate',duration:'1 Year',monthly:12500,perTerm:37500,total:null},
+    {name:'Digital Marketing',level:'Diploma',duration:'2 Years',monthly:12500,perTerm:37500,total:null},
+    {name:'Digital Journalism',level:'Short',duration:'6 Months',monthly:12500,perTerm:null,total:75000},
+    {name:'Digital Journalism Skill Cert',level:'Certificate',duration:'10 Months',monthly:15000,perTerm:null,total:150000},
+    {name:'Digital Journalism',level:'Certificate',duration:'1 Year',monthly:12000,perTerm:36000,total:null},
+    {name:'Digital Journalism',level:'Diploma',duration:'2 Years',monthly:12000,perTerm:36000,total:null},
+    {name:'Content Creation',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:45000},
+    {name:'Deejaying',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:30000},
+    {name:'Advanced Deejaying',level:'Short',duration:'5 Months',monthly:null,perTerm:null,total:50000},
+    {name:'Phone Repair',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:30000},
+    {name:'Phone & Laptop Repair',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:65000},
+    {name:'Food & Beverages',level:'Short',duration:'3 Months',monthly:null,perTerm:null,total:45000},
+    {name:'Food & Beverages',level:'Certificate',duration:'1 Year',monthly:13000,perTerm:39000,total:null},
+    {name:'Food & Beverages',level:'Diploma',duration:'2 Years',monthly:13000,perTerm:39000,total:null},
+  ]}
+];
+
+async function loadAllData(){
+  let loadError=false;
+  try{
+    const [evR,coR,galR,heroR,setR]=await Promise.all([
+      _sb.from('events').select('*').order('date',{ascending:true}),
+      _sb.from('courses').select('*').order('sort_order',{ascending:true}),
+      _sb.from('gallery').select('*').order('sort_order',{ascending:true}),
+      _sb.from('hero_slides').select('*').order('sort_order',{ascending:true}),
+      _sb.from('settings').select('*')
+    ]);
+    if(!evR.error) DB.events=evR.data||[];
+    if(!coR.error) DB.courses=coR.data||[];
+    if(!galR.error) DB.gallery=galR.data||[];
+    if(!heroR.error) DB.hero_slides=heroR.data||[];
+    if(!setR.error&&setR.data){DB.settings={};setR.data.forEach(s=>DB.settings[s.key]=s.value);}
+    if(evR.error||coR.error||galR.error||heroR.error||setR.error) loadError=true;
+  }catch(e){loadError=true;console.error('Load error:',e);}
+  if(loadError){
+    if(!DB.events.length) DB.events=DEF_EVENTS;
+    if(!DB.courses.length) DB.courses=DEF_COURSES;
+    if(!DB.gallery.length) DB.gallery=DEF_GALLERY;
+    if(!DB.hero_slides.length) DB.hero_slides=DEF_SLIDES;
+    if(!Object.keys(DB.settings).length) DB.settings=DEF_SETTINGS;
+  }
+  try{
+    const feeR=await _sb.from('fee_structure').select('*').order('school').order('sort_order');
+    if(!feeR.error&&feeR.data&&feeR.data.length){
+      const map={};
+      feeR.data.forEach(r=>{
+        if(!map[r.school]){const meta=FEE_SCHOOLS.find(s=>s.key===r.school);map[r.school]={key:r.school,label:meta?meta.label:r.school,icon:meta?meta.icon:'fas fa-school',programmes:[]};}
+        map[r.school].programmes.push({name:r.programme_name,level:r.level,duration:r.duration,monthly:r.monthly,perTerm:r.per_term,total:r.total});
+      });
+      DB.fee_schools=FEE_SCHOOLS.map(s=>map[s.key]||s);
+    }else{ DB.fee_schools=FEE_SCHOOLS; }
+  }catch(e){ DB.fee_schools=FEE_SCHOOLS; }
+  buildAnnBar();buildDDEvents();render();
+}
+
+function S(k){return DB.settings[k]||DEF_SETTINGS[k]||''}
+function ksh(n){return n?'Ksh '+Number(n).toLocaleString():'—';}
+function fmtDate(d){if(!d)return'';return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});}
+function getGalleryUrls(c){try{return JSON.parse(c.gallery_urls||'[]');}catch{return[];}}
+
+function buildAnnBar(){
+  const track=document.getElementById('annTrack');
+  const items=[...DB.events,...DB.events];
+  track.innerHTML=items.map(e=>`<span class="ann-item" onclick="openVid('${e.id}')"><i class="fas fa-calendar-alt"></i>${e.title} · ${e.date_label||fmtDate(e.date)} · ${e.time}</span>`).join('');
+}
+function buildDDEvents(){
+  const list=document.getElementById('ddEvList');
+  const upcoming=DB.events.slice(0,3);
+  list.innerHTML=upcoming.map(e=>{
+    const d=new Date(e.date);
+    return`<div class="event-card" onclick="openVid('${e.id}')">
+      <div class="ev-date-badge"><div class="day">${d.getDate()}</div><div class="mon">${d.toLocaleString('en',{month:'short'}).toUpperCase()}</div></div>
+      <div class="ev-info"><h5>${e.title}</h5><p>${e.time} · ${e.location}</p>
+      ${e.is_live?'<span class="ev-live-badge"><i class="fas fa-circle"></i>LIVE</span>':'<span class="ev-upcoming-badge">Upcoming</span>'}</div>
+    </div>`;
+  }).join('');
+}
+
+function go(page,data){
+  PAGE=page;SEL_COURSE=data||null;
+  document.querySelectorAll('.nav-a').forEach(a=>a.classList.remove('active'));
+  const el=document.getElementById('nav-'+page);
+  if(el)el.classList.add('active');
+  document.getElementById('navList').classList.remove('on');
+  render();window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggleNav(){document.getElementById('navList').classList.toggle('on');}
+
+function render(){
+  const m=document.getElementById('main');
+  const pages={home:renderHome,courses:renderCourses,events:renderEvents,gallery:renderGallery,fees:renderFees,about:renderAbout,contact:renderContact,apply:renderApply,detail:renderDetail};
+  m.innerHTML=(pages[PAGE]||renderHome)();
+  if(PAGE==='home') initSlider();
+}
+
+function renderHome(){
+  const slides=DB.hero_slides;
+  const slidesHTML=slides.map((s,i)=>`<div class="slide${i===0?' on':''}" style="background-image:url('${s.background_url}')"><div class="slide-ov"><span class="slide-badge">${s.badge}</span><h2>${s.title}</h2><p>${s.subtitle||''}</p><div class="slide-acts"><button class="btn btn-red" onclick="go('courses')"><i class="fas fa-graduation-cap"></i> Explore Courses</button><button class="btn btn-wh" onclick="go('apply')"><i class="fas fa-pen"></i> Apply Now</button></div></div></div>`).join('');
+  const dotsHTML=slides.map((_,i)=>`<div class="dot${i===0?' on':''}" onclick="goSlide(${i})"></div>`).join('');
+  const featCourses=DB.courses.slice(0,6);
+  const upEvents=DB.events.slice(0,3);
+  return`
+  <div class="hero" id="heroSlider">${slidesHTML}<div class="dots">${dotsHTML}</div></div>
+  <div class="stats-bar"><div class="container"><div class="stats-inner">
+    <div class="si"><div class="si-num">${S('students_count')}</div><div class="si-lbl">STUDENTS TRAINED</div></div>
+    <div class="si"><div class="si-num">${S('courses_count')}</div><div class="si-lbl">COURSES OFFERED</div></div>
+    <div class="si"><div class="si-num">${S('years_count')}</div><div class="si-lbl">YEARS OF EXCELLENCE</div></div>
+    <div class="si"><div class="si-num">${S('placement_rate')}</div><div class="si-lbl">PLACEMENT RATE</div></div>
+  </div></div></div>
+  <section style="padding:72px 0;background:var(--gray-lt)"><div class="container">
+    <h2 class="sec-title">Our <span>Courses</span></h2>
+    <div class="filter-bar">
+      <button class="fb on" onclick="filterCat('All',this)">All Courses</button>
+      <button class="fb" onclick="filterCat('ICT & Digital Technology',this)">ICT & Technology</button>
+      <button class="fb" onclick="filterCat('School of Media & Creative Arts',this)">Creative Media</button>
+      <button class="fb" onclick="filterCat('School of Business, Media & Hospitality',this)">Business & Media</button>
+      <button class="fb" onclick="filterCat('School of Engineering',this)">Engineering</button>
+    </div>
+    <div class="courses-grid" id="coursesGrid">${featCourses.map(c=>courseCard(c)).join('')}</div>
+    <div style="text-align:center"><button class="btn btn-or" onclick="go('courses')"><i class="fas fa-th-large"></i> View All ${DB.courses.length} Courses</button></div>
+  </div></section>
+  <section class="ev-section"><div class="container">
+    <h2 class="sec-title">Upcoming <span>Events</span></h2>
+    <div class="events-grid">${upEvents.map(e=>eventCard(e)).join('')}</div>
+    <div style="text-align:center;margin-top:32px"><button class="btn btn-or" onclick="go('events')"><i class="fas fa-calendar-alt"></i> View All Events</button></div>
+  </div></section>
+  <section style="padding:72px 0;background:var(--gray-lt)"><div class="container"><div class="why-grid">
+    <div class="why-text">
+      <span class="page-tag">WHY CHOOSE US</span>
+      <h2>Training That Actually Gets You Hired</h2>
+      <p>${S('about_text')}</p>
+      <ul class="check-list">
+        <li><i class="fas fa-check-circle"></i> Industry-certified instructors with real-world experience</li>
+        <li><i class="fas fa-check-circle"></i> Hands-on practical training from day one</li>
+        <li><i class="fas fa-check-circle"></i> Flexible study modes: Full-time, Part-time & Online</li>
+        <li><i class="fas fa-check-circle"></i> Rolling intakes — start anytime of the year</li>
+        <li><i class="fas fa-check-circle"></i> Job placement support and career guidance</li>
+        <li><i class="fas fa-check-circle"></i> Modern labs and equipment</li>
+      </ul>
+      <button class="btn btn-red" onclick="go('about')"><i class="fas fa-info-circle"></i> More About SCTI</button>
+    </div>
+    <div class="why-card">
+      <div class="sbox"><div class="num">${S('students_count')}</div><div class="lbl">Students Trained</div><div class="sub">And growing every intake</div></div>
+      <div class="sbox"><div class="num">${S('courses_count')}</div><div class="lbl">Courses Offered</div><div class="sub">Across 3 departments</div></div>
+      <div class="sbox"><div class="num">${S('years_count')}</div><div class="lbl">Years Running</div><div class="sub">Proven track record</div></div>
+      <div class="sbox"><div class="num">${S('placement_rate')}</div><div class="lbl">Graduate Placement</div><div class="sub">In employment or self-employment</div></div>
+    </div>
+  </div></div></section>
+  <div class="cta-band"><div class="container">
+    <h2>${S('cta_title')}</h2><p>${S('cta_subtitle')}</p>
+    <div class="cta-acts">
+      <button class="btn btn-red" onclick="go('apply')"><i class="fas fa-pen"></i> Apply Now</button>
+      <a class="btn btn-gold" href="tel:${S('phone1')}"><i class="fas fa-phone"></i> Call ${S('phone1')}</a>
+      <a class="btn btn-wh" href="https://wa.me/${(S('whatsapp')||'').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Us</a>
+    </div>
+  </div></div>
+  ${renderFooter()}`;
+}
+
+function renderCourses(){
+  return`<div class="page-hero"><div class="container"><div class="breadcrumb">Home <span>›</span> Courses</div><span class="page-tag">ALL COURSES</span><h1>Find Your Perfect Course</h1><p>Practical, industry-driven training across Technology, Creative Media & Business.</p></div></div>
+  <section style="padding:56px 0"><div class="container">
+    <div class="filter-bar">
+      <button class="fb on" onclick="filterCat('All',this)">All (${DB.courses.length})</button>
+      <button class="fb" onclick="filterCat('ICT & Digital Technology',this)">ICT & Technology</button>
+      <button class="fb" onclick="filterCat('School of Media & Creative Arts',this)">Creative Media</button>
+      <button class="fb" onclick="filterCat('School of Business, Media & Hospitality',this)">Business & Media</button>
+      <button class="fb" onclick="filterCat('School of Engineering',this)">Engineering</button>
+    </div>
+    <div class="courses-grid" id="coursesGrid">${DB.courses.map(c=>courseCard(c)).join('')}</div>
+  </div></section>
+  <div class="cta-band"><div class="container"><h2>Not sure which course to pick?</h2><p>Chat with our AI Guide or call us — we'll help you choose the right path.</p><div class="cta-acts"><button class="btn btn-gold" onclick="toggleChat()"><i class="fas fa-robot"></i> Ask AI Guide</button><button class="btn btn-or" onclick="go('fees')" style="border-color:white;color:white"><i class="fas fa-file-pdf"></i> View Fee Structure</button><a class="btn btn-wh" href="tel:${S('phone1')}"><i class="fas fa-phone"></i> Call Us</a></div></div></div>
+  ${renderFooter()}`;
+}
+
+function courseCard(c){
+  return`<div class="course-card" onclick="goDetail('${c.id}')">
+    <div class="cc-thumb" style="background-image:url('${c.image_url}')"><span class="cc-cat">${c.category}</span></div>
+    <div class="cc-body">
+      <h3>${c.name}</h3>
+      <p>${(c.description||'').substring(0,110)}…</p>
+      <div class="badge-row"><span class="cbadge"><i class="fas fa-clock"></i> ${c.duration}</span><span class="cbadge"><i class="fas fa-tag"></i> ${c.fee}</span>${(c.levels||'').split(',').map(l=>`<span class="cbadge">${l.trim()}</span>`).join('')}</div>
+    </div>
+  </div>`;
+}
+function goDetail(id){go('detail',DB.courses.find(c=>String(c.id)===String(id))||null);}
+function goApply(id){SEL_COURSE=DB.courses.find(c=>String(c.id)===String(id))||null;go('apply');}
+function filterCat(cat,btn){
+  ACT_CAT=cat;
+  document.querySelectorAll('.fb').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  const grid=document.getElementById('coursesGrid');
+  if(!grid)return;
+  const filtered=cat==='All'?DB.courses:DB.courses.filter(c=>c.category===cat);
+  grid.innerHTML=filtered.map(c=>courseCard(c)).join('');
+}
+
+function renderDetail(){
+  const c=SEL_COURSE;
+  if(!c)return renderCourses();
+  const gal=getGalleryUrls(c);
+  let whatLearn=[],intakes=[];
+  try{whatLearn=JSON.parse(c.what_you_learn||'[]');}catch(e){if(c.what_you_learn)whatLearn=c.what_you_learn.split('|').map(s=>s.trim()).filter(Boolean);}
+  try{intakes=JSON.parse(c.intake_dates||'[]');}catch(e){if(c.intake_dates)intakes=c.intake_dates.split(',').map(s=>s.trim()).filter(Boolean);}
+  if(!intakes.length)intakes=['January','March','May','July','September','November'];
+  if(!whatLearn.length&&c.description)whatLearn=[c.description];
+  const defCurriculum=[{title:'Introduction & Foundations',topics:['Course overview & objectives','Tools and equipment orientation','Industry landscape overview']},{title:'Core Skills Development',topics:['Practical exercises and projects','Hands-on lab sessions','Skill assessments']},{title:'Advanced Techniques',topics:['Professional workflows','Real-world case studies','Portfolio development']},{title:'Industry Readiness',topics:['Job preparation','CV and portfolio workshop','Graduation project']}];
+  const defFaqs=[{q:'What is the intake schedule?',a:'We have rolling intakes throughout the year. Contact us to confirm the next available date.'},{q:'What documents do I need to apply?',a:'You will need a passport photo, National ID (front and back), and your academic certificate (KCSE or equivalent).'},{q:'Can I study online or part-time?',a:`Yes! This course is available in ${c.mode} mode.`},{q:'Is there a payment plan?',a:'Yes, SCTI offers flexible payment plans. Speak to our admissions team for details.'},{q:'Will I get a certificate?',a:`Yes. Upon successful completion you receive a recognised ${(c.levels||'Certificate').split(',')[0].trim()} from Skymo Creative Training Institute.`}];
+  const careers=(c.careers||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const requirements=(c.requirements||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const related=DB.courses.filter(x=>String(x.id)!==String(c.id)&&x.category===c.category).slice(0,3);
+  return`
+  <div class="detail-hero"><div class="detail-hero-bg" style="background-image:url('${c.image_url}')"></div>
+  <div class="detail-hero-inner"><div class="container">
+    <button class="back-btn" onclick="go('courses')"><i class="fas fa-arrow-left"></i> All Courses</button>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;flex-wrap:wrap">
+      <span style="background:var(--gold);color:var(--navy);padding:3px 13px;border-radius:50px;font-size:.68rem;font-weight:800">${c.category}</span>
+      ${c.featured?'<span style="background:var(--red);color:white;padding:3px 13px;border-radius:50px;font-size:.68rem;font-weight:800">⭐ FEATURED</span>':''}
+    </div>
+    <h1>${c.name}</h1>
+    <p style="opacity:.82;max-width:600px;margin-top:8px;font-size:.95rem;line-height:1.65">${c.description||''}</p>
+    <div class="detail-meta" style="margin-top:18px">
+      <span><i class="fas fa-clock"></i> ${c.duration}</span>
+      <span><i class="fas fa-tag"></i> ${c.fee}</span>
+      <span><i class="fas fa-graduation-cap"></i> ${(c.levels||'').split(',').join(' / ')}</span>
+      <span><i class="fas fa-laptop"></i> ${c.mode}</span>
+    </div>
+    <div style="margin-top:22px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn btn-red" onclick="goApply('${c.id}')"><i class="fas fa-pen"></i> Apply Now</button>
+      <a class="btn btn-gold" href="https://wa.me/${(S('whatsapp')||'254113504043').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Enquiry</a>
+    </div>
+  </div></div></div>
+  <div class="container"><div class="detail-layout"><div>
+    <div class="cd-tabs" style="margin-top:36px">
+      <button class="cd-tab on" onclick="cdTab(this,'tab-overview')"><i class="fas fa-info-circle"></i> Overview</button>
+      <button class="cd-tab" onclick="cdTab(this,'tab-curriculum')"><i class="fas fa-list-ul"></i> Curriculum</button>
+      <button class="cd-tab" onclick="cdTab(this,'tab-requirements')"><i class="fas fa-check-square"></i> Requirements</button>
+      <button class="cd-tab" onclick="cdTab(this,'tab-careers')"><i class="fas fa-briefcase"></i> Careers</button>
+      <button class="cd-tab" onclick="cdTab(this,'tab-faq')"><i class="fas fa-question-circle"></i> FAQ</button>
+      ${gal.length?`<button class="cd-tab" onclick="cdTab(this,'tab-gallery')"><i class="fas fa-images"></i> Gallery</button>`:''}
+    </div>
+    <div id="tab-overview" class="cd-panel on">
+      <div class="info-block">
+        <div class="rating-row"><span class="stars">★★★★★</span><span style="font-size:.85rem;font-weight:700;color:var(--navy)">4.8</span><span class="rating-count">· Rated by graduates</span></div>
+        <h3><i class="fas fa-star"></i> What You'll Learn</h3>
+        <div class="learn-grid">
+          ${whatLearn.map(w=>`<div class="learn-item"><i class="fas fa-check-circle"></i><span>${w}</span></div>`).join('')}
+          ${whatLearn.length<2?['Practical hands-on skills from day one','Industry-standard tools and workflows','Real-world project experience','Portfolio-building guidance','Job preparation and career support','Certificate upon completion'].map(w=>`<div class="learn-item"><i class="fas fa-check-circle"></i><span>${w}</span></div>`).join(''):''}
+        </div>
+      </div>
+      <div class="info-block">
+        <h3><i class="fas fa-calendar-alt"></i> Available Intake Months</h3>
+        <div class="intake-badges">${intakes.map(m=>`<span class="intake-badge"><i class="fas fa-calendar" style="margin-right:5px"></i>${m}</span>`).join('')}</div>
+        <div style="margin-top:16px;padding:14px;background:white;border-radius:10px;border:1px solid var(--border);font-size:.84rem;color:var(--gray)"><i class="fas fa-info-circle" style="color:var(--red);margin-right:8px"></i>Can't find a date that works? Call us: <strong style="color:var(--navy)">${S('phone1')}</strong></div>
+      </div>
+    </div>
+    <div id="tab-curriculum" class="cd-panel">
+      <div class="info-block" style="background:white"><h3><i class="fas fa-book-open"></i> Course Curriculum</h3>
+        ${defCurriculum.map((m,i)=>`<div class="curr-module${i===0?' open':''}"><div class="curr-head" onclick="toggleModule(this.parentElement)"><div class="mod-num">${i+1}</div><span class="mod-title">${m.title}</span><i class="fas fa-chevron-down curr-chevron" style="${i===0?'transform:rotate(180deg)':''}"></i></div><div class="curr-body"><ul>${m.topics.map(t=>`<li><i class="fas fa-dot-circle"></i>${t}</li>`).join('')}</ul></div></div>`).join('')}
+      </div>
+    </div>
+    <div id="tab-requirements" class="cd-panel">
+      <div class="info-block"><h3><i class="fas fa-clipboard-list"></i> Entry Requirements</h3><ul class="info-list">${requirements.map(r=>`<li><i class="fas fa-check-circle"></i>${r}</li>`).join('')}</ul></div>
+      <div class="info-block"><h3><i class="fas fa-file-alt"></i> Documents Required to Apply</h3><ul class="info-list"><li><i class="fas fa-camera"></i>Passport-size photo (JPG/PNG)</li><li><i class="fas fa-id-card"></i>National ID – Front and Back</li><li><i class="fas fa-file-certificate"></i>Academic certificate (KCSE or equivalent)</li></ul><div style="margin-top:16px"><button class="btn btn-red" onclick="goApply('${c.id}')"><i class="fas fa-pen"></i> Apply Now</button></div></div>
+    </div>
+    <div id="tab-careers" class="cd-panel">
+      <div class="info-block"><h3><i class="fas fa-briefcase"></i> Career Opportunities</h3><div class="career-tags">${careers.map(j=>`<span class="career-tag"><i class="fas fa-arrow-right" style="color:var(--red);margin-right:6px;font-size:.65rem"></i>${j}</span>`).join('')}</div></div>
+    </div>
+    <div id="tab-faq" class="cd-panel">
+      <div class="info-block" style="background:white"><h3><i class="fas fa-question-circle"></i> Frequently Asked Questions</h3>
+        ${defFaqs.map((f,i)=>`<div class="faq-item${i===0?' open':''}"><div class="faq-q" onclick="toggleFaq(this.parentElement)"><span>${f.q}</span><i class="fas fa-chevron-down faq-chevron" style="${i===0?'transform:rotate(180deg)':''}"></i></div><div class="faq-a">${f.a}</div></div>`).join('')}
+      </div>
+    </div>
+    ${gal.length?`<div id="tab-gallery" class="cd-panel"><div class="info-block" style="background:white"><h3><i class="fas fa-images"></i> Course Gallery</h3><div class="mini-gal">${gal.map(img=>`<img src="${img}" onclick="openImgModal('${img}')" alt="${c.name}">`).join('')}</div></div></div>`:''}
+    ${related.length?`<div style="margin-top:40px;margin-bottom:40px"><h2 style="font-family:'Syne',sans-serif;font-size:1.3rem;color:var(--navy);margin-bottom:20px"><i class="fas fa-layer-group" style="color:var(--red);margin-right:10px"></i>Related Courses</h2><div class="related-grid">${related.map(r=>courseCard(r)).join('')}</div></div>`:''}
+  </div>
+  <div class="detail-sidebar">
+    <div class="enroll-card">
+      <div class="ec-price">${c.fee} <span style="font-size:1rem;color:var(--gray);font-weight:400;font-family:'Outfit',sans-serif">/ full course</span></div>
+      <div style="font-size:.78rem;color:var(--gray);margin-bottom:14px">Payment plans available</div>
+      <button class="btn btn-red" style="width:100%;justify-content:center;margin-bottom:10px;padding:14px" onclick="goApply('${c.id}')"><i class="fas fa-pen"></i> Apply for This Course</button>
+      <a class="btn btn-gold" style="width:100%;justify-content:center;margin-bottom:10px;padding:12px" href="https://wa.me/${(S('whatsapp')||'254113504043').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Enquiry</a>
+      <a class="btn btn-or" style="width:100%;justify-content:center;padding:11px" href="tel:${S('phone1')}"><i class="fas fa-phone"></i> Call ${S('phone1')}</a>
+      <hr class="enroll-divider">
+      <div class="ec-row"><span class="label"><i class="fas fa-clock"></i> Duration</span><span class="val">${c.duration}</span></div>
+      <div class="ec-row"><span class="label"><i class="fas fa-graduation-cap"></i> Level</span><span class="val">${(c.levels||'Certificate').split(',')[0].trim()}</span></div>
+      <div class="ec-row"><span class="label"><i class="fas fa-laptop"></i> Mode</span><span class="val">${c.mode}</span></div>
+      <div class="ec-row"><span class="label"><i class="fas fa-calendar-check"></i> Intake</span><span class="val">Rolling</span></div>
+      <div class="ec-row"><span class="label"><i class="fas fa-certificate"></i> Certificate</span><span class="val">Yes</span></div>
+    </div>
+    <div class="detail-contact-box">
+      <h4><i class="fas fa-headset"></i> Need Help? Talk to Us</h4>
+      <p><i class="fas fa-phone"></i> ${S('phone1')}</p>
+      <p><i class="fas fa-phone"></i> ${S('phone2')}</p>
+      <p><i class="fas fa-envelope"></i> ${S('email')}</p>
+      <p><i class="fas fa-map-marker-alt"></i> ${S('address')}</p>
+    </div>
+  </div></div></div>
+  ${renderFooter()}`;
+}
+
+function cdTab(btn,panelId){document.querySelectorAll('.cd-tab').forEach(b=>b.classList.remove('on'));document.querySelectorAll('.cd-panel').forEach(p=>p.classList.remove('on'));btn.classList.add('on');const panel=document.getElementById(panelId);if(panel)panel.classList.add('on');}
+function toggleModule(el){el.classList.toggle('open');}
+function toggleFaq(el){el.classList.toggle('open');}
+
+function renderEvents(){
+  return`<div class="page-hero"><div class="container"><div class="breadcrumb">Home <span>›</span> Events</div><span class="page-tag">EVENTS & WORKSHOPS</span><h1>What's Happening at SCTI</h1><p>Live streams, open days, workshops, graduation ceremonies and more.</p></div></div>
+  <section class="ev-section"><div class="container"><div class="events-grid">${DB.events.map(e=>eventCard(e)).join('')}</div></div></section>
+  ${renderFooter()}`;
+}
+
+function eventCard(e){
+  return`<div class="ev-full-card" onclick="openVid('${e.id}')">
+    <div class="ev-thumb" style="background-image:url('${e.thumbnail}')">
+      <div class="ev-thumb-overlay"></div>
+      <div class="ev-thumb-badges">${e.is_live?'<span class="badge-live"><i class="fas fa-circle"></i>LIVE</span>':''}<span class="badge-date">${e.tag||'Event'}</span></div>
+      <div class="play-btn"><i class="fas fa-play"></i></div>
+    </div>
+    <div class="ev-body"><h3>${e.title}</h3><p>${(e.description||'').substring(0,120)}${(e.description||'').length>120?'…':''}</p>
+    <div class="ev-meta"><span><i class="fas fa-calendar"></i>${e.date_label||fmtDate(e.date)}</span><span><i class="fas fa-clock"></i>${e.time}</span><span><i class="fas fa-map-marker-alt"></i>${e.location}</span></div></div>
+  </div>`;
+}
+
+function openVid(id){
+  const e=DB.events.find(x=>String(x.id)===String(id));
+  if(!e)return;
+  document.getElementById('vidTitle').textContent=e.title;
+  document.getElementById('vidDesc').textContent=`${e.date_label||fmtDate(e.date)} · ${e.time} · ${e.location}`;
+  document.getElementById('vidFrame').src=e.video_url||'';
+  document.getElementById('vidModal').classList.add('on');
+}
+function closeVid(e){if(e.target===document.getElementById('vidModal'))closeVidBtn();}
+function closeVidBtn(){document.getElementById('vidModal').classList.remove('on');document.getElementById('vidFrame').src='';}
+
+function renderGallery(){
+  return`<div class="page-hero"><div class="container"><div class="breadcrumb">Home <span>›</span> Gallery</div><span class="page-tag">PHOTO GALLERY</span><h1>Life at SCTI</h1><p>Photos from our campus, classes, events, and student life.</p></div></div>
+  <section style="padding:56px 0"><div class="container"><div class="gal-masonry">${DB.gallery.map(g=>`<div class="gi" onclick="openImgModal('${g.url||g}')"><img src="${g.url||g}" alt="${g.caption||'SCTI Gallery'}" loading="lazy"><div class="gi-ov">${g.caption||'SCTI Campus'}</div></div>`).join('')}</div></div></section>
+  <div class="cta-band"><div class="container"><h2>Want to Be Part of This?</h2><p>Join the SCTI family. Apply today and start your journey.</p><div class="cta-acts"><button class="btn btn-red" onclick="go('apply')"><i class="fas fa-pen"></i> Apply Now</button></div></div></div>
+  ${renderFooter()}`;
+}
+
+function openImgModal(src){document.getElementById('imgModalSrc').src=src;document.getElementById('imgModal').classList.add('on');}
+function closeImgModal(){document.getElementById('imgModal').classList.remove('on');}
+
+function renderFees(){
+  const schools=(DB.fee_schools&&DB.fee_schools.length)?DB.fee_schools:FEE_SCHOOLS;
+  return`<div class="page-hero"><div class="container"><div class="breadcrumb">Home <span>›</span> Fee Structure</div><span class="page-tag">FEES — 2026</span><h1>Course Fee Structure</h1><p>Transparent fees for every programme. Download a copy to keep or share.</p></div></div>
+  <section style="padding:56px 0"><div class="container">
+    <div class="fee-toolbar">
+      <div style="font-size:.85rem;color:var(--gray)">All amounts in Kenyan Shillings (Ksh). Fees correct as of 2026 intake.</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-red" onclick="downloadFeesPdf()"><i class="fas fa-file-pdf"></i> Download Fee Structure (PDF)</button>
+        <button class="btn btn-or" onclick="go('apply')"><i class="fas fa-pen"></i> Apply Now</button>
+      </div>
+    </div>
+    <div class="fee-note"><i class="fas fa-info-circle" style="margin-right:6px"></i><strong>Registration Fee:</strong> Ksh 2,000 — Non-refundable, applies to all programmes. <strong>Intakes:</strong> January, May, September. &nbsp;|&nbsp; <strong>Payment:</strong> Full payment or approved monthly instalments.</div>
+    ${schools.map(school=>`
+    <div class="fee-school">
+      <div class="fee-school-hdr"><i class="${school.icon||'fas fa-school'}"></i><h3>${school.label}</h3></div>
+      <div class="fee-tbl-wrap"><table class="fee-tbl"><thead><tr><th>Programme</th><th>Level</th><th>Duration</th><th>Monthly</th><th>Per Term</th><th>Total</th></tr></thead><tbody>
+        ${school.programmes.map(p=>`<tr><td><strong>${p.name}</strong></td><td><span class="fee-level-tag fee-level-${p.level}">${p.level}</span></td><td>${p.duration}</td><td class="fee-amt">${ksh(p.monthly)}</td><td class="fee-amt">${ksh(p.perTerm)}</td><td class="fee-amt-total">${ksh(p.total)}</td></tr>`).join('')}
+      </tbody></table></div>
+    </div>`).join('')}
+  </div></section>
+  <div class="cta-band"><div class="container"><h2>Ready to Secure Your Spot?</h2><p>Apply today or get in touch if you have questions about fees and payment plans.</p><div class="cta-acts"><button class="btn btn-red" onclick="go('apply')"><i class="fas fa-pen"></i> Apply Now</button><a class="btn btn-gold" href="https://wa.me/${(S('whatsapp')||'').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Us</a></div></div></div>
+  ${renderFooter()}`;
+}
+
+function downloadFeesPdf(){
+  if(typeof window.jspdf==='undefined'){alert('PDF library failed to load. Please check your connection and try again.');return;}
+  const schools=(DB.fee_schools&&DB.fee_schools.length)?DB.fee_schools:FEE_SCHOOLS;
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p','pt','a4');
+  const pageW = doc.internal.pageSize.getWidth();
+  const margin = 40;
+
+  // Letterhead
+  doc.setFillColor(10,37,64);
+  doc.rect(0,0,pageW,80,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(16);
+  doc.text('Skymo Creative Training Institute', margin, 34);
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(212,175,55);
+  doc.text('EMPOWERING SKILLS. CREATING LEADERS.', margin, 50);
+  doc.setTextColor(230,230,230);
+  doc.setFontSize(8.5);
+  doc.text(`${S('address')}  |  ${S('phone1')} / ${S('phone2')}  |  ${S('email')}`, margin, 66);
+
+  let y = 104;
+  doc.setTextColor(20,20,30);
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(15);
+  doc.text('Fee Structure — 2026', margin, y);
+  y += 18;
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(9);
+  doc.setTextColor(90,102,128);
+  doc.text(`Generated ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · All amounts in Kenyan Shillings (Ksh)`, margin, y);
+  y += 20;
+
+  schools.forEach(school=>{
+    const body = school.programmes.map(p=>[p.name,p.level,p.duration,p.monthly?'Ksh '+Number(p.monthly).toLocaleString():'-',p.perTerm?'Ksh '+Number(p.perTerm).toLocaleString():'-',p.total?'Ksh '+Number(p.total).toLocaleString():'-']);
+    doc.autoTable({
+      startY: y,
+      margin: { left: margin, right: margin },
+      head: [[school.label,'Level','Duration','Monthly','Per Term','Total']],
+      body: body,
+      theme: 'grid',
+      headStyles: { fillColor:[10,37,64], textColor:255, fontStyle:'bold', fontSize:9 },
+      bodyStyles: { fontSize:8.5, textColor:[30,30,40] },
+      alternateRowStyles: { fillColor:[244,247,251] },
+      columnStyles: { 0:{cellWidth:150}, 1:{cellWidth:60}, 2:{cellWidth:65}, 3:{halign:'right'}, 4:{halign:'right'}, 5:{halign:'right',fontStyle:'bold',textColor:[196,30,58]} },
+      didDrawPage: (data)=>{ y = data.cursor.y; }
+    });
+    y = doc.lastAutoTable.finalY + 22;
+    if(y > doc.internal.pageSize.getHeight() - 100){ doc.addPage(); y = 40; }
+  });
+
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(9.5);
+  doc.setTextColor(122,79,0);
+  doc.text('Registration Fee: Ksh 2,000 (non-refundable, applies to all programmes)', margin, y);
+  y += 14;
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(90,102,128);
+  doc.text('Intakes: January, May, September  |  Payment: Full payment or approved monthly instalments.', margin, y);
+
+  const pageCount = doc.internal.getNumberOfPages();
+  for(let i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    const h = doc.internal.pageSize.getHeight();
+    doc.setFontSize(8);
+    doc.setTextColor(150,150,160);
+    doc.text(`SCTI Fee Structure 2026  ·  Page ${i} of ${pageCount}`, margin, h-20);
+  }
+
+  doc.save('SCTI-Fee-Structure-2026.pdf');
+}
+
+function renderAbout(){
+  return`<div class="page-hero"><div class="container"><div class="breadcrumb">Home <span>›</span> About</div><span class="page-tag">ABOUT US</span><h1>Skymo Creative Training Institute</h1><p>Empowering Skills. Creating Leaders.</p></div></div>
+  <section style="padding:64px 0"><div class="container">
+    <div class="about-grid">
+      <img src="https://images.pexels.com/photos/5428836/pexels-photo-5428836.jpeg?auto=compress&cs=tinysrgb&w=700" class="about-img" alt="SCTI Campus">
+      <div class="about-text">
+        <h3>Who We Are</h3>
+        <p>${S('about_text')}</p>
+        <p>We offer practical, hands-on training designed around what employers actually need. Our instructors are industry practitioners — not just lecturers.</p>
+        <p><strong>Location:</strong> ${S('address')}<br><strong>Hours:</strong> ${S('working_hours')}<br><strong>Phone:</strong> ${S('phone1')} / ${S('phone2')}</p>
+        <div style="display:flex;gap:12px;margin-top:20px"><button class="btn btn-red" onclick="go('apply')"><i class="fas fa-pen"></i> Apply Now</button><button class="btn btn-or" onclick="go('contact')"><i class="fas fa-envelope"></i> Contact Us</button></div>
+      </div>
+    </div>
+    <h2 class="sec-title">Our <span>Values</span></h2>
+    <div class="vals-grid">
+      <div class="val-card"><div class="val-ico"><i class="fas fa-hands-helping"></i></div><h4>Practical First</h4><p>Learning by doing. Every course is hands-on from day one.</p></div>
+      <div class="val-card"><div class="val-ico"><i class="fas fa-industry"></i></div><h4>Industry Driven</h4><p>Curriculum built around what employers actually need.</p></div>
+      <div class="val-card"><div class="val-ico"><i class="fas fa-users"></i></div><h4>Student Focused</h4><p>Small classes, personal attention, flexible schedules.</p></div>
+      <div class="val-card"><div class="val-ico"><i class="fas fa-rocket"></i></div><h4>Career Ready</h4><p>We help you build a portfolio, land a job, or start your own business.</p></div>
+      <div class="val-card"><div class="val-ico"><i class="fas fa-lightbulb"></i></div><h4>Innovation</h4><p>Teaching the latest tools — including AI — so you stay ahead.</p></div>
+      <div class="val-card"><div class="val-ico"><i class="fas fa-heart"></i></div><h4>Community</h4><p>A family of alumni, trainers, and industry partners.</p></div>
+    </div>
+  </div></section>
+  <div class="cta-band"><div class="container"><h2>Come Visit Our Campus</h2><p>Ruiru Bypass, Opposite Tatu City, Nairobi. Open Monday–Friday 8am–5pm.</p><div class="cta-acts"><a class="btn btn-red" href="https://maps.google.com/?q=Ruiru+Bypass+Tatu+City+Nairobi" target="_blank"><i class="fas fa-map-marker-alt"></i> Get Directions</a><a class="btn btn-gold" href="tel:${S('phone1')}"><i class="fas fa-phone"></i> Call ${S('phone1')}</a></div></div></div>
+  ${renderFooter()}`;
+}
+
+function renderApply(){
+  const preselect=SEL_COURSE?SEL_COURSE.name:'';
+  return`<div class="page-hero"><div class="container"><div class="breadcrumb">Home <span>›</span> Apply</div><span class="page-tag">ADMISSION</span><h1>Apply to SCTI</h1><p>Fill in the form below. We'll review your application and contact you within 24 hours.</p></div></div>
+  <section style="padding:56px 0"><div class="container"><div id="applyContent">
+    <div class="apply-wrap">
+      <div>
+        <div class="sidebar-box"><h3><i class="fas fa-info-circle"></i> Admission Info</h3><p>Intakes are open all year round. You can start anytime.</p><p><strong style="color:var(--gold)">Processing time:</strong> We call you within 24 hours.</p><p><i class="fas fa-phone" style="color:var(--gold)"></i> ${S('phone1')}<br><i class="fas fa-phone" style="color:var(--gold)"></i> ${S('phone2')}</p></div>
+        <div class="sidebar-box"><h3><i class="fas fa-tags"></i> Course Fees</h3><p>See full fees for every programme and download a copy to keep.</p><button class="btn btn-gold btn-sm" onclick="go('fees')" style="margin-top:6px"><i class="fas fa-list"></i> View Fee Structure</button></div>
+        <div class="sidebar-box"><h3><i class="fas fa-file-alt"></i> Documents Required</h3><ul class="docs-list"><li><i class="fas fa-camera"></i>Passport-size photo (JPG/PNG)</li><li><i class="fas fa-id-card"></i>National ID – Front side</li><li><i class="fas fa-id-card"></i>National ID – Back side</li><li><i class="fas fa-file-certificate"></i>Academic certificate (KCSE or equivalent)</li></ul></div>
+        <div class="sidebar-box"><h3><i class="fas fa-map-marker-alt"></i> Find Us</h3><p>${S('address')}</p><a class="btn btn-gold btn-sm" href="https://maps.google.com/?q=Ruiru+Bypass+Tatu+City+Nairobi" target="_blank" style="margin-top:12px"><i class="fas fa-map"></i> Get Directions</a></div>
+      </div>
+      <div class="form-card">
+        <h3><i class="fas fa-pen" style="color:var(--red)"></i> Application Form</h3>
+        <div class="form-section-title"><i class="fas fa-user"></i> Personal Information</div>
+        <div class="fgrid">
+          <div class="fg"><label>Full Name <span class="r">*</span></label><input type="text" id="f_name" placeholder="Your full legal name" required></div>
+          <div class="fg"><label>Email Address <span class="r">*</span></label><input type="email" id="f_email" placeholder="your@email.com" required></div>
+          <div class="fg"><label>Phone Number <span class="r">*</span></label><input type="tel" id="f_phone" placeholder="0712 345 678" required></div>
+          <div class="fg"><label>Date of Birth</label><input type="date" id="f_dob"></div>
+          <div class="fg"><label>Gender</label><select id="f_gender"><option value="">Select…</option><option>Male</option><option>Female</option><option>Other</option><option>Prefer not to say</option></select></div>
+          <div class="fg"><label>National ID Number</label><input type="text" id="f_nid" placeholder="12345678"></div>
+          <div class="fg"><label>County</label><input type="text" id="f_county" placeholder="e.g. Nairobi"></div>
+          <div class="fg"><label>Town / Area</label><input type="text" id="f_town" placeholder="e.g. Ruiru"></div>
+        </div>
+        <div class="form-section-title"><i class="fas fa-book-open"></i> Course Selection</div>
+        <div class="fgrid">
+          <div class="fg s2"><label>Course of Interest <span class="r">*</span></label><select id="f_course" required><option value="">-- Select a Course --</option>${DB.courses.map(c=>`<option value="${c.name}"${c.name===preselect?' selected':''}>${c.name} (${c.fee})</option>`).join('')}</select></div>
+          <div class="fg"><label>Study Level</label><select id="f_level"><option value="">Select…</option><option>Certificate</option><option>Diploma</option><option>Short Course</option></select></div>
+          <div class="fg"><label>Study Mode</label><select id="f_mode"><option value="">Select…</option><option>Full-time</option><option>Part-time</option><option>Online</option></select></div>
+          <div class="fg"><label>Preferred Intake Month</label><select id="f_intake"><option value="">Select…</option><option>January</option><option>February</option><option>March</option><option>April</option><option>May</option><option>June</option><option>July</option><option>August</option><option>September</option><option>October</option><option>November</option><option>December</option></select></div>
+          <div class="fg"><label>How Did You Hear About Us?</label><select id="f_heard"><option value="">Select…</option><option>Social Media</option><option>Friend / Family Referral</option><option>Google Search</option><option>Roadside Signage</option><option>TV / Radio</option><option>Other</option></select></div>
+        </div>
+        <div class="form-section-title"><i class="fas fa-pen-alt"></i> Personal Statement</div>
+        <div class="fg" style="margin-bottom:16px"><label>Why do you want to study this course? (optional)</label><textarea id="f_stmt" rows="3" placeholder="Tell us briefly about your goals…"></textarea></div>
+        <div class="form-section-title"><i class="fas fa-file-upload"></i> Document Uploads</div>
+        <div class="fgrid">
+          <div class="fg"><label>Passport Photo <span class="r">*</span></label><div class="file-upload-area"><input type="file" id="f_passport" accept="image/jpeg,image/png,image/webp" onchange="previewFile('f_passport','prev_passport','fu_passport_name')"><div class="fu-icon"><i class="fas fa-camera"></i></div><p>Click to upload passport photo<br><small>JPG or PNG, max 5MB</small></p><div class="fu-name" id="fu_passport_name"></div></div><img id="prev_passport" class="img-preview" src="" alt=""></div>
+          <div class="fg"><label>National ID – Front <span class="r">*</span></label><div class="file-upload-area"><input type="file" id="f_id_front" accept="image/jpeg,image/png,application/pdf" onchange="previewFile('f_id_front','prev_id_front','fu_idf_name')"><div class="fu-icon"><i class="fas fa-id-card"></i></div><p>Click to upload ID front<br><small>JPG, PNG or PDF, max 5MB</small></p><div class="fu-name" id="fu_idf_name"></div></div><img id="prev_id_front" class="img-preview" src="" alt=""></div>
+          <div class="fg"><label>National ID – Back <span class="r">*</span></label><div class="file-upload-area"><input type="file" id="f_id_back" accept="image/jpeg,image/png,application/pdf" onchange="previewFile('f_id_back','prev_id_back','fu_idb_name')"><div class="fu-icon"><i class="fas fa-id-card"></i></div><p>Click to upload ID back<br><small>JPG, PNG or PDF, max 5MB</small></p><div class="fu-name" id="fu_idb_name"></div></div><img id="prev_id_back" class="img-preview" src="" alt=""></div>
+          <div class="fg"><label>Academic Certificate</label><div class="file-upload-area"><input type="file" id="f_cert" accept="image/jpeg,image/png,application/pdf" onchange="previewFile('f_cert','','fu_cert_name')"><div class="fu-icon"><i class="fas fa-file-certificate"></i></div><p>Click to upload certificate<br><small>JPG, PNG or PDF, max 5MB</small></p><div class="fu-name" id="fu_cert_name"></div></div></div>
+        </div>
+        <div class="consent-row"><input type="checkbox" id="f_consent" required><label for="f_consent">I confirm that the information provided is accurate and complete. I consent to SCTI processing my personal data for the purpose of this application. I understand I will be contacted within 24 hours.</label></div>
+
+        <!-- Registration Fee Notice -->
+        <div id="reg-fee-notice" style="margin:20px 0;border-radius:12px;overflow:hidden;border:2px solid #c41e3a;background:#fff9f9">
+          <div style="background:#c41e3a;padding:12px 16px;display:flex;align-items:center;gap:10px">
+            <i class="fas fa-exclamation-circle" style="color:#fff;font-size:1.1rem"></i>
+            <span style="color:#fff;font-weight:700;font-size:.95rem;font-family:'Syne',sans-serif">Registration Fee Required — Ksh 2,000</span>
+            <span style="margin-left:auto;background:rgba(255,255,255,.2);color:#fff;font-size:.7rem;padding:3px 9px;border-radius:20px;font-weight:600">NON-REFUNDABLE</span>
+          </div>
+          <div style="padding:16px">
+            <p style="font-size:.83rem;color:#555;margin:0 0 14px;line-height:1.55">Before submitting, please pay the <strong>Ksh 2,000 registration fee</strong> and attach proof of payment (M-Pesa message screenshot or bank deposit slip) below. This fee is <strong>non-refundable</strong> and confirms your application.</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+              <!-- M-Pesa -->
+              <div style="background:#f0fff4;border:1.5px solid #27ae60;border-radius:10px;padding:13px">
+                <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">
+                  <span style="background:#27ae60;color:#fff;font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:20px">M-PESA</span>
+                  <span style="font-weight:700;color:#27ae60;font-size:.85rem">Paybill</span>
+                </div>
+                <div style="font-size:.8rem;color:#333;line-height:1.7">
+                  <div><span style="color:#777">Paybill No:</span> <strong>522533</strong></div>
+                  <div><span style="color:#777">Account No:</span> <strong>8055445#<em>YourStudentNo</em></strong></div>
+                  <div style="margin-top:6px;font-size:.73rem;color:#555">Go to M-Pesa → Lipa na M-Pesa → Pay Bill → Enter above details</div>
+                </div>
+              </div>
+              <!-- Bank -->
+              <div style="background:#f0f4ff;border:1.5px solid #1a3a6b;border-radius:10px;padding:13px">
+                <div style="display:flex;align-items:center;gap:7px;margin-bottom:8px">
+                  <span style="background:#1a3a6b;color:#fff;font-size:.65rem;font-weight:700;padding:3px 8px;border-radius:20px">BANK</span>
+                  <span style="font-weight:700;color:#1a3a6b;font-size:.85rem">KCB</span>
+                </div>
+                <div style="font-size:.8rem;color:#333;line-height:1.7">
+                  <div><span style="color:#777">Account Name:</span> <strong style="font-size:.75rem">SKYMO CREATIVE TRAINING INSTITUTE</strong></div>
+                  <div><span style="color:#777">Account No:</span> <strong>1348754354</strong></div>
+                </div>
+              </div>
+            </div>
+            <!-- Proof of payment upload -->
+            <label style="font-size:.82rem;font-weight:700;color:#1a3a6b;display:block;margin-bottom:6px"><i class="fas fa-file-image" style="color:#c41e3a;margin-right:6px"></i>Attach Proof of Payment <span style="color:#c41e3a">*</span></label>
+            <div class="file-upload-area" style="border-color:#c41e3a20" onclick="document.getElementById('f_reg_proof').click()">
+              <input type="file" id="f_reg_proof" accept="image/jpeg,image/png,application/pdf" style="display:none" onchange="previewFile('f_reg_proof','prev_reg_proof','fu_reg_name')">
+              <div class="fu-icon"><i class="fas fa-receipt" style="color:#c41e3a"></i></div>
+              <p>Click to upload M-Pesa screenshot or bank slip<br><small>JPG, PNG or PDF, max 5MB</small></p>
+              <div class="fu-name" id="fu_reg_name"></div>
+            </div>
+            <img id="prev_reg_proof" class="img-preview" src="" alt="" style="display:none;margin-top:8px;max-height:120px;border-radius:8px;border:1px solid #eee">
+          </div>
+        </div>
+
+        <button class="btn btn-red" style="width:100%;justify-content:center;padding:14px" onclick="submitApplication()" id="submitBtn"><i class="fas fa-paper-plane"></i> Submit Application</button>
+        <p style="text-align:center;font-size:.75rem;color:var(--gray);margin-top:12px">Or call us directly: <strong>${S('phone1')}</strong> / <strong>${S('phone2')}</strong></p>
+      </div>
+    </div>
+  </div></div></section>
+  ${renderFooter()}`;
+}
+
+function previewFile(inputId,previewId,nameId){
+  const file=document.getElementById(inputId)?.files[0];
+  if(!file)return;
+  if(nameId){const n=document.getElementById(nameId);if(n){n.textContent=file.name;n.style.display='block';}}
+  if(previewId){const pr=document.getElementById(previewId);if(pr&&file.type.startsWith('image/')){const reader=new FileReader();reader.onload=e=>{pr.src=e.target.result;pr.style.display='block';};reader.readAsDataURL(file);}}
+}
+
+async function submitApplication(){
+  const btn=document.getElementById('submitBtn');
+  const name=document.getElementById('f_name')?.value.trim();
+  const email=document.getElementById('f_email')?.value.trim();
+  const phone=document.getElementById('f_phone')?.value.trim();
+  const course=document.getElementById('f_course')?.value;
+  const consent=document.getElementById('f_consent')?.checked;
+  if(!name){alert('Please enter your full name.');return;}
+  if(!email){alert('Please enter your email address.');return;}
+  if(!phone){alert('Please enter your phone number.');return;}
+  if(!course){alert('Please select a course.');return;}
+  if(!consent){alert('Please accept the consent declaration to proceed.');return;}
+  const regProof=document.getElementById('f_reg_proof')?.files[0];
+  if(!regProof){alert('Please attach proof of the Ksh 2,000 registration fee payment (M-Pesa screenshot or bank slip) before submitting.');return;}
+  btn.disabled=true;btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Submitting…';
+  try{
+    const appId='app_'+Date.now();
+    let passportUrl='',idFrontUrl='',idBackUrl='',certUrl='',regProofUrl='';
+    async function uploadFile(inputId,folder){
+      const file=document.getElementById(inputId)?.files[0];
+      if(!file)return{url:'',path:''};
+      const ext=file.name.split('.').pop();
+      const path=`${folder}/${appId}_${inputId}.${ext}`;
+      const{data,error}=await _sb.storage.from('scti-applications').upload(path,file,{upsert:true});
+      if(error)throw error;
+      const{data:urlData}=_sb.storage.from('scti-applications').getPublicUrl(path);
+      return{url:urlData?.publicUrl||'',path};
+    }
+    try{
+      const r1=await uploadFile('f_passport','passport');passportUrl=r1.url;
+      const r2=await uploadFile('f_id_front','id_front');idFrontUrl=r2.url;
+      const r3=await uploadFile('f_id_back','id_back');idBackUrl=r3.url;
+      const r4=await uploadFile('f_cert','certificate');certUrl=r4.url;
+      const r5=await uploadFile('f_reg_proof','reg_fee_proof');regProofUrl=r5.url;
+    }catch(uploadErr){console.warn('File upload error:',uploadErr);}
+    const courseObj=DB.courses.find(c=>c.name===course);
+    const{error}=await _sb.from('applications').insert([{
+      full_name:name,email,phone,
+      date_of_birth:document.getElementById('f_dob')?.value||null,
+      gender:document.getElementById('f_gender')?.value||null,
+      national_id:document.getElementById('f_nid')?.value||null,
+      county:document.getElementById('f_county')?.value||null,
+      town:document.getElementById('f_town')?.value||null,
+      course_id:courseObj?.id||null,course_name:course,
+      study_level:document.getElementById('f_level')?.value||null,
+      study_mode:document.getElementById('f_mode')?.value||null,
+      intake_month:document.getElementById('f_intake')?.value||null,
+      how_heard:document.getElementById('f_heard')?.value||null,
+      personal_statement:document.getElementById('f_stmt')?.value||null,
+      passport_photo_url:passportUrl,national_id_front_url:idFrontUrl,
+      national_id_back_url:idBackUrl,certificate_url:certUrl,
+      reg_fee_proof_url:regProofUrl,
+      consent_accepted:true,status:'pending'
+    }]);
+    if(error)throw error;
+    document.getElementById('applyContent').innerHTML=`<div class="success-card"><div class="s-ico"><i class="fas fa-check"></i></div><h3>Application Submitted! 🎉</h3><p>Thank you <strong>${name}</strong>! Your application for <strong>${course}</strong> has been received.<br><br>Our admissions team will call you on <strong>${phone}</strong> within 24 hours.</p><p style="background:#f0f8ff;padding:12px;border-radius:10px;margin:15px 0"><strong>📌 Track your application:</strong><br><a href="status.html" style="color:var(--red);font-weight:600">Click here to check your application status</a> (use your email or phone number)</p><p style="font-size:.8rem;color:var(--gray)">Questions? Call us: <strong>${S('phone1')}</strong> or WhatsApp: <strong>${S('whatsapp')}</strong></p><div style="display:flex;gap:12px;justify-content:center;margin-top:20px"><button class="btn btn-red btn-sm" onclick="go('courses')">Browse More Courses</button><a class="btn btn-or btn-sm" href="status.html">📋 Check Status</a><a class="btn btn-gold btn-sm" href="https://wa.me/${(S('whatsapp')||'').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a></div></div>`;
+  }catch(e){
+    console.error('Application error:',e);
+    btn.disabled=false;btn.innerHTML='<i class="fas fa-paper-plane"></i> Submit Application';
+    alert('Submission failed. Please try again or call us on '+S('phone1'));
+  }
+}
+
+function renderContact(){
+  return`<div class="page-hero"><div class="container"><div class="breadcrumb">Home <span>›</span> Contact</div><span class="page-tag">GET IN TOUCH</span><h1>Contact SCTI</h1><p>We're always happy to answer your questions.</p></div></div>
+  <section style="padding:64px 0"><div class="container">
+    <div class="contact-grid">
+      <div class="contact-info"><h3>Reach Us</h3>
+        <div class="ci"><div class="ci-ico"><i class="fas fa-phone"></i></div><div class="ci-text"><strong>Phone / Call</strong><span>${S('phone1')}<br>${S('phone2')}</span></div></div>
+        <div class="ci"><div class="ci-ico"><i class="fab fa-whatsapp"></i></div><div class="ci-text"><strong>WhatsApp</strong><a href="https://wa.me/${(S('whatsapp')||'').replace(/\D/g,'')}" target="_blank">${S('whatsapp')}</a></div></div>
+        <div class="ci"><div class="ci-ico"><i class="fas fa-envelope"></i></div><div class="ci-text"><strong>Email</strong><a href="mailto:${S('email')}">${S('email')}</a></div></div>
+        <div class="ci"><div class="ci-ico"><i class="fas fa-map-marker-alt"></i></div><div class="ci-text"><strong>Location</strong><span>${S('address')}</span></div></div>
+        <div class="ci"><div class="ci-ico"><i class="fas fa-clock"></i></div><div class="ci-text"><strong>Working Hours</strong><span>${S('working_hours')}</span></div></div>
+        <div class="social-row">
+          <a class="sbtn" href="${S('facebook')}" target="_blank"><i class="fab fa-facebook-f"></i></a>
+          <a class="sbtn" href="${S('instagram')}" target="_blank"><i class="fab fa-instagram"></i></a>
+          <a class="sbtn" href="${S('tiktok')}" target="_blank"><i class="fab fa-tiktok"></i></a>
+          <a class="sbtn" href="${S('youtube')}" target="_blank"><i class="fab fa-youtube"></i></a>
+          <a class="sbtn" href="${S('twitter')}" target="_blank"><i class="fab fa-x-twitter"></i></a>
+        </div>
+      </div>
+      <div class="cf-box"><h3>Send a Message</h3>
+        <div class="fg"><label>Your Name</label><input type="text" id="cf_name" placeholder="Full name"></div>
+        <div class="fg"><label>Email</label><input type="email" id="cf_email" placeholder="you@email.com"></div>
+        <div class="fg"><label>Phone</label><input type="tel" id="cf_phone" placeholder="0712 345 678"></div>
+        <div class="fg"><label>Subject</label><input type="text" id="cf_subject" placeholder="e.g. Course enquiry"></div>
+        <div class="fg"><label>Message</label><textarea id="cf_msg" rows="4" placeholder="Your message…"></textarea></div>
+        <button class="btn btn-red" style="width:100%;justify-content:center" onclick="sendContactMsg()"><i class="fas fa-paper-plane"></i> Send Message</button>
+      </div>
+    </div>
+    <div style="border-radius:var(--rlg);overflow:hidden;height:360px;border:1px solid var(--border);margin-top:32px">
+      <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.75!2d36.9585!3d-1.1485!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f3f5b5b5b5b5b%3A0x0!2zMcKwMDgnNTQuNiJTIDM2wrA1Nyc0OC4wIkU!5e0!3m2!1sen!2ske!4v1" width="100%" height="100%" style="border:0" allowfullscreen loading="lazy"></iframe>
+    </div>
+  </div></section>
+  ${renderFooter()}`;
+}
+
+async function sendContactMsg(){
+  const name=document.getElementById('cf_name')?.value.trim();
+  const email=document.getElementById('cf_email')?.value.trim();
+  const msg=document.getElementById('cf_msg')?.value.trim();
+  if(!name||!email||!msg){alert('Please fill in name, email and message.');return;}
+  try{
+    await _sb.from('contact_enquiries').insert([{name,email,phone:document.getElementById('cf_phone')?.value||null,subject:document.getElementById('cf_subject')?.value||null,message:msg}]);
+    alert('Message sent! We will get back to you shortly.');
+    ['cf_name','cf_email','cf_phone','cf_subject','cf_msg'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  }catch(e){alert('Failed to send. Please call us on '+S('phone1'));}
+}
+
+function renderFooter(){
+  return`<footer><div class="container">
+    <div class="ft-grid">
+      <div class="ft-brand">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px"><img src="https://i.ibb.co/XHH8Qff/image-removebg-preview-1.png" alt="SCTI Logo" style="width:40px;height:40px;border-radius:9px;object-fit:cover;flex-shrink:0"><div><div style="color:white;font-weight:700;font-size:.95rem">Skymo Creative</div><div style="color:var(--gold);font-size:.55rem;letter-spacing:2px">TRAINING INSTITUTE</div></div></div>
+        <p>${S('footer_text')}</p>
+        <div class="social-row" style="margin-top:16px"><a class="sbtn" href="${S('facebook')}" target="_blank"><i class="fab fa-facebook-f"></i></a><a class="sbtn" href="${S('instagram')}" target="_blank"><i class="fab fa-instagram"></i></a><a class="sbtn" href="${S('tiktok')}" target="_blank"><i class="fab fa-tiktok"></i></a><a class="sbtn" href="${S('youtube')}" target="_blank"><i class="fab fa-youtube"></i></a><a class="sbtn" href="${S('twitter')}" target="_blank"><i class="fab fa-x-twitter"></i></a></div>
+      </div>
+      <div class="ft-col"><h4>QUICK LINKS</h4><div onclick="go('home')">Home</div><div onclick="go('courses')">All Courses</div><div onclick="go('events')">Events</div><div onclick="go('gallery')">Gallery</div><div onclick="go('fees')">Fee Structure</div><div onclick="go('about')">About Us</div><div onclick="go('contact')">Contact</div><div onclick="window.location.href='status.html'">📋 Check Application Status</div><div onclick="go('apply')">Apply Now</div></div>
+      <div class="ft-col"><h4>OUR COURSES</h4>${DB.courses.slice(0,6).map(c=>`<div onclick="goDetail('${c.id}')">${c.name}</div>`).join('')}</div>
+      <div class="ft-col"><h4>CONTACT US</h4><div><i class="fas fa-phone" style="color:var(--gold);margin-right:6px"></i>${S('phone1')}</div><div><i class="fas fa-phone" style="color:var(--gold);margin-right:6px"></i>${S('phone2')}</div><div><i class="fas fa-envelope" style="color:var(--gold);margin-right:6px"></i>${S('email')}</div><div><i class="fas fa-map-marker-alt" style="color:var(--gold);margin-right:6px"></i>${S('address')}</div><a class="btn btn-red btn-sm" style="margin-top:14px;display:inline-flex" href="https://wa.me/${(S('whatsapp')||'').replace(/\D/g,'')}" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp Us</a></div>
+    </div>
+    <div class="ft-bottom"><p>© 2026 Skymo Creative Training Institute. All rights reserved. | Ruiru Bypass, Opposite Tatu City, Nairobi</p></div>
+  </div></footer>`;
+}
+
+function initSlider(){
+  if(slideTimer)clearInterval(slideTimer);
+  slideIdx=0;updateSlide();
+  slideTimer=setInterval(()=>{slideIdx=(slideIdx+1)%DB.hero_slides.length;updateSlide();},5500);
+}
+function updateSlide(){
+  document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('on',i===slideIdx));
+  document.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('on',i===slideIdx));
+}
+function goSlide(i){slideIdx=i;updateSlide();}
+
+function toggleChat(){document.getElementById('chatWin').classList.toggle('on');}
+
+function sendMsg(){
+  if(chatLoading)return;
+  const inp=document.getElementById('chatIn');
+  const txt=inp.value.trim();
+  if(!txt)return;
+  const msgs=document.getElementById('chatMsgs');
+  msgs.innerHTML+=`<div class="mb" style="align-self:flex-end"><div class="mb-user">${txt.replace(/</g,'&lt;')}</div></div>`;
+  inp.value='';
+  chatLoading=true;
+  setTimeout(()=>{
+    let reply=getSimpleReply(txt.toLowerCase());
+    msgs.innerHTML+=`<div class="mb"><div class="mb-bot">${reply}</div></div>`;
+    chatLoading=false;
+    msgs.scrollTop=msgs.scrollHeight;
+  },500);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function getSimpleReply(msg){
+  if(msg.includes('course')||msg.includes('study')||msg.includes('learn'))return`We offer <strong>23 courses</strong> across 4 schools: <strong>ICT & Technology</strong> (Cyber Security, Web Dev, ICT), <strong>Creative Media</strong> (Film, Photography, Graphic Design, Animation), <strong>Business & Media</strong> (Digital Marketing, Journalism, Deejaying, Food & Beverages), and <strong>Engineering</strong> (Electrical, Solar, CCTV, Plumbing). <a onclick="go('courses')" style="color:var(--red);cursor:pointer">View all courses →</a>`;
+  if(msg.includes('fee')||msg.includes('cost')||msg.includes('price'))return`Course fees range from <strong>Ksh 15,000 to Ksh 300,000</strong> depending on the course and level (Short / Certificate / Diploma). There is also a <strong>Ksh 2,000 non-refundable registration fee</strong> for all programmes. See the full <a onclick="go('fees')" style="color:var(--red);cursor:pointer">Fee Structure</a> (with PDF download) or call ${S('phone1')} for details.`;
+  if(msg.includes('apply')||msg.includes('admission'))return`Apply online via our <a onclick="go('apply')" style="color:var(--red);cursor:pointer">Application Form</a>. You'll need: Passport photo, National ID (front & back), and academic certificate. We'll call you within 24 hours!`;
+  if(msg.includes('location')||msg.includes('address')||msg.includes('where'))return`We're located at <strong>${S('address')}</strong>. Open ${S('working_hours')}.`;
+  if(msg.includes('phone')||msg.includes('call')||msg.includes('contact'))return`Call us: <strong>${S('phone1')}</strong> / <strong>${S('phone2')}</strong> | WhatsApp: <strong>${S('whatsapp')}</strong> | Email: ${S('email')}`;
+  if(msg.includes('event')||msg.includes('live')||msg.includes('workshop'))return`Check our <a onclick="go('events')" style="color:var(--red);cursor:pointer">Events page</a> for upcoming workshops, open days, and live streams!`;
+  if(msg.includes('status')||msg.includes('track'))return`You can check your application status anytime at <a href="status.html" style="color:var(--red);cursor:pointer">scti.ac.ke/status</a>. Just enter your email or phone number.`;
+  return`Thanks for your question! For more details, call <strong>${S('phone1')}</strong> or WhatsApp <strong>${S('whatsapp')}</strong>. You can also browse our <a onclick="go('courses')" style="color:var(--red);cursor:pointer">Courses</a> or <a onclick="go('apply')" style="color:var(--red);cursor:pointer">Apply Now</a>. You can also <a href="status.html" style="color:var(--red);cursor:pointer">check your application status</a> online.`;
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeVidBtn();closeImgModal();}});
+Object.assign(window,{go,goDetail,goApply,filterCat,goSlide,openVid,closeVid,closeVidBtn,openImgModal,closeImgModal,toggleChat,sendMsg,toggleNav,submitApplication,sendContactMsg,previewFile,cdTab,toggleModule,toggleFaq,downloadFeesPdf});
+loadAllData();
+</script>
+</body>
+</html>
